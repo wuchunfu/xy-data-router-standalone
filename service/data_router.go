@@ -100,9 +100,9 @@ func dataProcessor(dp *tDataProcessor) {
 		switch js[0] {
 		case '[':
 			// 字典列表 [{body},{body}]
-			gjson.GetBytes(js, "@this").ForEach(func(_, v gjson.Result) bool {
+			gjson.Result{Type: gjson.JSON, Raw: utils.B2S(js)}.ForEach(func(_, v gjson.Result) bool {
 				if v.IsObject() {
-					body := appendSYSField(utils.S2B(v.String()), dp.data.ip, dp.data.now)
+					body := appendSYSField(utils.S2B(v.String()), dp.data.ip)
 					dp.dr.drOut.esChan.In <- utils.JoinBytes(dp.dr.apiConf.ESBulkHeader, body, ln)
 					if isPostToAPI {
 						dp.dr.drOut.apiChan.In <- body
@@ -112,7 +112,7 @@ func dataProcessor(dp *tDataProcessor) {
 			})
 		case '{':
 			// 批量文本数据 {body}=-:-={body}
-			js = appendSYSField(js, dp.data.ip, dp.data.now)
+			js = appendSYSField(js, dp.data.ip)
 			dp.dr.drOut.esChan.In <- utils.JoinBytes(dp.dr.apiConf.ESBulkHeader, js, ln)
 			if isPostToAPI {
 				dp.dr.drOut.apiChan.In <- js

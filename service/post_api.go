@@ -12,22 +12,31 @@ import (
 )
 
 func apiWorker(dr *tDataRouter) {
-	interval := time.Duration(dr.apiConf.PostAPI.Interval) * time.Second
-	if interval < time.Second {
-		interval = time.Second
+	// 默认 1s 空转
+	interval := 1
+	if dr.apiConf.PostAPI.Interval > 0 {
+		interval = dr.apiConf.PostAPI.Interval
+		common.Log.Info().
+			Int("interval", interval).Str("apiname", dr.apiConf.APIName).
+			Msg("apiWorker start")
 	}
-	ticker := time.NewTicker(interval)
-	defer func() {
-		ticker.Stop()
-	}()
+	ticker := common.TW.NewTicker(time.Duration(interval) * time.Second)
+	defer ticker.Stop()
 
 	var buf bytes.Buffer
 	for {
 		select {
 		case <-ticker.C:
 			if dr.apiConf.PostAPI.Interval > 0 {
+				// 校准推送周期
+				if dr.apiConf.PostAPI.Interval != interval {
+					interval = dr.apiConf.PostAPI.Interval
+					ticker.Reset(time.Duration(interval) * time.Second)
+					common.Log.Warn().
+						Int("interval", interval).Str("apiname", dr.apiConf.APIName).
+						Msg("apiWorker restart")
+				}
 				// 指定时间间隔推送数据
-				ticker.Reset(time.Duration(dr.apiConf.PostAPI.Interval) * time.Second)
 				postAPI(&buf, dr.apiConf.PostAPI.API)
 			}
 		case js, ok := <-dr.drOut.apiChan.Out:

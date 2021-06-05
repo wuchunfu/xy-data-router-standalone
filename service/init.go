@@ -1,8 +1,6 @@
 package service
 
 import (
-	"time"
-
 	"github.com/fufuok/chanx"
 	"github.com/fufuok/cmap"
 	"github.com/panjf2000/ants/v2"
@@ -21,9 +19,6 @@ type tDataItem struct {
 
 	// HTTP / UDP 数据
 	body *[]byte
-
-	// 接收到数据的时间
-	now time.Time
 }
 
 // 数据分发
@@ -92,7 +87,7 @@ var (
 	esBulkPool *ants.PoolWithFunc
 )
 
-func init() {
+func InitService() {
 	// 初始化 ES 数据信道
 	esChan = newChanx()
 
@@ -114,6 +109,9 @@ func init() {
 	// 初始化协程池
 	go initDataProcessorPool()
 	go initESBulkPool()
+
+	// 初始化运行时参数
+	go initRuntime()
 }
 
 func PoolRelease() {
@@ -138,7 +136,7 @@ func newChanx() chanx.UnboundedChan {
 
 // 新数据项
 func newDataItem(apiname, ip string, body *[]byte) *tDataItem {
-	return &tDataItem{apiname, ip, body, common.GetGlobalTime()}
+	return &tDataItem{apiname, ip, body}
 }
 
 // 新数据信道

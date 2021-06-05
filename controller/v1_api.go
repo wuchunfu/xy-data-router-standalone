@@ -72,7 +72,7 @@ func V1APIHandler(c *fiber.Ctx) error {
 		service.PushDataToChanx(apiname, ip, &body)
 	})
 
-	return middleware.APISuccess(c, nil, 0)
+	return middleware.APISuccessNil(c)
 }
 
 // 获取所有 GET 请求参数

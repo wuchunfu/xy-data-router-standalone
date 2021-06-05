@@ -3,7 +3,6 @@ package master
 import (
 	"context"
 	"reflect"
-	"time"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -30,7 +29,7 @@ func getRemoteConf(ctx context.Context, c *conf.TFilesConf) {
 		Str("path", c.Path).Str("method", c.Method).Dur("duration", c.GetConfDuration).
 		Msg("start get remote conf")
 
-	ticker := time.NewTicker(c.GetConfDuration)
+	ticker := common.TW.NewTicker(c.GetConfDuration)
 	defer ticker.Stop()
 
 	for range ticker.C {

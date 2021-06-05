@@ -11,7 +11,7 @@ import (
 
 var ES *elasticsearch.Client
 
-func init() {
+func initES() {
 	// 首次初始化 ES 连接, 连接失败时允许启动程序
 	es, cfgErr, _ := newES()
 	if cfgErr != nil {

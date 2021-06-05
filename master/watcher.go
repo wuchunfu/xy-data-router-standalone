@@ -26,7 +26,10 @@ func Watcher() {
 		Msg("Watching")
 
 	go func() {
-		for range time.Tick(time.Duration(conf.Config.SYSConf.WatcherInterval) * time.Minute) {
+		ticker := common.TW.NewTicker(time.Duration(conf.Config.SYSConf.WatcherInterval) * time.Minute)
+		defer ticker.Stop()
+
+		for range ticker.C {
 			// 程序二进制变化时重启
 			md5New, _ := utils.MD5Sum(mainFile)
 			if md5New != md5Main {

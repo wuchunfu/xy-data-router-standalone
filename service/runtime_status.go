@@ -32,7 +32,7 @@ var (
 	ExternalIPv4 string
 )
 
-func init() {
+func initRuntime() {
 	go func() {
 		InternalIPv4 = myip.InternalIPv4()
 	}()
@@ -125,7 +125,7 @@ func dataStats() map[string]interface{} {
 		"ESBulkDropWorkerCounters__": utils.Commau(atomic.LoadUint64(&esBulkDropWorkerCounters)),
 
 		"DataProcessorWorkerRunning": dataProcessorPool.Running(),
-		"DataProcessorWorkerFree":    dataProcessorPool.Free(),
+		"DataProcessorWorkerFree___": dataProcessorPool.Free(),
 		"ESBulkWorkerRunning":        esBulkPool.Running(),
 		"ESBulkWorkerFree__________": esBulkPool.Free(),
 		"CommonPoolFree":             common.Pool.Free(),

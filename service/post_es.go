@@ -101,25 +101,23 @@ func updateESBulkHeader() {
 }
 
 // 附加系统字段: 数据必定为 {JSON字典}
-func appendSYSField(js []byte, ip string, now time.Time) []byte {
+func appendSYSField(js []byte, ip string) []byte {
 	if gjson.GetBytes(js, "_cip").Exists() {
 		return js
 	}
 	return append(
 		utils.AddStringBytes(
 			`{"_cip":"`, ip,
-			`","_ctime":"`, now.Format("2006-01-02T15:04:05Z"),
-			`","_gtime":"`, now.Format(time.RFC3339), `",`,
+			`","_ctime":"`, common.Now3399UTC,
+			`","_gtime":"`, common.Now3399, `",`,
 		),
 		js[1:]...,
 	)
 }
 
 func esWorker() {
-	ticker := time.NewTicker(conf.Config.SYSConf.ESPostMaxIntervalDuration)
-	defer func() {
-		ticker.Stop()
-	}()
+	ticker := common.TW.NewTicker(conf.Config.SYSConf.ESPostMaxIntervalDuration)
+	defer ticker.Stop()
 
 	var buf bytes.Buffer
 	n := 0
@@ -138,16 +136,15 @@ func esWorker() {
 
 			if !conf.Config.SYSConf.ESDisableWrite {
 				buf.Write(data.([]byte))
+				n += 1
+				if n%conf.Config.SYSConf.ESPostBatchNum == 0 || buf.Len() > conf.Config.SYSConf.ESPostBatchBytes {
+					// 达到限定数量或大小写入 ES
+					postES(&buf)
+					n = 0
+				}
 			}
 
 			atomic.AddUint64(&esDataCounters, 1)
-
-			n += 1
-			if n%conf.Config.SYSConf.ESPostBatchNum == 0 || buf.Len() > conf.Config.SYSConf.ESPostBatchBytes {
-				// 达到限定数量或大小写入 ES
-				postES(&buf)
-				n = 0
-			}
 		}
 	}
 }

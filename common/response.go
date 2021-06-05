@@ -35,3 +35,15 @@ func APISuccessData(data interface{}, count int) *TAPIData {
 		Count: count,
 	}
 }
+
+// API 请求成功返回, 无数据
+func APISuccessNil() *TAPIData {
+	return &TAPIData{
+		ID:    1,
+		OK:    1,
+		Code:  0,
+		Msg:   "",
+		Data:  nil,
+		Count: 0,
+	}
+}

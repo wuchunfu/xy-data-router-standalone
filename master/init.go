@@ -20,13 +20,10 @@ var (
 )
 
 func Start() {
+	// 初始化
+	initMaster()
+
 	go func() {
-		// 启动 Web 服务
-		go controller.InitWebServer()
-
-		// 统计和性能工具
-		go startPProf()
-
 		for {
 			cancelCtx, cancel := context.WithCancel(common.CtxBG)
 			ctx := context.WithValue(cancelCtx, "start", time.Now())
@@ -48,8 +45,23 @@ func Start() {
 	}()
 }
 
+func initMaster() {
+	// 优先初始化公共变量
+	common.InitCommon()
+
+	// 启动 Web 服务
+	go controller.InitWebServer()
+
+	// 启动数据服务
+	go service.InitService()
+
+	// 统计和性能工具
+	go startPProf()
+}
+
 // 程序退出时清理
 func Stop() {
+	common.TWStop()
 	common.PoolRelease()
 	service.PoolRelease()
 }

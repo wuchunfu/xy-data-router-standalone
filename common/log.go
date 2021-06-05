@@ -18,7 +18,7 @@ var (
 	LogSampled zerolog.Logger
 )
 
-func init() {
+func initLogger() {
 	if err := InitLogger(); err != nil {
 		log.Fatalln("Failed to initialize logger:", err, "\nbye.")
 	}

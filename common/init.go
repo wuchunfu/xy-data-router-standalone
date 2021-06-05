@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/fufuok/utils/timewheel"
 	"github.com/panjf2000/gnet/pool/goroutine"
 	"github.com/tidwall/gjson"
 )
@@ -17,13 +18,49 @@ var (
 
 	// 协程池
 	Pool = goroutine.Default()
+
+	// 时间轮, 精度 100ms
+	TW *timewheel.TimeWheel
+
+	// 当前时间
+	Now3399UTC string
+	Now3399    string
 )
+
+func InitCommon() {
+	TW, _ = timewheel.NewTimeWheel(100*time.Millisecond, 600)
+	TW.Start()
+
+	// 初始化日志环境
+	initLogger()
+
+	// 初始化 ES 连接
+	initES()
+
+	// 每秒格式化时间字符串
+	go func() {
+		ticker := time.NewTicker(1 * time.Second)
+		defer ticker.Stop()
+
+		for {
+			// TODO: GTimeSub
+			now := GetGlobalTime()
+			Now3399UTC = now.Format("2006-01-02T15:04:05Z")
+			Now3399 = now.Format(time.RFC3339)
+			<-ticker.C
+		}
+	}()
+}
+
+func TWStop() {
+	TW.Stop()
+}
 
 func PoolRelease() {
 	Pool.Release()
 }
 
-// 统一时间: TODO: 原子钟
+// 统一时间
 func GetGlobalTime() time.Time {
 	return time.Now().Add(GTimeSub)
 }

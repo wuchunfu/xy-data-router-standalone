@@ -256,8 +256,8 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, erro
 			}
 		}
 		config.SYSConf.MainConfig.GetConfDuration = time.Duration(config.SYSConf.MainConfig.Interval) * time.Second
-		config.SYSConf.MainConfig.Path = ConfigFile
 	}
+	config.SYSConf.MainConfig.Path = ConfigFile
 
 	// 文件变化监控时间间隔
 	if config.SYSConf.WatcherInterval < 1 {
@@ -275,7 +275,7 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, erro
 	}
 
 	// 数据处理并发协程数限制
-	if config.SYSConf.DataProcessorSize < 1000 {
+	if config.SYSConf.DataProcessorSize < 10 {
 		config.SYSConf.DataProcessorSize = DataProcessorSize
 	}
 
@@ -301,7 +301,7 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, erro
 	}
 
 	// ES Bulk 单次批量最大时间间隔
-	if config.SYSConf.ESPostMaxInterval < 50 {
+	if config.SYSConf.ESPostMaxInterval < 100 {
 		config.SYSConf.ESPostMaxIntervalDuration = ESPostMaxInterval
 	} else {
 		config.SYSConf.ESPostMaxIntervalDuration = time.Duration(config.SYSConf.ESPostMaxInterval) * time.Millisecond
