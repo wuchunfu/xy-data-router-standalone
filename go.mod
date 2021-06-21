@@ -8,8 +8,9 @@ require (
 	github.com/fufuok/chanx v0.0.103
 	github.com/fufuok/cmap v0.0.100
 	github.com/fufuok/utils v0.1.13
-	github.com/gofiber/fiber/v2 v2.13.0
+	github.com/gin-gonic/gin v1.7.2
 	github.com/imroc/req v0.3.0
+	github.com/nanmu42/gzip v1.1.0
 	github.com/panjf2000/ants/v2 v2.4.5
 	github.com/panjf2000/gnet v1.4.4
 	github.com/rs/zerolog v1.23.0

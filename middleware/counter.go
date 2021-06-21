@@ -3,15 +3,15 @@ package middleware
 import (
 	"sync/atomic"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 
 	"github.com/fufuok/xy-data-router/service"
 )
 
 // 请求简单计数
-func HTTPCounter() fiber.Handler {
-	return func(c *fiber.Ctx) (err error) {
+func HTTPCounter() gin.HandlerFunc {
+	return func(c *gin.Context) {
 		atomic.AddUint64(&service.HTTPRequestCounters, 1)
-		return c.Next()
+		c.Next()
 	}
 }

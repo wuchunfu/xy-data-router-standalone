@@ -50,7 +50,7 @@ func initMaster() {
 	common.InitCommon()
 
 	// 启动数据服务
-	go service.InitService()
+	service.InitService()
 
 	// 启动 Web 服务
 	go controller.InitWebServer()

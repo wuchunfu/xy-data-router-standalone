@@ -6,8 +6,8 @@ import (
 
 const (
 	WebAPPName     = "XY.DataRouter"
-	CurrentVersion = "1.100.12.21061717"
-	LastChange     = "Optimize timewheel"
+	CurrentVersion = "1.100.20.21061900"
+	LastChange     = "Replace Fiber with Gin"
 	ProjectName    = "xydatarouter"
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off

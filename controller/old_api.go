@@ -1,9 +1,10 @@
 package controller
 
 import (
+	"net/http"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/tidwall/sjson"
 
 	"github.com/fufuok/utils"
@@ -14,29 +15,30 @@ import (
 )
 
 // 兼容旧接口
-func oldAPIHandler(delKeys []string) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		if len(c.Body()) == 0 {
-			return c.SendString("0")
+func oldAPIHandler(delKeys []string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		body, _ := c.GetRawData()
+		if len(body) == 0 {
+			c.String(http.StatusOK, "0")
+			return
 		}
 
 		// 接口名
-		apiname := strings.Trim(strings.Replace(c.Path(), "/bulk", "", 1), "/")
+		apiname := strings.Trim(strings.Replace(c.Request.URL.String(), "/bulk", "", 1), "/")
 
 		// 接口配置检查
 		apiConf, ok := conf.APIConfig[apiname]
 		if !ok || apiConf.APIName == "" {
-			common.LogSampled.Error().Str("uri", c.OriginalURL()).Int("len", len(apiname)).Msg("api not found")
-			return c.SendString("0")
+			common.LogSampled.Error().Str("uri", c.Request.RequestURI).Int("len", len(apiname)).Msg("api not found")
+			c.String(http.StatusOK, "0")
+			return
 		}
 
 		// 必有字段校验
-		body := utils.CopyBytes(c.Body())
 		if !common.CheckRequiredField(&body, apiConf.RequiredField) {
-			return c.SendString("0")
+			c.String(http.StatusOK, "0")
+			return
 		}
-
-		apiname = utils.CopyString(apiname)
 
 		// 删除可能非法中文编码的字段
 		for _, k := range delKeys {
@@ -44,7 +46,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		}
 
 		// 请求 IP
-		ip := utils.GetSafeString(c.IP(), common.IPv4Zero)
+		ip := utils.GetString(c.ClientIP(), common.IPv4Zero)
 
 		// 写入队列
 		_ = common.Pool.Submit(func() {
@@ -52,6 +54,6 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		})
 
 		// 旧接口返回值处理
-		return c.SendString("1")
+		c.String(http.StatusOK, "1")
 	}
 }

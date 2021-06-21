@@ -3,8 +3,8 @@ package controller
 import (
 	"log"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gin-gonic/gin"
+	"github.com/nanmu42/gzip"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -12,23 +12,27 @@ import (
 )
 
 func InitWebServer() {
-	app := fiber.New(fiber.Config{
-		ServerHeader:          conf.WebAPPName,
-		BodyLimit:             conf.Config.SYSConf.LimitBody,
-		DisableStartupMessage: true,
-		// Immutable:             true,
-	})
+	app := gin.New()
 
-	// 限流 (有一定的 CPU 占用)
-	if conf.Config.SYSConf.LimitExpiration > 0 && conf.Config.SYSConf.LimitRequest > 0 {
-		app.Use(middleware.IPLimiter())
+	if conf.Config.SYSConf.Debug {
+		gin.SetMode(gin.DebugMode)
+		app.Use(gin.Logger())
+	} else {
+		// 生产环境不记录请求日志
+		gin.SetMode(gin.ReleaseMode)
 	}
 
-	app.Use(middleware.RecoverLogger(), middleware.HTTPCounter(), compress.New())
+	app.Use(
+		gzip.DefaultHandler().Gin,
+		middleware.RecoverLogger(true),
+		middleware.HTTPCounter(),
+		middleware.ResponseHeaders(),
+	)
+
 	setupRouter(app)
 
 	common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerAddr).Msg("Listening and serving HTTP")
-	if err := app.Listen(conf.Config.SYSConf.WebServerAddr); err != nil {
+	if err := app.Run(conf.Config.SYSConf.WebServerAddr); err != nil {
 		log.Fatalln("Failed to start HTTP Server:", err, "\nbye.")
 	}
 }

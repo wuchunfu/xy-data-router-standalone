@@ -4,17 +4,18 @@ import (
 	"context"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/middleware"
 )
 
 // ES Scroll 接口
-func ESScrollHandler(c *fiber.Ctx) error {
+func ESScrollHandler(c *gin.Context) {
 	esScroll := new(tESSearch)
-	if err := c.BodyParser(&esScroll); err != nil || esScroll.Scroll == 0 || esScroll.ScrollID == "" {
-		return middleware.APIFailure(c, "查询参数有误")
+	if err := c.ShouldBindJSON(&esScroll); err != nil || esScroll.Scroll == 0 || esScroll.ScrollID == "" {
+		middleware.APIFailure(c, "查询参数有误")
+		return
 	}
 
 	resp, err := common.ES.Scroll(
@@ -24,18 +25,19 @@ func ESScrollHandler(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("es scroll, getting response")
-		return middleware.APIFailure(c, "查询失败, 服务繁忙")
+		middleware.APIFailure(c, "查询失败, 服务繁忙")
+		return
 	}
 
 	defer func() {
 		_ = resp.Body.Close()
 	}()
 
-	esScroll.ClientIP = c.IP()
+	esScroll.ClientIP = c.ClientIP()
 	res, count, msg := parseESSearch(resp, esScroll)
 	if msg != "" {
-		return middleware.APIFailure(c, msg)
+		middleware.APIFailure(c, msg)
+		return
 	}
-
-	return middleware.APISuccess(c, res, count)
+	middleware.APISuccess(c, res, count)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v6/esapi"
 	"github.com/fufuok/utils"
 	"github.com/fufuok/utils/json"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -16,18 +16,19 @@ import (
 )
 
 type tESSearch struct {
-	Index    string       `json:"index"`
-	Scroll   int          `json:"scroll"`
-	ScrollID string       `json:"scroll_id"`
+	Index    string                 `json:"index"`
+	Scroll   int                    `json:"scroll"`
+	ScrollID string                 `json:"scroll_id"`
 	Body     map[string]interface{} `json:"body"`
 	ClientIP string
 }
 
 // ES 通用查询接口
-func ESSearchHandler(c *fiber.Ctx) error {
+func ESSearchHandler(c *gin.Context) {
 	esSearch := new(tESSearch)
-	if err := c.BodyParser(&esSearch); err != nil || esSearch.Index == "" || esSearch.Body == nil {
-		return middleware.APIFailure(c, "查询参数有误")
+	if err := c.ShouldBindJSON(&esSearch); err != nil || esSearch.Index == "" || esSearch.Body == nil {
+		middleware.APIFailure(c, "查询参数有误")
+		return
 	}
 
 	var bodyBuf bytes.Buffer
@@ -42,20 +43,21 @@ func ESSearchHandler(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("es search, getting response")
-		return middleware.APIFailure(c, "查询失败, 服务繁忙")
+		middleware.APIFailure(c, "查询失败, 服务繁忙")
+		return
 	}
 
 	defer func() {
 		_ = resp.Body.Close()
 	}()
 
-	esSearch.ClientIP = c.IP()
+	esSearch.ClientIP = c.ClientIP()
 	res, count, msg := parseESSearch(resp, esSearch)
 	if msg != "" {
-		return middleware.APIFailure(c, msg)
+		middleware.APIFailure(c, msg)
+		return
 	}
-
-	return middleware.APISuccess(c, res, count)
+	middleware.APISuccess(c, res, count)
 }
 
 // 处理搜索结果
