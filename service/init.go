@@ -95,7 +95,7 @@ func InitService() {
 	go esWorker()
 
 	// 初始化数据分发器
-	go InitDataRouter()
+	InitDataRouter()
 
 	// 启动 UDP 接口服务
 	go initUDPServer()

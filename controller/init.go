@@ -24,8 +24,8 @@ func InitWebServer() {
 		app.Use(middleware.IPLimiter())
 	}
 
-	app.Use(compress.New(), middleware.RecoverLogger(), middleware.HTTPCounter())
-	app = setupRouter(app)
+	app.Use(middleware.RecoverLogger(), middleware.HTTPCounter(), compress.New())
+	setupRouter(app)
 
 	common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerAddr).Msg("Listening and serving HTTP")
 	if err := app.Listen(conf.Config.SYSConf.WebServerAddr); err != nil {

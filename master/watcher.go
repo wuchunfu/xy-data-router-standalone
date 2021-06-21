@@ -26,7 +26,7 @@ func Watcher() {
 		Msg("Watching")
 
 	go func() {
-		ticker := common.TW.NewTicker(time.Duration(conf.Config.SYSConf.WatcherInterval) * time.Minute)
+		ticker := common.TWm.NewTicker(time.Duration(conf.Config.SYSConf.WatcherInterval) * time.Minute)
 		defer ticker.Stop()
 
 		for range ticker.C {

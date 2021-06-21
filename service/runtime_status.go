@@ -121,8 +121,8 @@ func dataStats() map[string]interface{} {
 
 		"ESDataCounters":             utils.Commau(atomic.LoadUint64(&esDataCounters)),
 		"ESBulkWorkerCounters":       utils.Comma(atomic.LoadInt64(&esBulkWorkerCounters)),
-		"ESBulkErrors______________": utils.Commau(atomic.LoadUint64(&esBulkErrors)),
-		"ESBulkDropWorkerCounters__": utils.Commau(atomic.LoadUint64(&esBulkDropWorkerCounters)),
+		"ESBulkErrors______________": atomic.LoadUint64(&esBulkErrors),
+		"ESBulkDropWorkerCounters__": atomic.LoadUint64(&esBulkDropWorkerCounters),
 
 		"DataProcessorWorkerRunning": dataProcessorPool.Running(),
 		"DataProcessorWorkerFree___": dataProcessorPool.Free(),

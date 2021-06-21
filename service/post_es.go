@@ -116,7 +116,7 @@ func appendSYSField(js []byte, ip string) []byte {
 }
 
 func esWorker() {
-	ticker := common.TW.NewTicker(conf.Config.SYSConf.ESPostMaxIntervalDuration)
+	ticker := common.TWms.NewTicker(conf.Config.SYSConf.ESPostMaxIntervalDuration)
 	defer ticker.Stop()
 
 	var buf bytes.Buffer

@@ -7,13 +7,14 @@ import (
 )
 
 func setupRouter(app *fiber.App) *fiber.App {
+	// 动态接口
 	v1 := app.Group("/v1/:apiname", middleware.WebAPILogger())
 	{
-		v1.Get("", V1APIHandler)
-		v1.Post("", V1APIHandler)
-		v1.Post("/gzip", V1APIHandler)
-		v1.Post("/bulk", V1APIHandler)
 		v1.Post("/bulk/gzip", V1APIHandler)
+		v1.Post("/bulk", V1APIHandler)
+		v1.Post("/gzip", V1APIHandler)
+		v1.Post("", V1APIHandler)
+		v1.Get("", V1APIHandler)
 	}
 
 	// 兼容旧 ES 上报接口

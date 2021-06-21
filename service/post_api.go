@@ -20,7 +20,7 @@ func apiWorker(dr *tDataRouter) {
 			Int("interval", interval).Str("apiname", dr.apiConf.APIName).
 			Msg("apiWorker start")
 	}
-	ticker := common.TW.NewTicker(time.Duration(interval) * time.Second)
+	ticker := common.TWs.NewTicker(time.Duration(interval) * time.Second)
 	defer ticker.Stop()
 
 	var buf bytes.Buffer

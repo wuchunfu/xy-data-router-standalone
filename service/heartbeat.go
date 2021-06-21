@@ -12,7 +12,7 @@ import (
 
 // 心跳日志
 func initHeartbeat() {
-	ticker := common.TW.NewTicker(time.Minute)
+	ticker := common.TWm.NewTicker(time.Minute)
 	defer ticker.Stop()
 
 	for range ticker.C {

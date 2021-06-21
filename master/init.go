@@ -49,11 +49,11 @@ func initMaster() {
 	// 优先初始化公共变量
 	common.InitCommon()
 
-	// 启动 Web 服务
-	go controller.InitWebServer()
-
 	// 启动数据服务
 	go service.InitService()
+
+	// 启动 Web 服务
+	go controller.InitWebServer()
 
 	// 统计和性能工具
 	go startPProf()

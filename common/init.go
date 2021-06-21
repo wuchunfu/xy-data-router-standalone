@@ -19,8 +19,10 @@ var (
 	// 协程池
 	Pool = goroutine.Default()
 
-	// 时间轮, 精度 100ms
-	TW *timewheel.TimeWheel
+	// 时间轮, 精度 50ms, 1s, 1m
+	TWms *timewheel.TimeWheel
+	TWs  *timewheel.TimeWheel
+	TWm  *timewheel.TimeWheel
 
 	// 当前时间
 	Now3399UTC string
@@ -28,8 +30,17 @@ var (
 )
 
 func InitCommon() {
-	TW, _ = timewheel.NewTimeWheel(100*time.Millisecond, 600)
-	TW.Start()
+	// 30 秒
+	TWms, _ = timewheel.NewTimeWheel(50*time.Millisecond, 600)
+	TWms.Start()
+
+	// 30 分
+	TWs, _ = timewheel.NewTimeWheel(time.Second, 1800)
+	TWs.Start()
+
+	// 24 时
+	TWm, _ = timewheel.NewTimeWheel(time.Minute, 1440)
+	TWm.Start()
 
 	// 初始化日志环境
 	initLogger()
@@ -53,7 +64,9 @@ func InitCommon() {
 }
 
 func TWStop() {
-	TW.Stop()
+	TWms.Stop()
+	TWs.Stop()
+	TWm.Stop()
 }
 
 func PoolRelease() {
