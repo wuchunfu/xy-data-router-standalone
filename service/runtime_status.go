@@ -131,8 +131,9 @@ func dataStats() map[string]interface{} {
 		"CommonPoolFree":             common.Pool.Free(),
 		"CommonPoolRunning":          common.Pool.Running(),
 
-		"HTTPRequestCounters": utils.Commau(atomic.LoadUint64(&HTTPRequestCounters)),
-		"UDPRequestCounters":  utils.Commau(atomic.LoadUint64(&UDPRequestCounters)),
+		"HTTPRequestCounters":    utils.Commau(atomic.LoadUint64(&HTTPRequestCounters)),
+		"HTTPBadRequestCounters": utils.Commau(atomic.LoadUint64(&HTTPBadRequestCounters)),
+		"UDPRequestCounters":     utils.Commau(atomic.LoadUint64(&UDPRequestCounters)),
 	}
 }
 

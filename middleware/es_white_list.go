@@ -25,7 +25,7 @@ func CheckESWhiteList(asAPI bool) fiber.Handler {
 
 			if forbidden {
 				msg := "非法来访: " + clientIP
-				common.LogSampled.Warn().Msg(msg)
+				common.LogSampled.Warn().Str("method", c.Method()).Str("uri", c.OriginalURL()).Msg(msg)
 				if asAPI {
 					return APIFailure(c, msg)
 				} else {

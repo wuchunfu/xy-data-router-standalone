@@ -34,10 +34,16 @@ func V1APIHandler(c *fiber.Ctx) error {
 	if c.Method() == "GET" {
 		// GET 单条数据
 		body = query2JSON(c)
+		if len(body) == 0 {
+			return middleware.APIFailure(c, "数据为空")
+		}
 	} else {
 		body = utils.CopyBytes(c.Body())
-		uri := strings.TrimRight(c.Path(), "/")
+		if len(body) == 0 {
+			return middleware.APIFailure(c, "数据为空")
+		}
 
+		uri := strings.TrimRight(c.Path(), "/")
 		if strings.HasSuffix(uri, "/gzip") {
 			// 请求体解压缩
 			uri = uri[:len(uri)-5]

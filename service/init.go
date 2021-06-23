@@ -75,7 +75,8 @@ var (
 	esBulkDropWorkerCounters uint64 = 0
 
 	// HTTP 请求计数
-	HTTPRequestCounters uint64 = 0
+	HTTPRequestCounters    uint64 = 0
+	HTTPBadRequestCounters uint64 = 0
 
 	// UDP 请求计数
 	UDPRequestCounters uint64 = 0

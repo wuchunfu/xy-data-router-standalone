@@ -26,6 +26,7 @@ type TSYSConf struct {
 	Log                       tLogConf   `json:"log"`
 	PProfAddr                 string     `json:"pprof_addr"`
 	WebServerAddr             string     `json:"web_server_addr"`
+	EnableKeepalive           bool       `json:"enable_keepalive"`
 	LimitBody                 int        `json:"limit_body"`
 	LimitExpiration           int        `json:"limit_expiration"`
 	LimitRequest              int        `json:"limit_request"`
