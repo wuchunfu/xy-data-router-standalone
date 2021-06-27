@@ -6,8 +6,8 @@ import (
 
 const (
 	WebAPPName     = "XY.DataRouter"
-	CurrentVersion = "1.100.14.21062300"
-	LastChange     = "disables keep-alive connections"
+	CurrentVersion = "1.100.16.21062717"
+	LastChange     = "add config reduce_memory_usage"
 	ProjectName    = "xydatarouter"
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off

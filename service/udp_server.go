@@ -113,6 +113,11 @@ func saveUDPData(body *[]byte, clientIP string) bool {
 	// 计数
 	atomic.AddUint64(&UDPRequestCounters, 1)
 
+	if len(conf.ESBlackListConfig) > 0 && utils.InIPNetString(clientIP, conf.ESBlackListConfig) {
+		common.LogSampled.Info().Str("method", "UDP").Msg("非法访问: " + clientIP)
+		return false
+	}
+
 	// 接口名称与索引名称相同, 存放在 _x 字段
 	esIndex := getUDPESIndex(body, conf.UDPESIndexField)
 	if esIndex == "" {

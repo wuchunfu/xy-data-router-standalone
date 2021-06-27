@@ -181,7 +181,7 @@ func esBulk(body *[]byte) {
 		_ = resp.Body.Close()
 	}()
 
-	// 低级别日志配置时, 开启批量写入错误抽样日志
+	// 低级别日志配置时(Warn), 开启批量写入错误抽样日志, Error 时关闭批量写入错误日志
 	if conf.Config.SYSConf.Log.Level <= int(zerolog.WarnLevel) {
 		var res map[string]interface{}
 		var blk tESBulkResponse
@@ -201,41 +201,45 @@ func esBulk(body *[]byte) {
 			return
 		}
 
-		if err := json.NewDecoder(resp.Body).Decode(&blk); err != nil {
-			common.LogSampled.Error().Err(err).
-				Str("resp", resp.String()).
-				Msg("es bulk, parsing the response body")
-		} else if blk.Errors {
-			for _, d := range blk.Items {
-				if d.Index.Status > 201 {
-					atomic.AddUint64(&esBulkErrors, 1)
+		// 低级别批量日志时(Error), 解析批量写入结果
+		if conf.Config.SYSConf.Log.ESBulkLevel <= int(zerolog.ErrorLevel) {
+			if err := json.NewDecoder(resp.Body).Decode(&blk); err != nil {
+				common.LogSampled.Error().Err(err).
+					Str("resp", resp.String()).
+					Msg("es bulk, parsing the response body")
+			} else if blk.Errors {
+				for _, d := range blk.Items {
+					if d.Index.Status > 201 {
+						atomic.AddUint64(&esBulkErrors, 1)
 
-					// error: [429] es_rejected_execution_exception
-					// 等待一个提交周期, 重新排队
-					if utils.InInts(conf.Config.SYSConf.ESReentryCodes, d.Index.Status) {
-						time.Sleep(conf.Config.SYSConf.ESPostMaxIntervalDuration)
-						submitESBulk(body)
-					}
+						// error: [429] es_rejected_execution_exception
+						// 等待一个提交周期, 重新排队
+						if utils.InInts(conf.Config.SYSConf.ESReentryCodes, d.Index.Status) {
+							time.Sleep(conf.Config.SYSConf.ESPostMaxIntervalDuration)
+							submitESBulk(body)
+						}
 
-					if conf.Config.SYSConf.Log.ESBulkError {
-						common.LogSampled.Error().
-							Msgf("error: [%d] %s; %s; %s; %s\n||\n%s||",
-								d.Index.Status,
-								d.Index.Error.Type,
-								d.Index.Error.Reason,
-								d.Index.Error.Cause.Type,
-								d.Index.Error.Cause.Reason,
-								utils.B2S(*body),
-							)
-					} else {
-						common.LogSampled.Error().
-							Msgf("error: [%d] %s; %s; %s; %s",
-								d.Index.Status,
-								d.Index.Error.Type,
-								d.Index.Error.Reason,
-								d.Index.Error.Cause.Type,
-								d.Index.Error.Cause.Reason,
-							)
+						// Warn 级别时, 抽样数据详情
+						if conf.Config.SYSConf.Log.ESBulkLevel <= int(zerolog.WarnLevel) {
+							common.LogSampled.Error().
+								Msgf("error: [%d] %s; %s; %s; %s\n||\n%s||",
+									d.Index.Status,
+									d.Index.Error.Type,
+									d.Index.Error.Reason,
+									d.Index.Error.Cause.Type,
+									d.Index.Error.Cause.Reason,
+									utils.B2S(*body),
+								)
+						} else {
+							common.LogSampled.Error().
+								Msgf("error: [%d] %s; %s; %s; %s",
+									d.Index.Status,
+									d.Index.Error.Type,
+									d.Index.Error.Reason,
+									d.Index.Error.Cause.Type,
+									d.Index.Error.Cause.Reason,
+								)
+						}
 					}
 				}
 			}

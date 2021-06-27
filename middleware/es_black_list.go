@@ -8,11 +8,11 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-// ES 查询接口白名单检查
-func CheckESWhiteList(asAPI bool) fiber.Handler {
+// ES 数据上报接口黑名单检查
+func CheckESBlackList(asAPI bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		if len(conf.ESWhiteListConfig) > 0 && !utils.InIPNetString(c.IP(), conf.ESWhiteListConfig) {
-			msg := "非法来访: " + c.IP()
+		if len(conf.ESBlackListConfig) > 0 && utils.InIPNetString(c.IP(), conf.ESBlackListConfig) {
+			msg := "非法访问: " + c.IP()
 			common.LogSampled.Info().Str("method", c.Method()).Str("uri", c.OriginalURL()).Msg(msg)
 			if asAPI {
 				return APIFailure(c, msg)

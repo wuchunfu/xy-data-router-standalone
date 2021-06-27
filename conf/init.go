@@ -30,8 +30,11 @@ var Config TJSONConf
 // 以接口名为键的配置
 var APIConfig map[string]*TAPIConf
 
-// ES 接口 IP 白名单配置
+// ES 查询接口 IP 白名单配置
 var ESWhiteListConfig map[*net.IPNet]struct{}
+
+// ES 上报接口 IP 黑名单配置
+var ESBlackListConfig map[*net.IPNet]struct{}
 
 // UDP 接口 ES 索引字段
 var UDPESIndexField = "_x"

@@ -22,6 +22,7 @@ func InitWebServer() {
 		DisableStartupMessage: true,
 		StrictRouting:         true,
 		DisableKeepalive:      !conf.Config.SYSConf.EnableKeepalive,
+		ReduceMemoryUsage:     conf.Config.SYSConf.ReduceMemoryUsage,
 		ErrorHandler:          errorHandler,
 		// Immutable:             true,
 	})
@@ -31,7 +32,7 @@ func InitWebServer() {
 		app.Use(middleware.IPLimiter())
 	}
 
-	app.Use(middleware.RecoverLogger(), middleware.HTTPCounter(), compress.New())
+	app.Use(middleware.CheckESBlackList(true), middleware.RecoverLogger(), middleware.HTTPCounter(), compress.New())
 	setupRouter(app)
 
 	common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerAddr).Msg("Listening and serving HTTP")

@@ -18,6 +18,7 @@ type TJSONConf struct {
 	SYSConf     TSYSConf   `json:"sys_conf"`
 	APIConf     []TAPIConf `json:"api_conf"`
 	ESWhiteList []string   `json:"es_white_list"`
+	ESBlackList []string   `json:"es_black_list"`
 }
 
 // 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
@@ -27,6 +28,7 @@ type TSYSConf struct {
 	PProfAddr                 string     `json:"pprof_addr"`
 	WebServerAddr             string     `json:"web_server_addr"`
 	EnableKeepalive           bool       `json:"enable_keepalive"`
+	ReduceMemoryUsage         bool       `json:"reduce_memory_usage"`
 	LimitBody                 int        `json:"limit_body"`
 	LimitExpiration           int        `json:"limit_expiration"`
 	LimitRequest              int        `json:"limit_request"`
@@ -67,7 +69,7 @@ type tLogConf struct {
 	MaxSize     int    `json:"max_size"`
 	MaxBackups  int    `json:"max_backups"`
 	MaxAge      int    `json:"max_age"`
-	ESBulkError bool   `json:"es_bulk_error"`
+	ESBulkLevel int    `json:"es_bulk_level"`
 	PeriodDur   time.Duration
 }
 
@@ -108,7 +110,7 @@ func init() {
 
 // 加载配置
 func LoadConf() error {
-	config, apiConfig, whiteList, err := readConf()
+	config, apiConfig, whiteList, blackList, err := readConf()
 	if err != nil {
 		return err
 	}
@@ -116,31 +118,37 @@ func LoadConf() error {
 	Config = *config
 	APIConfig = apiConfig
 	ESWhiteListConfig = whiteList
+	ESBlackListConfig = blackList
 
 	return nil
 }
 
 // 读取配置
-func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, error) {
+func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[*net.IPNet]struct{}, error) {
 	body, err := ioutil.ReadFile(ConfigFile)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	var config *TJSONConf
 	if err := json.Unmarshal(body, &config); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	// 基础密钥 Key
 	config.SYSConf.BaseSecretValue = utils.GetenvDecrypt(BaseSecretKeyName, BaseSecretSalt)
 	if config.SYSConf.BaseSecretValue == "" {
-		return nil, nil, nil, fmt.Errorf("%s cannot be empty", BaseSecretKeyName)
+		return nil, nil, nil, nil, fmt.Errorf("%s cannot be empty", BaseSecretKeyName)
 	}
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off
 	if config.SYSConf.Log.Level > 7 || config.SYSConf.Log.Level < -1 {
 		config.SYSConf.Log.Level = LogLevel
+	}
+
+	// ES 批量写入错误日志
+	if config.SYSConf.Log.ESBulkLevel > 7 || config.SYSConf.Log.ESBulkLevel < -1 {
+		config.SYSConf.Log.ESBulkLevel = LogLevel
 	}
 
 	// 抽样日志设置 (x 秒 n 条)
@@ -222,28 +230,16 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, erro
 		apiConfig[apiConf.APIName] = &apiConf
 	}
 
-	// ES IP 白名单
-	whiteList := make(map[*net.IPNet]struct{})
-	for _, ip := range config.ESWhiteList {
-		// 排除空白行, __ 或 # 开头的注释行
-		ip = strings.TrimSpace(ip)
-		if ip == "" || strings.HasPrefix(ip, "__") || strings.HasPrefix(ip, "#") {
-			continue
-		}
-		// 补全掩码
-		if !strings.Contains(ip, "/") {
-			if strings.Contains(ip, ":") {
-				ip = ip + "/128"
-			} else {
-				ip = ip + "/32"
-			}
-		}
-		// 转为网段
-		_, ipNet, err := net.ParseCIDR(ip)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		whiteList[ipNet] = struct{}{}
+	// ES 查询接口 IP 白名单
+	whiteList, err := getIPNetList(config.ESWhiteList)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	// ES 查询接口 IP 白名单
+	blackList, err := getIPNetList(config.ESBlackList)
+	if err != nil {
+		return nil, nil, nil, nil, err
 	}
 
 	// 每次获取远程主配置的时间间隔, < 30 秒则禁用该功能
@@ -253,7 +249,7 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, erro
 			config.SYSConf.MainConfig.SecretValue = utils.GetenvDecrypt(config.SYSConf.MainConfig.SecretName,
 				config.SYSConf.BaseSecretValue)
 			if config.SYSConf.MainConfig.SecretValue == "" {
-				return nil, nil, nil, fmt.Errorf("%s cannot be empty", config.SYSConf.MainConfig.SecretName)
+				return nil, nil, nil, nil, fmt.Errorf("%s cannot be empty", config.SYSConf.MainConfig.SecretName)
 			}
 		}
 		config.SYSConf.MainConfig.GetConfDuration = time.Duration(config.SYSConf.MainConfig.Interval) * time.Second
@@ -308,5 +304,33 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, erro
 		config.SYSConf.ESPostMaxIntervalDuration = time.Duration(config.SYSConf.ESPostMaxInterval) * time.Millisecond
 	}
 
-	return config, apiConfig, whiteList, nil
+	return config, apiConfig, whiteList, blackList, nil
+}
+
+// IP 配置转换
+func getIPNetList(ips []string) (map[*net.IPNet]struct{}, error) {
+	ipNets := make(map[*net.IPNet]struct{})
+	for _, ip := range ips {
+		// 排除空白行, __ 或 # 开头的注释行
+		ip = strings.TrimSpace(ip)
+		if ip == "" || strings.HasPrefix(ip, "__") || strings.HasPrefix(ip, "#") {
+			continue
+		}
+		// 补全掩码
+		if !strings.Contains(ip, "/") {
+			if strings.Contains(ip, ":") {
+				ip = ip + "/128"
+			} else {
+				ip = ip + "/32"
+			}
+		}
+		// 转为网段
+		_, ipNet, err := net.ParseCIDR(ip)
+		if err != nil {
+			return nil, err
+		}
+		ipNets[ipNet] = struct{}{}
+	}
+
+	return ipNets, nil
 }

@@ -108,6 +108,8 @@ func memStats() map[string]interface{} {
 		"NumGC": utils.Commau(ms.NextGC),
 		// 被强制 GC 的次数
 		"NumForcedGC": ms.NumForcedGC,
+		// HTTP 服务是否开启了减少内存占用选项
+		"ReduceMemoryUsage": conf.Config.SYSConf.ReduceMemoryUsage,
 	}
 }
 
