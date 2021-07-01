@@ -11,7 +11,7 @@ OPT_ETC="${OPT_DIR}/etc"
 all: build
 
 build:
-	go build -v -o "${CI_BIN}" -tags=go_json .
+	go build -v -o "${CI_BIN}" .
 
 clean:
 	killall "${PROJECT}" || true

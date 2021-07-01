@@ -23,41 +23,42 @@ type TJSONConf struct {
 
 // 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
 type TSYSConf struct {
-	Debug                     bool       `json:"debug"`
-	Log                       tLogConf   `json:"log"`
-	PProfAddr                 string     `json:"pprof_addr"`
-	WebServerAddr             string     `json:"web_server_addr"`
-	EnableKeepalive           bool       `json:"enable_keepalive"`
-	ReduceMemoryUsage         bool       `json:"reduce_memory_usage"`
-	LimitBody                 int        `json:"limit_body"`
-	LimitExpiration           int        `json:"limit_expiration"`
-	LimitRequest              int        `json:"limit_request"`
-	WebSlowResponse           int        `json:"web_slow_response"`
-	WebErrCodeLog             int        `json:"web_errcode_log"`
-	UDPServerRAddr            string     `json:"udp_server_raddr"`
-	UDPServerRWAddr           string     `json:"udp_server_rwaddr"`
-	UDPGoReadNum1CPU          int        `json:"udp_go_read_num_1cpu"`
-	UDPProto                  string     `json:"udp_proto"`
-	ESAddress                 []string   `json:"es_address"`
-	ESPostBatchNum            int        `json:"es_post_batch_num"`
-	ESPostBatchBytes          int        `json:"es_post_batch_mb"`
-	ESPostMaxInterval         int        `json:"es_post_max_interval"`
-	ESEnableRetry             bool       `json:"es_enable_retry"`
-	ESDisableWrite            bool       `json:"es_disable_write"`
-	ESSlowQuery               int        `json:"es_slow_query"`
-	ESReentryCodes            []int      `json:"es_reentry_codes"`
-	DataChanSize              int        `json:"data_chan_size"`
-	DataProcessorSize         int        `json:"data_processor_size"`
-	ESBulkWorkerSize          int        `json:"es_bulk_worker_size"`
-	ESBulkMaxWorkerSize       int        `json:"es_bulk_max_worker_size"`
-	MainConfig                TFilesConf `json:"main_config"`
-	RestartMain               bool       `json:"restart_main"`
-	WatcherInterval           int        `json:"watcher_interval"`
-	HeartbeatIndex            string     `json:"heartbeat_index"`
-	BaseSecretValue           string
-	WebSlowRespDuration       time.Duration
-	ESSlowQueryDuration       time.Duration
-	ESPostMaxIntervalDuration time.Duration
+	Debug                      bool       `json:"debug"`
+	Log                        tLogConf   `json:"log"`
+	PProfAddr                  string     `json:"pprof_addr"`
+	WebServerAddr              string     `json:"web_server_addr"`
+	EnableKeepalive            bool       `json:"enable_keepalive"`
+	ReduceMemoryUsage          bool       `json:"reduce_memory_usage"`
+	LimitBody                  int        `json:"limit_body"`
+	LimitExpiration            int        `json:"limit_expiration"`
+	LimitRequest               int        `json:"limit_request"`
+	WebSlowResponse            int        `json:"web_slow_response"`
+	WebErrCodeLog              int        `json:"web_errcode_log"`
+	UDPServerRAddr             string     `json:"udp_server_raddr"`
+	UDPServerRWAddr            string     `json:"udp_server_rwaddr"`
+	UDPGoReadNum1CPU           int        `json:"udp_go_read_num_1cpu"`
+	UDPProto                   string     `json:"udp_proto"`
+	ESAddress                  []string   `json:"es_address"`
+	ESPostBatchNum             int        `json:"es_post_batch_num"`
+	ESPostBatchBytes           int        `json:"es_post_batch_mb"`
+	ESPostMaxInterval          int        `json:"es_post_max_interval"`
+	ESEnableRetry              bool       `json:"es_enable_retry"`
+	ESDisableWrite             bool       `json:"es_disable_write"`
+	ESSlowQuery                int        `json:"es_slow_query"`
+	ESReentryCodes             []int      `json:"es_reentry_codes"`
+	DataChanSize               int        `json:"data_chan_size"`
+	DataProcessorSize          int        `json:"data_processor_size"`
+	ESBulkWorkerSize           int        `json:"es_bulk_worker_size"`
+	ESBulkMaxWorkerSize        int        `json:"es_bulk_max_worker_size"`
+	DataProcessorMaxWorkerSize int        `json:"data_processor_max_worker_size"`
+	MainConfig                 TFilesConf `json:"main_config"`
+	RestartMain                bool       `json:"restart_main"`
+	WatcherInterval            int        `json:"watcher_interval"`
+	HeartbeatIndex             string     `json:"heartbeat_index"`
+	BaseSecretValue            string
+	WebSlowRespDuration        time.Duration
+	ESSlowQueryDuration        time.Duration
+	ESPostMaxIntervalDuration  time.Duration
 }
 
 type tLogConf struct {
@@ -274,6 +275,9 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	// 数据处理并发协程数限制
 	if config.SYSConf.DataProcessorSize < 10 {
 		config.SYSConf.DataProcessorSize = DataProcessorSize
+	}
+	if config.SYSConf.DataProcessorMaxWorkerSize < 10000 {
+		config.SYSConf.DataProcessorMaxWorkerSize = DataProcessorMaxWorkerSize
 	}
 
 	// ES Bulk 写入并发协程限制

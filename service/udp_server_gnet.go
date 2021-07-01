@@ -25,6 +25,7 @@ func udpServerG(addr string, withSendTo bool) error {
 	)
 }
 
+// PS: 一次接收的数据上限为: 64K
 func (s *tUDPServerG) React(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
 	n := len(frame)
 	if s.withSendTo || n < 7 {

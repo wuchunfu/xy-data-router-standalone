@@ -6,8 +6,8 @@ import (
 
 const (
 	WebAPPName     = "XY.DataRouter"
-	CurrentVersion = "1.100.16.21062717"
-	LastChange     = "add config reduce_memory_usage"
+	CurrentVersion = "1.100.18.21063012"
+	LastChange     = "Fixed es_search pointer"
 	ProjectName    = "xydatarouter"
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off
@@ -60,7 +60,8 @@ const (
 	DataChanSize = 50
 
 	// 数据处理并发协程数
-	DataProcessorSize = 3000
+	DataProcessorSize          = 3000
+	DataProcessorMaxWorkerSize = 100000
 
 	// 项目基础密钥 (环境变量名)
 	BaseSecretKeyName = "DR_BASE_SECRET_KEY"

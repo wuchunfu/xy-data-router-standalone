@@ -41,7 +41,6 @@ func initESBulkPool() {
 	esBulkPool, _ = ants.NewPoolWithFunc(
 		conf.Config.SYSConf.ESBulkWorkerSize,
 		func(i interface{}) {
-			atomic.AddInt64(&esBulkWorkerCounters, 1)
 			esBulk(i.(*[]byte))
 		},
 		ants.WithExpiryDuration(10*time.Second),
@@ -161,8 +160,9 @@ func postES(buf *bytes.Buffer) {
 // 提交批量任务, 提交不阻塞, 有执行并发限制, 最大排队数限制
 func submitESBulk(body *[]byte) {
 	_ = common.Pool.Submit(func() {
+		atomic.AddInt64(&esBulkTodoCounters, 1)
 		if err := esBulkPool.Invoke(body); err != nil {
-			atomic.AddUint64(&esBulkDropWorkerCounters, 1)
+			atomic.AddUint64(&esBulkDropCounters, 1)
 			common.LogSampled.Error().Err(err).Msg("go esBulk")
 		}
 	})
@@ -170,12 +170,17 @@ func submitESBulk(body *[]byte) {
 
 // 批量写入 ES
 func esBulk(body *[]byte) {
+	defer atomic.AddInt64(&esBulkTodoCounters, -1)
+
 	resp, err := common.ES.Bulk(bytes.NewReader(*body))
 	if err != nil {
-		common.LogSampled.Error().Err(err).Int64("workes", atomic.LoadInt64(&esBulkWorkerCounters)).Msg("es bulk")
+		common.LogSampled.Error().Err(err).Msg("es bulk")
 		atomic.AddUint64(&esBulkErrors, 1)
 		return
 	}
+
+	// 批量写入完成计数
+	atomic.AddUint64(&esBulkDoneCounters, 1)
 
 	defer func() {
 		_ = resp.Body.Close()

@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"sync/atomic"
 	"time"
 
 	"github.com/fufuok/utils"
@@ -52,6 +53,7 @@ func initDataProcessorPool() {
 			dataProcessor(i.(*tDataProcessor))
 		},
 		ants.WithExpiryDuration(10*time.Second),
+		ants.WithMaxBlockingTasks(conf.Config.SYSConf.DataProcessorMaxWorkerSize),
 		ants.WithPanicHandler(func(r interface{}) {
 			common.LogSampled.Error().Interface("recover", r).Msg("panic")
 		}),
@@ -67,12 +69,17 @@ func dataRouter(dr *tDataRouter) {
 
 	// 接收数据
 	for item := range dr.drChan.Out {
-		if err := dataProcessorPool.Invoke(&tDataProcessor{
-			dr:   dr,
-			data: item.(*tDataItem),
-		}); err != nil {
-			common.LogSampled.Error().Err(err).Msg("go dataProcessor")
-		}
+		// 提交不阻塞, 有执行并发限制, 最大排队数限制
+		_ = common.Pool.Submit(func() {
+			atomic.AddInt64(&dataProcessorTodoCounters, 1)
+			if err := dataProcessorPool.Invoke(&tDataProcessor{
+				dr:   dr,
+				data: item.(*tDataItem),
+			}); err != nil {
+				atomic.AddUint64(&dataProcessorDropCounters, 1)
+				common.LogSampled.Error().Err(err).Msg("go dataProcessor")
+			}
+		})
 	}
 
 	// 准备退出
@@ -84,6 +91,7 @@ func dataRouter(dr *tDataRouter) {
 // 数据处理和分发
 // 格式化每个 JSON 数据, 附加系统字段, 发送给 ES 和 API 队列
 func dataProcessor(dp *tDataProcessor) {
+	defer atomic.AddInt64(&dataProcessorTodoCounters, -1)
 	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
 
 	// 兼容 {body} 或 {body}=-:-=[{body},{body}]

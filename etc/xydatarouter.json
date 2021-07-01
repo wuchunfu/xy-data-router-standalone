@@ -16,8 +16,8 @@
       "__Sample": "抽样日志设置, 默认每 1 秒最多 3 个日志, 0 则关闭所有抽样",
       "period": 1,
       "burst": 3,
-      "__ESBulkError": "ES Bulk 批量写入错误日志是否记录详细内容",
-      "es_bulk_error": false
+      "__ESBulkLevel": "依赖于 Level <= Warn, 设置 Error 解析 ES Bulk 批量结果, 抽样错误; Warn 记录详细内容",
+      "es_bulk_level": 2
     },
     "es_address": [
       "http://192.168.2.103:9200",
@@ -33,6 +33,8 @@
     "web_server_addr": ":6600",
     "__EnableKeepalive": "压测时开启, 实际应用短连接更合适, 默认关闭",
     "enable_keepalive": false,
+    "__ReduceMemoryUsage": "减少内存占用(可能增加CPU占用), 默认关闭",
+    "reduce_memory_usage": true,
     "__ESSlowQueryDuration": "可选, ES 慢查询日志时间设置, 默认: > 10(秒)则记录",
     "es_slow_query": 10,
     "__WebSlowRespDuration": "可选, Web 慢响应日志时间设置, 默认: > 1(秒)则记录",
@@ -44,6 +46,8 @@
     "limit_request": 10000,
     "__DataProcessorSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",
     "data_processor_size": 3000,
+    "__DataProcessorMaxWorkerSize": "数据处理最大排队大小, 达到该值会丢弃, 最低: 10000, 默认 100000 个数据",
+    "data_processor_max_worker_size": 100000,
     "__ESBulkWorkerSize": "ES 批量写入并发协程数, 达到该值会排队, 最低: 1, 默认: 30",
     "es_bulk_worker_size": 30,
     "__ESBulkMaxWorkerSize": "ES 批量写入协程池最大排队大小, 达到该值会丢弃, 最低: 100, 默认: 800, 最大占用: 830*5M, 重启生效",
@@ -52,7 +56,7 @@
     "es_post_batch_num": 4500,
     "__ESPostBatchMB": "ES 单次批量写入最大字节数, 单位: MB, 最低: 1, 默认: 5",
     "es_post_batch_mb": 5,
-    "__ESPostMaxInterval": "ES 单次批量最大写入时间间隔, 单位: 毫秒, 最低: 50, 默认: 1000, 即 1 秒至少 1 次",
+    "__ESPostMaxInterval": "ES 单次批量最大写入时间间隔, 单位: 毫秒, 最低: 100, 默认: 500, 即 1 秒至少 2 次",
     "es_post_max_interval": 1000,
     "__ESReentryCodes": "ES 批量写入错误时, 配置中的状态码会重新进入排队, 比如: 429, 注: 有重复数据风险",
     "es_reentry_codes": [],

@@ -62,17 +62,26 @@ var (
 	// 计数开始时间
 	counterStartTime = common.GetGlobalTime()
 
+	// 待处理的数据项计数
+	dataProcessorTodoCounters int64 = 0
+
+	// 数据处理丢弃计数, 超过 DataProcessorMaxWorkerSize
+	dataProcessorDropCounters uint64 = 0
+
 	// ES 收到数据数量计数
 	esDataCounters uint64 = 0
 
-	// ES Bulk 执行计数
-	esBulkWorkerCounters int64 = 0
+	// ES Bulk 批量写入完成计数
+	esBulkDoneCounters uint64 = 0
 
 	// ES Bulk 写入错误次数
 	esBulkErrors uint64 = 0
 
+	// ES Bulk 待处理项计数
+	esBulkTodoCounters int64 = 0
+
 	// ES Bulk 写入丢弃协程数, 超过 ESBulkMaxWorkerSize
-	esBulkDropWorkerCounters uint64 = 0
+	esBulkDropCounters uint64 = 0
 
 	// HTTP 请求计数
 	HTTPRequestCounters    uint64 = 0

@@ -116,23 +116,32 @@ func memStats() map[string]interface{} {
 // 数据处理信息
 func dataStats() map[string]interface{} {
 	return map[string]interface{}{
+		// 数据传输到 ES 处理通道繁忙状态
 		"ESDataQueueAll": esChan.Len(),
 		"ESDataQueueBuf": esChan.BufLen(),
 
 		"CounterStartTime": counterStartTime,
 
-		"ESDataCounters":             utils.Commau(atomic.LoadUint64(&esDataCounters)),
-		"ESBulkWorkerCounters":       utils.Comma(atomic.LoadInt64(&esBulkWorkerCounters)),
-		"ESBulkErrors______________": atomic.LoadUint64(&esBulkErrors),
-		"ESBulkDropWorkerCounters__": atomic.LoadUint64(&esBulkDropWorkerCounters),
+		// 公共协程池, 不阻塞
+		"CommonPoolFree":    common.Pool.Free(),
+		"CommonPoolRunning": common.Pool.Running(),
 
+		// 数据处理协程池, 排队, 待处理数据量, 丢弃数据量, 繁忙状态
+		"DataProcessorTodoCounters_": atomic.LoadInt64(&dataProcessorTodoCounters),
+		"DataProcessorDropCounters_": atomic.LoadUint64(&dataProcessorDropCounters),
 		"DataProcessorWorkerRunning": dataProcessorPool.Running(),
 		"DataProcessorWorkerFree___": dataProcessorPool.Free(),
+
+		// ES 总数据量, 排队, 待批量写入任务数, 丢弃任务数, 写入错误任务数, 繁忙状态
+		"ESDataCounters":             utils.Commau(atomic.LoadUint64(&esDataCounters)),
+		"ESBulkTodoCounters________": atomic.LoadInt64(&esBulkTodoCounters),
+		"ESBulkDoneCounters":         utils.Commau(atomic.LoadUint64(&esBulkDoneCounters)),
+		"ESBulkDropCounters________": atomic.LoadUint64(&esBulkDropCounters),
+		"ESBulkErrors______________": atomic.LoadUint64(&esBulkErrors),
 		"ESBulkWorkerRunning":        esBulkPool.Running(),
 		"ESBulkWorkerFree__________": esBulkPool.Free(),
-		"CommonPoolFree":             common.Pool.Free(),
-		"CommonPoolRunning":          common.Pool.Running(),
 
+		// HTTP 请求数, 非法/错误请求数, UDP 请求数
 		"HTTPRequestCounters":    utils.Commau(atomic.LoadUint64(&HTTPRequestCounters)),
 		"HTTPBadRequestCounters": utils.Commau(atomic.LoadUint64(&HTTPBadRequestCounters)),
 		"UDPRequestCounters":     utils.Commau(atomic.LoadUint64(&UDPRequestCounters)),

@@ -16,9 +16,9 @@ import (
 )
 
 type tESSearch struct {
-	Index    string       `json:"index"`
-	Scroll   int          `json:"scroll"`
-	ScrollID string       `json:"scroll_id"`
+	Index    string                 `json:"index"`
+	Scroll   int                    `json:"scroll"`
+	ScrollID string                 `json:"scroll_id"`
 	Body     map[string]interface{} `json:"body"`
 	ClientIP string
 }
@@ -26,7 +26,7 @@ type tESSearch struct {
 // ES 通用查询接口
 func ESSearchHandler(c *fiber.Ctx) error {
 	esSearch := new(tESSearch)
-	if err := c.BodyParser(&esSearch); err != nil || esSearch.Index == "" || esSearch.Body == nil {
+	if err := c.BodyParser(esSearch); err != nil || esSearch.Index == "" || esSearch.Body == nil {
 		return middleware.APIFailure(c, "查询参数有误")
 	}
 
@@ -69,7 +69,7 @@ func parseESSearch(resp *esapi.Response, esSearch *tESSearch) (map[string]interf
 				Msg("es search, parsing the response body")
 		} else {
 			common.LogSampled.Warn().
-				Bytes("body", utils.MustJSON(&esSearch)).Int("http_code", resp.StatusCode).
+				Bytes("body", utils.MustJSON(esSearch)).Int("http_code", resp.StatusCode).
 				Msgf("es search, %s, %+v", msg, res["error"])
 		}
 
@@ -87,7 +87,7 @@ func parseESSearch(resp *esapi.Response, esSearch *tESSearch) (map[string]interf
 	costTime := time.Duration(int(res["took"].(float64))) * time.Millisecond
 	if costTime > conf.Config.SYSConf.ESSlowQueryDuration {
 		common.LogSampled.Warn().
-			Bytes("body", utils.MustJSON(&esSearch)).Dur("duration", costTime).
+			Bytes("body", utils.MustJSON(esSearch)).Dur("duration", costTime).
 			Msgf("es search slow, timeout: %s", res["timed_out"])
 	}
 
