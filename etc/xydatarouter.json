@@ -45,6 +45,8 @@
     "__LimitRequest": "可选, 默认单 IP 每 5 (单位: 秒)限制请求 500 次 (0 表示不限), 有 CPU 消耗",
     "limit_expiration": 0,
     "limit_request": 10000,
+    "__DataChanMaxBufCap": "无限缓冲信道最大缓冲数量, 0 为无限(默认), 超过限制(DataChanSize + DataChanMaxBufCap)丢弃数据",
+    "data_chan_max_buf_cap": 500000,
     "__DataProcessorSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",
     "data_processor_size": 3000,
     "__DataProcessorMaxWorkerSize": "数据处理最大排队大小, 达到该值会丢弃, 最低: 10000, 默认 100000 个数据",

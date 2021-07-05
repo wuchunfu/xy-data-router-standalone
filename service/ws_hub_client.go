@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"log"
 	"net/url"
 	"time"
@@ -36,9 +37,11 @@ func initWsHubClient() {
 		}
 	}
 
-	go WsHubKeepalive()
+	ctx, cancel := context.WithCancel(common.CtxBG)
+	go WsHubKeepalive(ctx)
 
 	defer func() {
+		cancel()
 		close(wsHubChan.In)
 		_ = wsHubClient.Close()
 	}()
@@ -57,10 +60,18 @@ func initWsHubClient() {
 }
 
 // 保持 WsHub 连接
-func WsHubKeepalive() {
+func WsHubKeepalive(ctx context.Context) {
 	ticker := common.TWs.NewTicker(conf.WsHubHeartbeat)
 	defer ticker.Stop()
 	for range ticker.C {
+		select {
+		case <-ctx.Done():
+			common.Log.Warn().Msg("wshub client exited")
+			return
+		default:
+		}
+
+		// 检测连接状态
 		if err := wsHubClient.WriteControl(websocket.PingMessage, nil, time.Now().Add(time.Second)); err != nil {
 			// 断线重连
 			if err := wsHubDial(); err != nil {

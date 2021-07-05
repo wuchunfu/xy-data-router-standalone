@@ -153,7 +153,7 @@ func TuneESBulkWorkerSize(n int) {
 
 // 初始化无限缓冲信道
 func newChanx() chanx.UnboundedChan {
-	return chanx.NewUnboundedChan(conf.Config.SYSConf.DataChanSize)
+	return chanx.NewUnboundedChan(conf.Config.SYSConf.DataChanSize, conf.Config.SYSConf.DataChanMaxBufCap)
 }
 
 // 新数据项

@@ -6,8 +6,8 @@ import (
 
 const (
 	WebAPPName     = "XY.DataRouter"
-	CurrentVersion = "1.100.30.21070323"
-	LastChange     = "add ws hub"
+	CurrentVersion = "1.100.31.21070417"
+	LastChange     = "set data_chan_max_buf_cap"
 	ProjectName    = "xydatarouter"
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off
@@ -60,8 +60,10 @@ const (
 	ESBulkWorkerSize    = 30
 	ESBulkMaxWorkerSize = 800
 
-	// 数据分发通道默认初始化缓冲大小
+	// 无限缓冲信道默认初始化缓冲大小
 	DataChanSize = 50
+	// 无限缓冲信道最大缓冲数量, 0 为无限, 超过限制(DataChanSize + DataChanMaxBufCap)丢弃数据
+	DataChanMaxBufCap = 0
 
 	// 数据处理并发协程数
 	DataProcessorSize          = 3000

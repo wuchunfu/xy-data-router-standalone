@@ -10,8 +10,8 @@ github.com/elastic/go-elasticsearch/v6 v6.8.10 h1:2lN0gJ93gMBXvkhwih5xquldszpm8F
 github.com/elastic/go-elasticsearch/v6 v6.8.10/go.mod h1:UwaDJsD3rWLM5rKNFzv9hgox93HoX8utj1kxD9aFUcI=
 github.com/fasthttp/websocket v0.0.0-20200320073529-1554a54587ab h1:9e2joQGp642wHGFP5m86SDptAavrdGBe8/x9DGEEAaI=
 github.com/fasthttp/websocket v0.0.0-20200320073529-1554a54587ab/go.mod h1:smsv/h4PBEBaU0XDTY5UwJTpZv69fQ0FfcLJr21mA6Y=
-github.com/fufuok/chanx v0.0.103 h1:sHLOHr9lcjPd5SOkgxKghz63LWeFPyHYpJ9RVj1Qyg8=
-github.com/fufuok/chanx v0.0.103/go.mod h1:FHzHGzXfF0uY2YGaoKg9ny5LxuNtQr7+Ssnkz6DUjQo=
+github.com/fufuok/chanx v0.0.105 h1:8bmHv4NhY/TIYJK3ZsLRj9CpQ7NYboI8fkhyPWYd5yA=
+github.com/fufuok/chanx v0.0.105/go.mod h1:FHzHGzXfF0uY2YGaoKg9ny5LxuNtQr7+Ssnkz6DUjQo=
 github.com/fufuok/cmap v0.0.100 h1:8EaEsmABx0ZTJBN+7h3UB0cL3+PKguhsx4RUvlbd97w=
 github.com/fufuok/cmap v0.0.100/go.mod h1:6Iq0SGphIoEbZYzCGjssHcuUkUbepCjduobtbAW1Lwk=
 github.com/fufuok/utils v0.1.15 h1:bP2fHbMh2o+8/FuSNxtoBi0rPgjqFGFAxLgUnrmamv4=

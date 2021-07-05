@@ -48,6 +48,7 @@ type TSYSConf struct {
 	ESSlowQuery                int        `json:"es_slow_query"`
 	ESReentryCodes             []int      `json:"es_reentry_codes"`
 	DataChanSize               int        `json:"data_chan_size"`
+	DataChanMaxBufCap          int        `json:"data_chan_max_buf_cap"`
 	DataProcessorSize          int        `json:"data_processor_size"`
 	ESBulkWorkerSize           int        `json:"es_bulk_worker_size"`
 	ESBulkMaxWorkerSize        int        `json:"es_bulk_max_worker_size"`
@@ -187,6 +188,11 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	// 数据分发通道缓存大小
 	if config.SYSConf.DataChanSize < 1 {
 		config.SYSConf.DataChanSize = DataChanSize
+	}
+
+	// 数据分发通道最大缓存数限制, 0 为无限
+	if config.SYSConf.DataChanMaxBufCap < 0 {
+		config.SYSConf.DataChanMaxBufCap = DataChanMaxBufCap
 	}
 
 	// 优先使用配置中的绑定参数(HTTP)

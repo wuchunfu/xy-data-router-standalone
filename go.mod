@@ -6,7 +6,7 @@ require (
 	github.com/arl/statsviz v0.4.0
 	github.com/elastic/go-elasticsearch/v6 v6.8.10
 	github.com/fasthttp/websocket v0.0.0-20200320073529-1554a54587ab
-	github.com/fufuok/chanx v0.0.103
+	github.com/fufuok/chanx v0.0.105
 	github.com/fufuok/cmap v0.0.100
 	github.com/fufuok/utils v0.1.15
 	github.com/gofiber/fiber/v2 v2.14.0

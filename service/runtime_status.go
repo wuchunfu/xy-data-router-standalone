@@ -19,8 +19,9 @@ type tDataRouterStats struct {
 }
 
 type tChanLen struct {
-	AllLen int
-	BufLen int
+	AllLen   int
+	BufLen   int
+	Discards uint64
 }
 
 var (
@@ -122,12 +123,14 @@ func memStats() map[string]interface{} {
 func dataStats() map[string]interface{} {
 	return map[string]interface{}{
 		// 数据传输到 ES 处理通道繁忙状态
-		"ESDataQueueAll": esChan.Len(),
-		"ESDataQueueBuf": esChan.BufLen(),
+		"ESDataQueueAll":      esChan.Len(),
+		"ESDataQueueBuf":      esChan.BufLen(),
+		"ESDataQueueDiscards": esChan.Discards(),
 
 		// 数据传输到 WsHub 通道繁忙状态
-		"WsHubQueueAll": wsHubChan.Len(),
-		"WsHubQueueBuf": wsHubChan.BufLen(),
+		"WsHubQueueAll":      wsHubChan.Len(),
+		"WsHubQueueBuf":      wsHubChan.BufLen(),
+		"WsHubQueueDiscards": wsHubChan.Discards(),
 
 		"CounterStartTime": counterStartTime,
 
@@ -165,12 +168,14 @@ func chanStats() map[string]interface{} {
 		dr := item.Val.(*tDataRouter)
 		stats[item.Key] = tDataRouterStats{
 			DataRouterQueue: tChanLen{
-				AllLen: dr.drChan.Len(),
-				BufLen: dr.drChan.BufLen(),
+				AllLen:   dr.drChan.Len(),
+				BufLen:   dr.drChan.BufLen(),
+				Discards: dr.drChan.Discards(),
 			},
 			APIQueue: tChanLen{
-				AllLen: dr.drOut.apiChan.Len(),
-				BufLen: dr.drOut.apiChan.BufLen(),
+				AllLen:   dr.drOut.apiChan.Len(),
+				BufLen:   dr.drOut.apiChan.BufLen(),
+				Discards: dr.drOut.apiChan.Discards(),
 			},
 		}
 	}
