@@ -55,6 +55,9 @@ func initMaster() {
 	// 启动 Web 服务
 	go controller.InitWebServer()
 
+	// 启动 WsHub 服务
+	go controller.InitWsHubServer()
+
 	// 统计和性能工具
 	go startPProf()
 }

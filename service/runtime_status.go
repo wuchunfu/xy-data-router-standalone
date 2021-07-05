@@ -73,6 +73,13 @@ func sysStatus() map[string]interface{} {
 		"NumCgoCall":   runtime.NumCgoCall(),
 		"InternalIPv4": InternalIPv4,
 		"ExternalIPv4": ExternalIPv4,
+
+		// HTTP 服务是否开启了减少内存占用选项
+		"ReduceMemoryUsage": conf.Config.SYSConf.ReduceMemoryUsage,
+		// HTTP 服务是否开启了 Keepalive
+		"EnableKeepalive": conf.Config.SYSConf.EnableKeepalive,
+		// WsHub 数据转发地址, 为空时本地处理数据
+		"ForwardWsHub": conf.ForwardWsHub,
 	}
 }
 
@@ -108,8 +115,6 @@ func memStats() map[string]interface{} {
 		"NumGC": utils.Commau(ms.NextGC),
 		// 被强制 GC 的次数
 		"NumForcedGC": ms.NumForcedGC,
-		// HTTP 服务是否开启了减少内存占用选项
-		"ReduceMemoryUsage": conf.Config.SYSConf.ReduceMemoryUsage,
 	}
 }
 
@@ -119,6 +124,10 @@ func dataStats() map[string]interface{} {
 		// 数据传输到 ES 处理通道繁忙状态
 		"ESDataQueueAll": esChan.Len(),
 		"ESDataQueueBuf": esChan.BufLen(),
+
+		// 数据传输到 WsHub 通道繁忙状态
+		"WsHubQueueAll": wsHubChan.Len(),
+		"WsHubQueueBuf": wsHubChan.BufLen(),
 
 		"CounterStartTime": counterStartTime,
 
@@ -141,10 +150,11 @@ func dataStats() map[string]interface{} {
 		"ESBulkWorkerRunning":        esBulkPool.Running(),
 		"ESBulkWorkerFree__________": esBulkPool.Free(),
 
-		// HTTP 请求数, 非法/错误请求数, UDP 请求数
+		// HTTP 请求数, 非法/错误请求数, UDP 请求数, WsHub 请求数
 		"HTTPRequestCounters":    utils.Commau(atomic.LoadUint64(&HTTPRequestCounters)),
 		"HTTPBadRequestCounters": utils.Commau(atomic.LoadUint64(&HTTPBadRequestCounters)),
 		"UDPRequestCounters":     utils.Commau(atomic.LoadUint64(&UDPRequestCounters)),
+		"WsHubRequestCounters":   utils.Commau(atomic.LoadUint64(&WsHubRequestCounters)),
 	}
 }
 

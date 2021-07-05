@@ -14,6 +14,7 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
+// 接口服务
 func InitWebServer() {
 	app := fiber.New(fiber.Config{
 		ServerHeader:          conf.WebAPPName,
@@ -38,6 +39,25 @@ func InitWebServer() {
 	common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerAddr).Msg("Listening and serving HTTP")
 	if err := app.Listen(conf.Config.SYSConf.WebServerAddr); err != nil {
 		log.Fatalln("Failed to start HTTP Server:", err, "\nbye.")
+	}
+}
+
+// 数据传输服务
+func InitWsHubServer() {
+	app := fiber.New(fiber.Config{
+		ServerHeader:          conf.WebAPPName,
+		BodyLimit:             conf.Config.SYSConf.LimitBody,
+		DisableStartupMessage: true,
+		StrictRouting:         true,
+		ReduceMemoryUsage:     conf.Config.SYSConf.ReduceMemoryUsage,
+	})
+
+	app.Use(middleware.RecoverLogger())
+	setupWsHub(app)
+
+	common.Log.Info().Str("addr", conf.Config.SYSConf.WsHubServerAddr).Msg("Listening and serving WsHub")
+	if err := app.Listen(conf.Config.SYSConf.WsHubServerAddr); err != nil {
+		log.Fatalln("Failed to start WsHub Server:", err, "\nbye.")
 	}
 }
 

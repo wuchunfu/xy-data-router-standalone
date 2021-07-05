@@ -6,8 +6,8 @@ import (
 
 const (
 	WebAPPName     = "XY.DataRouter"
-	CurrentVersion = "1.100.18.21063012"
-	LastChange     = "Fixed es_search pointer"
+	CurrentVersion = "1.100.30.21070323"
+	LastChange     = "add ws hub"
 	ProjectName    = "xydatarouter"
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off
@@ -22,14 +22,18 @@ const (
 
 	// HTTP 接口端口
 	WebServerAddr = ":6600"
-	// ES 慢查询日志时间设置, 默认: > 10秒则记录
-	ESSlowQueryDuration = 10 * time.Second
+	// WsHub 绑定端口
+	WsHubServerAddr = ":6633"
 	// Web 慢响应日志时间设置, 默认: > 1秒则记录
 	WebSlowRespDuration = time.Second
 	// HTTP 响应码日志记录, 默认: 500, 即大于等于 500 的状态码记录日志
 	WebErrorCodeLog = 500
 	// POST 最大 500M, Request Entity Too Large
 	BodyLimit = 500 << 20
+	// ES 慢查询日志时间设置, 默认: > 10秒则记录
+	ESSlowQueryDuration = 10 * time.Second
+	// WsHub 心跳和重连时间间隔
+	WsHubHeartbeat = 3 * time.Second
 
 	// UDP 接口端口, 不应答(Echo包除外)
 	UDPServerRAddr = ":6611"

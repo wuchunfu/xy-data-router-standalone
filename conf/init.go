@@ -41,3 +41,6 @@ var UDPESIndexField = "_x"
 
 // 请求名称
 var ReqUserAgent = req.Header{"User-Agent": WebAPPName + "/" + CurrentVersion}
+
+// 上联 WsHub 地址, 指定后将启动 Websocket 客户端, 将所有数据转交到 WsHub
+var ForwardWsHub = ""

@@ -31,6 +31,7 @@
     "udp_server_raddr": ":6611",
     "udp_server_rwaddr": ":6622",
     "web_server_addr": ":6600",
+    "ws_hub_server_addr": ":6633",
     "__EnableKeepalive": "压测时开启, 实际应用短连接更合适, 默认关闭",
     "enable_keepalive": false,
     "__ReduceMemoryUsage": "减少内存占用(可能增加CPU占用), 默认关闭",
