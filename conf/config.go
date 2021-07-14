@@ -27,7 +27,7 @@ type TSYSConf struct {
 	Log                        tLogConf   `json:"log"`
 	PProfAddr                  string     `json:"pprof_addr"`
 	WebServerAddr              string     `json:"web_server_addr"`
-	WsHubServerAddr            string     `json:"ws_hub_server_addr"`
+	TunServerAddr              string     `json:"tun_server_addr"`
 	EnableKeepalive            bool       `json:"enable_keepalive"`
 	ReduceMemoryUsage          bool       `json:"reduce_memory_usage"`
 	LimitBody                  int        `json:"limit_body"`
@@ -104,10 +104,10 @@ type TFilesConf struct {
 
 func init() {
 	confFile := flag.String("c", ConfigFile, "配置文件绝对路径(可选)")
-	forwardWsHub := flag.String("f", "", "指定上联 WsHub 地址(可选)")
+	forwardTunnel := flag.String("f", "", "指定上联 Tunnel 地址(可选)")
 	flag.Parse()
 	ConfigFile = *confFile
-	ForwardWsHub = *forwardWsHub
+	ForwardTunnel = *forwardTunnel
 	if err := LoadConf(); err != nil {
 		log.Fatalln("Failed to initialize config:", err, "\nbye.")
 	}
@@ -200,9 +200,9 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		config.SYSConf.WebServerAddr = WebServerAddr
 	}
 
-	// 优先使用配置中的绑定参数(WsHub)
-	if config.SYSConf.WsHubServerAddr == "" {
-		config.SYSConf.WsHubServerAddr = WsHubServerAddr
+	// 优先使用配置中的绑定参数(Tun)
+	if config.SYSConf.TunServerAddr == "" {
+		config.SYSConf.TunServerAddr = TunServerAddr
 	}
 
 	// 优先使用配置中的绑定参数(UDP带应答)

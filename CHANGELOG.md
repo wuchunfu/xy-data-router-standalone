@@ -1,5 +1,9 @@
 # XY.DataRouter
 
+## 1.100.40.21071323
+
+- 数据代理由 `WsHub(Websocket)` 替换为 `Tunnel(aRPC)`
+
 ## 1.100.31.21070417
 
 - 新增: 无限缓冲信道最大缓冲数量配置(可选) `data_chan_max_buf_cap`

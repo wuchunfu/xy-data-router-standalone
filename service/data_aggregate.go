@@ -7,9 +7,9 @@ import (
 
 // 接收数据推入队列
 func PushDataToChanx(apiname, ip string, body *[]byte) {
-	if conf.ForwardWsHub != "" {
-		// 发送数据到 WsHub
-		wsHubChan.In <- common.GenDataItem{
+	if conf.ForwardTunnel != "" {
+		// 发送数据到 Tun
+		TunChan.In <- &common.GenDataItem{
 			APIName: apiname,
 			IP:      ip,
 			Body:    *body,

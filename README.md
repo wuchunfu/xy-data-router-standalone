@@ -38,6 +38,7 @@
     ├── service     应用逻辑
     ├── model       模型, 数据交互
     ├── tools       环境变量加密小工具
+    ├── tunnel      数据传递通道
     ├── script      脚本
     ├── util        工具类库
     └── main.go     入口文件

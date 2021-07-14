@@ -59,8 +59,8 @@ var (
 	// ES 数据接收信道
 	esChan chanx.UnboundedChan
 
-	// WsHub 数据信道
-	wsHubChan chanx.UnboundedChan
+	// Tun 数据信道
+	TunChan chanx.UnboundedChan
 
 	// 计数开始时间
 	counterStartTime = common.GetGlobalTime()
@@ -90,8 +90,11 @@ var (
 	HTTPRequestCounters    uint64 = 0
 	HTTPBadRequestCounters uint64 = 0
 
-	// WsHub 请求计数
-	WsHubRequestCounters uint64 = 0
+	// Tun 请求计数
+	TunRecvCounters    uint64 = 0
+	TunRecvBadCounters uint64 = 0
+	TunSendCounters    uint64 = 0
+	TunSendBadCounters uint64 = 0
 
 	// UDP 请求计数
 	UDPRequestCounters uint64 = 0
@@ -107,8 +110,8 @@ func InitService() {
 	// 初始化 ES 数据信道
 	esChan = newChanx()
 
-	// 初始化 WsHub 数据信道
-	wsHubChan = newChanx()
+	// 初始化 Tun 数据信道
+	TunChan = newChanx()
 
 	// 开启 ES 写入
 	go esWorker()
@@ -118,9 +121,6 @@ func InitService() {
 
 	// 启动 UDP 接口服务
 	go initUDPServer()
-
-	// 启动 WsHub 客户端
-	go initWsHubClient()
 
 	// 心跳服务
 	go initHeartbeat()

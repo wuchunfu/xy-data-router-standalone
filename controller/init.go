@@ -42,25 +42,6 @@ func InitWebServer() {
 	}
 }
 
-// 数据传输服务
-func InitWsHubServer() {
-	app := fiber.New(fiber.Config{
-		ServerHeader:          conf.WebAPPName,
-		BodyLimit:             conf.Config.SYSConf.LimitBody,
-		DisableStartupMessage: true,
-		StrictRouting:         true,
-		ReduceMemoryUsage:     conf.Config.SYSConf.ReduceMemoryUsage,
-	})
-
-	app.Use(middleware.RecoverLogger())
-	setupWsHub(app)
-
-	common.Log.Info().Str("addr", conf.Config.SYSConf.WsHubServerAddr).Msg("Listening and serving WsHub")
-	if err := app.Listen(conf.Config.SYSConf.WsHubServerAddr); err != nil {
-		log.Fatalln("Failed to start WsHub Server:", err, "\nbye.")
-	}
-}
-
 // 请求错误处理
 func errorHandler(c *fiber.Ctx, err error) error {
 	code := fiber.StatusInternalServerError

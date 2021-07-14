@@ -9,6 +9,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/controller"
 	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/tunnel"
 )
 
 var (
@@ -52,11 +53,12 @@ func initMaster() {
 	// 启动数据服务
 	service.InitService()
 
+	// 启动 Tunnel 服务
+	go tunnel.InitTunServer()
+	go tunnel.InitTunClient()
+
 	// 启动 Web 服务
 	go controller.InitWebServer()
-
-	// 启动 WsHub 服务
-	go controller.InitWsHubServer()
 
 	// 统计和性能工具
 	go startPProf()

@@ -6,8 +6,8 @@ import (
 
 const (
 	WebAPPName     = "XY.DataRouter"
-	CurrentVersion = "1.100.31.21070417"
-	LastChange     = "set data_chan_max_buf_cap"
+	CurrentVersion = "1.100.40.21071323"
+	LastChange     = "replace WsHub to Tunnel"
 	ProjectName    = "xydatarouter"
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off
@@ -22,8 +22,8 @@ const (
 
 	// HTTP 接口端口
 	WebServerAddr = ":6600"
-	// WsHub 绑定端口
-	WsHubServerAddr = ":6633"
+	// Tunnel 绑定端口
+	TunServerAddr = ":6633"
 	// Web 慢响应日志时间设置, 默认: > 1秒则记录
 	WebSlowRespDuration = time.Second
 	// HTTP 响应码日志记录, 默认: 500, 即大于等于 500 的状态码记录日志
@@ -32,8 +32,9 @@ const (
 	BodyLimit = 500 << 20
 	// ES 慢查询日志时间设置, 默认: > 10秒则记录
 	ESSlowQueryDuration = 10 * time.Second
-	// WsHub 心跳和重连时间间隔
-	WsHubHeartbeat = 3 * time.Second
+	// Tunnel 连接超时时间和数据读写超时时间
+	TunDialTimeout = 3 * time.Second
+	TunSendTimeout = 3 * time.Second
 
 	// UDP 接口端口, 不应答(Echo包除外)
 	UDPServerRAddr = ":6611"

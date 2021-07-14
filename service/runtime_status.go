@@ -79,8 +79,8 @@ func sysStatus() map[string]interface{} {
 		"ReduceMemoryUsage": conf.Config.SYSConf.ReduceMemoryUsage,
 		// HTTP 服务是否开启了 Keepalive
 		"EnableKeepalive": conf.Config.SYSConf.EnableKeepalive,
-		// WsHub 数据转发地址, 为空时本地处理数据
-		"ForwardWsHub": conf.ForwardWsHub,
+		// Tun 数据转发地址, 为空时本地处理数据
+		"ForwardTunnel": conf.ForwardTunnel,
 	}
 }
 
@@ -123,14 +123,14 @@ func memStats() map[string]interface{} {
 func dataStats() map[string]interface{} {
 	return map[string]interface{}{
 		// 数据传输到 ES 处理通道繁忙状态
-		"ESDataQueueAll":      esChan.Len(),
-		"ESDataQueueBuf":      esChan.BufLen(),
-		"ESDataQueueDiscards": esChan.Discards(),
+		"ESDataQueueAll":             esChan.Len(),
+		"ESDataQueueBuf":             esChan.BufLen(),
+		"ESDataQueueDiscards_______": esChan.Discards(),
 
-		// 数据传输到 WsHub 通道繁忙状态
-		"WsHubQueueAll":      wsHubChan.Len(),
-		"WsHubQueueBuf":      wsHubChan.BufLen(),
-		"WsHubQueueDiscards": wsHubChan.Discards(),
+		// 数据传输通道繁忙状态
+		"TunnelQueueAll":             TunChan.Len(),
+		"TunnelQueueBuf":             TunChan.BufLen(),
+		"TunnelQueueDiscards_______": TunChan.Discards(),
 
 		"CounterStartTime": counterStartTime,
 
@@ -153,11 +153,14 @@ func dataStats() map[string]interface{} {
 		"ESBulkWorkerRunning":        esBulkPool.Running(),
 		"ESBulkWorkerFree__________": esBulkPool.Free(),
 
-		// HTTP 请求数, 非法/错误请求数, UDP 请求数, WsHub 请求数
+		// HTTP 请求数, 非法/错误请求数, UDP 请求数, Tunnel 收发数据数
 		"HTTPRequestCounters":    utils.Commau(atomic.LoadUint64(&HTTPRequestCounters)),
 		"HTTPBadRequestCounters": utils.Commau(atomic.LoadUint64(&HTTPBadRequestCounters)),
 		"UDPRequestCounters":     utils.Commau(atomic.LoadUint64(&UDPRequestCounters)),
-		"WsHubRequestCounters":   utils.Commau(atomic.LoadUint64(&WsHubRequestCounters)),
+		"TunnelRecvCounters":     utils.Commau(atomic.LoadUint64(&TunRecvCounters)),
+		"TunnelRecvBadCounters":  utils.Commau(atomic.LoadUint64(&TunRecvBadCounters)),
+		"TunnelSendCounters":     utils.Commau(atomic.LoadUint64(&TunSendCounters)),
+		"TunnelSendBadCounters":  utils.Commau(atomic.LoadUint64(&TunSendBadCounters)),
 	}
 }
 
