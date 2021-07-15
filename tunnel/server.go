@@ -32,13 +32,13 @@ func InitTunServer() {
 func onData(c *arpc.Context) {
 	d := &common.GenDataItem{}
 	if err := c.Bind(d); err != nil {
-		atomic.AddUint64(&service.TunRecvBadCounters, 1)
+		atomic.AddUint64(&service.TunRecvBadCount, 1)
 		return
 	}
 
 	// 写入队列
 	_ = common.Pool.Submit(func() {
-		atomic.AddUint64(&service.TunRecvCounters, 1)
+		atomic.AddUint64(&service.TunRecvCount, 1)
 		if d.APIName != "" {
 			service.PushDataToChanx(d.APIName, d.IP, &d.Body)
 		}

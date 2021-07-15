@@ -49,7 +49,7 @@ func errorHandler(c *fiber.Ctx, err error) error {
 		code = e.Code
 	}
 
-	atomic.AddUint64(&service.HTTPBadRequestCounters, 1)
+	atomic.AddUint64(&service.HTTPBadRequestCount, 1)
 	if conf.Config.SYSConf.Debug {
 		common.LogSampled.Error().Err(err).
 			Str("client_ip", c.IP()).Str("uri", c.OriginalURL()).

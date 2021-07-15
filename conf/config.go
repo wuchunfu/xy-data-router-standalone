@@ -28,6 +28,7 @@ type TSYSConf struct {
 	PProfAddr                  string     `json:"pprof_addr"`
 	WebServerAddr              string     `json:"web_server_addr"`
 	TunServerAddr              string     `json:"tun_server_addr"`
+	TunSendQueueSize           int        `json:"tun_send_queue_size"`
 	EnableKeepalive            bool       `json:"enable_keepalive"`
 	ReduceMemoryUsage          bool       `json:"reduce_memory_usage"`
 	LimitBody                  int        `json:"limit_body"`
@@ -200,7 +201,7 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		config.SYSConf.WebServerAddr = WebServerAddr
 	}
 
-	// 优先使用配置中的绑定参数(Tun)
+	// 优先使用配置中的绑定参数(Tunnel)
 	if config.SYSConf.TunServerAddr == "" {
 		config.SYSConf.TunServerAddr = TunServerAddr
 	}
@@ -213,6 +214,11 @@ func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	// 优先使用配置中的绑定参数(UDP不带应答)
 	if config.SYSConf.UDPServerRAddr == "" {
 		config.SYSConf.UDPServerRAddr = UDPServerRAddr
+	}
+
+	// Tunnel 发送队列容量
+	if config.SYSConf.TunSendQueueSize < TunSendQueueSize {
+		config.SYSConf.TunSendQueueSize = TunSendQueueSize
 	}
 
 	// ES 慢查询日志时间设置

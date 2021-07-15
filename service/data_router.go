@@ -71,12 +71,12 @@ func dataRouter(dr *tDataRouter) {
 	for item := range dr.drChan.Out {
 		// 提交不阻塞, 有执行并发限制, 最大排队数限制
 		_ = common.Pool.Submit(func() {
-			atomic.AddInt64(&dataProcessorTodoCounters, 1)
+			atomic.AddInt64(&dataProcessorTodoCount, 1)
 			if err := dataProcessorPool.Invoke(&tDataProcessor{
 				dr:   dr,
 				data: item.(*tDataItem),
 			}); err != nil {
-				atomic.AddUint64(&dataProcessorDropCounters, 1)
+				atomic.AddUint64(&dataProcessorDiscards, 1)
 				common.LogSampled.Error().Err(err).Msg("go dataProcessor")
 			}
 		})
@@ -91,7 +91,7 @@ func dataRouter(dr *tDataRouter) {
 // 数据处理和分发
 // 格式化每个 JSON 数据, 附加系统字段, 发送给 ES 和 API 队列
 func dataProcessor(dp *tDataProcessor) {
-	defer atomic.AddInt64(&dataProcessorTodoCounters, -1)
+	defer atomic.AddInt64(&dataProcessorTodoCount, -1)
 	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
 
 	// 兼容 {body} 或 {body}=-:-=[{body},{body}]

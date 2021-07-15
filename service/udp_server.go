@@ -111,7 +111,7 @@ func writeToUDP(conn *net.UDPConn, clientAddr *net.UDPAddr) {
 // 校验并保存数据
 func saveUDPData(body *[]byte, clientIP string) bool {
 	// 计数
-	atomic.AddUint64(&UDPRequestCounters, 1)
+	atomic.AddUint64(&UDPRequestCount, 1)
 
 	if len(conf.ESBlackListConfig) > 0 && utils.InIPNetString(clientIP, conf.ESBlackListConfig) {
 		common.LogSampled.Info().Str("method", "UDP").Msg("非法访问: " + clientIP)

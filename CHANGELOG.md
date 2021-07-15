@@ -1,5 +1,11 @@
 # XY.DataRouter
 
+## 1.100.41.21071515
+
+- 增加 `TunnelDataTotal` `TunnelTodoSendCount` 等, 规范统计字段名称
+- 增加配置项 `TunSendQueueSize` 发送数据最大队列长度, 默认: `8192`, 公网大丢包可能超过队列长度而丢弃数据
+- `Tunnel` 数据发送不设置超时
+
 ## 1.100.40.21071323
 
 - 数据代理由 `WsHub(Websocket)` 替换为 `Tunnel(aRPC)`

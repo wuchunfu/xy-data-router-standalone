@@ -30,13 +30,14 @@ func InitTunClient() {
 
 	// 接收数据转发到通道 (支持创建多个 client, 每 client 支持多协程并发处理数据)
 	for item := range service.TunChan.Out {
-		err = client.Notify(tunMethod, item, conf.TunSendTimeout)
+		// 不超时, 直到 ErrClientOverstock
+		err = client.Notify(tunMethod, item, arpc.TimeZero)
 		if err != nil {
-			common.LogSampled.Info().Err(err).Msg("write to tunnel failed")
-			atomic.AddUint64(&service.TunSendBadCounters, 1)
+			common.LogSampled.Info().Err(err).Msg("Failed to write Tunnel")
+			atomic.AddUint64(&service.TunSendErrors, 1)
 			continue
 		}
 
-		atomic.AddUint64(&service.TunSendCounters, 1)
+		atomic.AddUint64(&service.TunSendCount, 1)
 	}
 }

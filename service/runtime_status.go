@@ -121,6 +121,10 @@ func memStats() map[string]interface{} {
 
 // 数据处理信息
 func dataStats() map[string]interface{} {
+	tunSendErrors := atomic.LoadUint64(&TunSendErrors)
+	tunSendCount := atomic.LoadUint64(&TunSendCount)
+	tunTotal := atomic.LoadUint64(&TunDataTotal)
+
 	return map[string]interface{}{
 		// 数据传输到 ES 处理通道繁忙状态
 		"ESDataQueueAll":             esChan.Len(),
@@ -139,28 +143,30 @@ func dataStats() map[string]interface{} {
 		"CommonPoolRunning": common.Pool.Running(),
 
 		// 数据处理协程池, 排队, 待处理数据量, 丢弃数据量, 繁忙状态
-		"DataProcessorTodoCounters_": atomic.LoadInt64(&dataProcessorTodoCounters),
-		"DataProcessorDropCounters_": atomic.LoadUint64(&dataProcessorDropCounters),
+		"DataProcessorTodoCount____": atomic.LoadInt64(&dataProcessorTodoCount),
+		"DataProcessorDiscards_____": atomic.LoadUint64(&dataProcessorDiscards),
 		"DataProcessorWorkerRunning": dataProcessorPool.Running(),
 		"DataProcessorWorkerFree___": dataProcessorPool.Free(),
 
 		// ES 总数据量, 排队, 待批量写入任务数, 丢弃任务数, 写入错误任务数, 繁忙状态
-		"ESDataCounters":             utils.Commau(atomic.LoadUint64(&esDataCounters)),
-		"ESBulkTodoCounters________": atomic.LoadInt64(&esBulkTodoCounters),
-		"ESBulkDoneCounters":         utils.Commau(atomic.LoadUint64(&esBulkDoneCounters)),
-		"ESBulkDropCounters________": atomic.LoadUint64(&esBulkDropCounters),
+		"ESDataTotal":                utils.Commau(atomic.LoadUint64(&esDataTotal)),
+		"ESBulkTodoCount___________": atomic.LoadInt64(&esBulkTodoCount),
+		"ESBulkCount":                utils.Commau(atomic.LoadUint64(&esBulkCount)),
+		"ESBulkDiscards____________": atomic.LoadUint64(&esBulkDiscards),
 		"ESBulkErrors______________": atomic.LoadUint64(&esBulkErrors),
 		"ESBulkWorkerRunning":        esBulkPool.Running(),
 		"ESBulkWorkerFree__________": esBulkPool.Free(),
 
 		// HTTP 请求数, 非法/错误请求数, UDP 请求数, Tunnel 收发数据数
-		"HTTPRequestCounters":    utils.Commau(atomic.LoadUint64(&HTTPRequestCounters)),
-		"HTTPBadRequestCounters": utils.Commau(atomic.LoadUint64(&HTTPBadRequestCounters)),
-		"UDPRequestCounters":     utils.Commau(atomic.LoadUint64(&UDPRequestCounters)),
-		"TunnelRecvCounters":     utils.Commau(atomic.LoadUint64(&TunRecvCounters)),
-		"TunnelRecvBadCounters":  utils.Commau(atomic.LoadUint64(&TunRecvBadCounters)),
-		"TunnelSendCounters":     utils.Commau(atomic.LoadUint64(&TunSendCounters)),
-		"TunnelSendBadCounters":  utils.Commau(atomic.LoadUint64(&TunSendBadCounters)),
+		"HTTPRequestCount":           utils.Commau(atomic.LoadUint64(&HTTPRequestCount)),
+		"HTTPBadRequestCount":        utils.Commau(atomic.LoadUint64(&HTTPBadRequestCount)),
+		"UDPRequestCount":            utils.Commau(atomic.LoadUint64(&UDPRequestCount)),
+		"TunnelRecvCount":            utils.Commau(atomic.LoadUint64(&TunRecvCount)),
+		"TunnelRecvBadCount":         utils.Commau(atomic.LoadUint64(&TunRecvBadCount)),
+		"TunnelDataTotal":            utils.Commau(tunTotal),
+		"TunnelSendCount":            utils.Commau(tunSendCount),
+		"TunnelSendErrors__________": utils.Commau(tunSendErrors),
+		"TunnelTodoSendCount_______": utils.Commau(tunTotal - tunSendCount - tunSendErrors),
 	}
 }
 

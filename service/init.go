@@ -66,38 +66,39 @@ var (
 	counterStartTime = common.GetGlobalTime()
 
 	// 待处理的数据项计数
-	dataProcessorTodoCounters int64 = 0
+	dataProcessorTodoCount int64 = 0
 
 	// 数据处理丢弃计数, 超过 DataProcessorMaxWorkerSize
-	dataProcessorDropCounters uint64 = 0
+	dataProcessorDiscards uint64 = 0
 
 	// ES 收到数据数量计数
-	esDataCounters uint64 = 0
+	esDataTotal uint64 = 0
 
 	// ES Bulk 批量写入完成计数
-	esBulkDoneCounters uint64 = 0
+	esBulkCount uint64 = 0
 
 	// ES Bulk 写入错误次数
 	esBulkErrors uint64 = 0
 
 	// ES Bulk 待处理项计数
-	esBulkTodoCounters int64 = 0
+	esBulkTodoCount int64 = 0
 
 	// ES Bulk 写入丢弃协程数, 超过 ESBulkMaxWorkerSize
-	esBulkDropCounters uint64 = 0
+	esBulkDiscards uint64 = 0
 
 	// HTTP 请求计数
-	HTTPRequestCounters    uint64 = 0
-	HTTPBadRequestCounters uint64 = 0
+	HTTPRequestCount    uint64 = 0
+	HTTPBadRequestCount uint64 = 0
 
-	// Tun 请求计数
-	TunRecvCounters    uint64 = 0
-	TunRecvBadCounters uint64 = 0
-	TunSendCounters    uint64 = 0
-	TunSendBadCounters uint64 = 0
+	// Tunnel 服务端接收和客户端发送计数
+	TunRecvCount    uint64 = 0
+	TunRecvBadCount uint64 = 0
+	TunSendCount    uint64 = 0
+	TunSendErrors   uint64 = 0
+	TunDataTotal    uint64 = 0
 
 	// UDP 请求计数
-	UDPRequestCounters uint64 = 0
+	UDPRequestCount uint64 = 0
 
 	// 数据处理协程池
 	dataProcessorPool *ants.PoolWithFunc

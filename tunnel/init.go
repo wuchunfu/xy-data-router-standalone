@@ -1,7 +1,10 @@
 package tunnel
 
 import (
+	"github.com/lesismal/arpc"
 	"github.com/lesismal/arpc/log"
+
+	"github.com/fufuok/xy-data-router/conf"
 )
 
 var (
@@ -9,5 +12,7 @@ var (
 )
 
 func init() {
+	arpc.DefaultHandler.SetSendQueueSize(conf.Config.SYSConf.TunSendQueueSize)
+	arpc.DefaultHandler.SetLogTag("[Tunnel]")
 	log.SetLogger(&logger{})
 }

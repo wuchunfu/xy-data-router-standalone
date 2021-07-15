@@ -11,7 +11,7 @@ import (
 // 请求简单计数
 func HTTPCounter() fiber.Handler {
 	return func(c *fiber.Ctx) (err error) {
-		atomic.AddUint64(&service.HTTPRequestCounters, 1)
+		atomic.AddUint64(&service.HTTPRequestCount, 1)
 		return c.Next()
 	}
 }

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"sync/atomic"
+
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 )
@@ -14,6 +16,7 @@ func PushDataToChanx(apiname, ip string, body *[]byte) {
 			IP:      ip,
 			Body:    *body,
 		}
+		atomic.AddUint64(&TunDataTotal, 1)
 
 		return
 	}
