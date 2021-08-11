@@ -64,7 +64,7 @@ func initMaster() {
 	go startPProf()
 }
 
-// 程序退出时清理
+// Stop 程序退出时清理
 func Stop() {
 	common.TWStop()
 	common.PoolRelease()

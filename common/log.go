@@ -59,11 +59,11 @@ func InitLogger() error {
 	return nil
 }
 
-// 日志配置
+// LogConfig 日志配置
 // 1. 开发环境时, 日志高亮输出到控制台
 // 2. 生产环境时, 日志输出到文件(可选关闭高亮, 保存最近 10 个 30 天内的日志)
 func LogConfig() error {
-	basicLog := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "15:04:05"}
+	basicLog := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "0102 15:04:05"}
 
 	if !conf.Config.SYSConf.Debug {
 		basicLog.NoColor = conf.Config.SYSConf.Log.NoColor

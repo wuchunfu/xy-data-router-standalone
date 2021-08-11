@@ -14,7 +14,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-// 根据接口配置初始化数据分发处理器
+// InitDataRouter 根据接口配置初始化数据分发处理器
 func InitDataRouter() {
 	// 关闭配置中已取消的接口
 	for item := range dataRouters.IterBuffered() {

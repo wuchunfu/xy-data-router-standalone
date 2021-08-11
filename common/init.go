@@ -13,18 +13,18 @@ var (
 	IPv4Zero = "0.0.0.0"
 	CtxBG    = context.Background()
 
-	// 同步时间差值
+	// GTimeSub 同步时间差值
 	GTimeSub time.Duration
 
-	// 协程池
+	// Pool 协程池
 	Pool = goroutine.Default()
 
-	// 时间轮, 精度 50ms, 1s, 1m
+	// TWms 时间轮, 精度 50ms, 1s, 1m
 	TWms *timewheel.TimeWheel
 	TWs  *timewheel.TimeWheel
 	TWm  *timewheel.TimeWheel
 
-	// 当前时间
+	// Now3399UTC 当前时间
 	Now3399UTC string
 	Now3399    string
 )
@@ -73,12 +73,12 @@ func PoolRelease() {
 	Pool.Release()
 }
 
-// 统一时间
+// GetGlobalTime 统一时间
 func GetGlobalTime() time.Time {
 	return time.Now().Add(GTimeSub)
 }
 
-// 统一时间并格式化
+// GetGlobalDataTime 统一时间并格式化
 func GetGlobalDataTime(layout string) string {
 	if layout == "" {
 		layout = time.RFC3339
@@ -87,7 +87,7 @@ func GetGlobalDataTime(layout string) string {
 	return GetGlobalTime().Format(layout)
 }
 
-// 检查必有字段: 只要存在该字段即可, 值可为空
+// CheckRequiredField 检查必有字段: 只要存在该字段即可, 值可为空
 func CheckRequiredField(body *[]byte, fields []string) bool {
 	for _, field := range fields {
 		if !gjson.GetBytes(*body, field).Exists() {

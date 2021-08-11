@@ -11,7 +11,7 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
-// 监听程序二进制变化(重启)和配置文件(热加载)
+// Watcher 监听程序二进制变化(重启)和配置文件(热加载)
 func Watcher() {
 	mainFile := utils.Executable(true)
 	if mainFile == "" {

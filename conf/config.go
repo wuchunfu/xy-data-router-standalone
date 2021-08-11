@@ -13,7 +13,7 @@ import (
 	"github.com/fufuok/utils/json"
 )
 
-// 接口配置
+// TJSONConf 接口配置
 type TJSONConf struct {
 	SYSConf     TSYSConf   `json:"sys_conf"`
 	APIConf     []TAPIConf `json:"api_conf"`
@@ -21,7 +21,7 @@ type TJSONConf struct {
 	ESBlackList []string   `json:"es_black_list"`
 }
 
-// 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
+// TSYSConf 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
 type TSYSConf struct {
 	Debug                      bool       `json:"debug"`
 	Log                        tLogConf   `json:"log"`
@@ -114,7 +114,7 @@ func init() {
 	}
 }
 
-// 加载配置
+// LoadConf 加载配置
 func LoadConf() error {
 	config, apiConfig, whiteList, blackList, err := readConf()
 	if err != nil {

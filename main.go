@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/zh-five/xdaemon"
+	"github.com/fufuok/utils/xdaemon"
 
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/master"

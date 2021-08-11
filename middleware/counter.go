@@ -8,7 +8,7 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
-// 请求简单计数
+// HTTPCounter 请求简单计数
 func HTTPCounter() fiber.Handler {
 	return func(c *fiber.Ctx) (err error) {
 		atomic.AddUint64(&service.HTTPRequestCount, 1)

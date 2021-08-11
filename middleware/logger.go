@@ -10,7 +10,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-// Web 日志
+// WebAPILogger Web 日志
 func WebAPILogger() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		start := time.Now()
@@ -42,7 +42,7 @@ func WebAPILogger() fiber.Handler {
 	}
 }
 
-// Recover 并记录日志
+// RecoverLogger Recover 并记录日志
 func RecoverLogger() fiber.Handler {
 	return func(c *fiber.Ctx) (err error) {
 		// Catch panics

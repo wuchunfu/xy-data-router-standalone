@@ -12,7 +12,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-// 基于请求 IP 限流
+// IPLimiter 基于请求 IP 限流
 func IPLimiter() fiber.Handler {
 	return limiter.New(limiter.Config{
 		Max:        conf.Config.SYSConf.LimitRequest,

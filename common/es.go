@@ -21,7 +21,7 @@ func initES() {
 	ES = es
 }
 
-// 重新初始化 ES 连接, 成功则更新连接
+// InitES 重新初始化 ES 连接, 成功则更新连接
 func InitES() error {
 	es, cfgErr, esErr := newES()
 	if cfgErr != nil || esErr != nil {

@@ -50,7 +50,7 @@ func initUDPServer() {
 
 	common.Log.Info().
 		Str("raddr", conf.Config.SYSConf.UDPServerRAddr).Str("rwaddr", conf.Config.SYSConf.UDPServerRWAddr).
-		Msgf("Listening and serving UDP")
+		Msg("Listening and serving UDP")
 
 	err := <-exitUDPChan
 	log.Fatalln("Failed to start UDP Server:", err, "\nbye.")

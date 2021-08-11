@@ -8,7 +8,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-// ES 查询接口白名单检查
+// CheckESWhiteList ES 查询接口白名单检查
 func CheckESWhiteList(asAPI bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		if len(conf.ESWhiteListConfig) > 0 && !utils.InIPNetString(c.IP(), conf.ESWhiteListConfig) {

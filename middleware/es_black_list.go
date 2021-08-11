@@ -8,7 +8,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-// ES 数据上报接口黑名单检查
+// CheckESBlackList ES 数据上报接口黑名单检查
 func CheckESBlackList(asAPI bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		if len(conf.ESBlackListConfig) > 0 && utils.InIPNetString(c.IP(), conf.ESBlackListConfig) {

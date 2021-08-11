@@ -28,7 +28,7 @@ var (
 	// 系统启动时间
 	start = time.Now()
 
-	// 服务器 IP
+	// InternalIPv4 服务器 IP
 	InternalIPv4 string
 	ExternalIPv4 string
 )
@@ -42,7 +42,7 @@ func initRuntime() {
 	}()
 }
 
-// 运行状态
+// RunningStatus 运行状态
 func RunningStatus() map[string]interface{} {
 	return map[string]interface{}{
 		"DATA": dataStats(),
@@ -51,7 +51,7 @@ func RunningStatus() map[string]interface{} {
 	}
 }
 
-// 队列状态
+// RunningQueueStatus 队列状态
 func RunningQueueStatus() map[string]interface{} {
 	return chanStats()
 }
@@ -165,8 +165,8 @@ func dataStats() map[string]interface{} {
 		"TunnelRecvBadCount":         utils.Commau(atomic.LoadUint64(&TunRecvBadCount)),
 		"TunnelDataTotal":            utils.Commau(tunTotal),
 		"TunnelSendCount":            utils.Commau(tunSendCount),
-		"TunnelSendErrors__________": utils.Commau(tunSendErrors),
-		"TunnelTodoSendCount_______": utils.Commau(tunTotal - tunSendCount - tunSendErrors),
+		"TunnelSendErrors__________": tunSendErrors,
+		"TunnelTodoSendCount_______": tunTotal - tunSendCount - tunSendErrors,
 	}
 }
 

@@ -1,6 +1,6 @@
 package common
 
-// API 标准返回, 内部规范
+// TAPIData API 标准返回, 内部规范
 // id: 1, ok: 1, code: 0 成功; id: 0, ok: 0, code: 1 失败
 // 成功时 msg 必定为空
 type TAPIData struct {
@@ -12,7 +12,7 @@ type TAPIData struct {
 	Count int         `json:"count"`
 }
 
-// API 请求失败返回值
+// APIFailureData API 请求失败返回值
 func APIFailureData(msg string) *TAPIData {
 	return &TAPIData{
 		ID:    0,
@@ -24,7 +24,7 @@ func APIFailureData(msg string) *TAPIData {
 	}
 }
 
-// API 请求成功返回值
+// APISuccessData API 请求成功返回值
 func APISuccessData(data interface{}, count int) *TAPIData {
 	return &TAPIData{
 		ID:    1,
@@ -36,7 +36,7 @@ func APISuccessData(data interface{}, count int) *TAPIData {
 	}
 }
 
-// API 请求成功返回, 无数据
+// APISuccessNil API 请求成功返回, 无数据
 func APISuccessNil() *TAPIData {
 	return &TAPIData{
 		ID:    1,

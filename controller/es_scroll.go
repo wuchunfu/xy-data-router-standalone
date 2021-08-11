@@ -10,7 +10,7 @@ import (
 	"github.com/fufuok/xy-data-router/middleware"
 )
 
-// ES Scroll 接口
+// ESScrollHandler ES Scroll 接口
 func ESScrollHandler(c *fiber.Ctx) error {
 	esScroll := new(tESSearch)
 	if err := c.BodyParser(esScroll); err != nil || esScroll.Scroll == 0 || esScroll.ScrollID == "" {

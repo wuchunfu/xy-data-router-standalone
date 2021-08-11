@@ -7,7 +7,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-// 接收数据推入队列
+// PushDataToChanx 接收数据推入队列
 func PushDataToChanx(apiname, ip string, body *[]byte) {
 	if conf.ForwardTunnel != "" {
 		// 发送数据到 Tun

@@ -59,7 +59,7 @@ var (
 	// ES 数据接收信道
 	esChan chanx.UnboundedChan
 
-	// Tun 数据信道
+	// TunChan Tun 数据信道
 	TunChan chanx.UnboundedChan
 
 	// 计数开始时间
@@ -86,18 +86,18 @@ var (
 	// ES Bulk 写入丢弃协程数, 超过 ESBulkMaxWorkerSize
 	esBulkDiscards uint64 = 0
 
-	// HTTP 请求计数
+	// HTTPRequestCount HTTP 请求计数
 	HTTPRequestCount    uint64 = 0
 	HTTPBadRequestCount uint64 = 0
 
-	// Tunnel 服务端接收和客户端发送计数
+	// TunRecvCount Tunnel 服务端接收和客户端发送计数
 	TunRecvCount    uint64 = 0
 	TunRecvBadCount uint64 = 0
 	TunSendCount    uint64 = 0
 	TunSendErrors   uint64 = 0
 	TunDataTotal    uint64 = 0
 
-	// UDP 请求计数
+	// UDPRequestCount UDP 请求计数
 	UDPRequestCount uint64 = 0
 
 	// 数据处理协程池
@@ -142,12 +142,12 @@ func PoolRelease() {
 	esBulkPool.Release()
 }
 
-// 调节协程并发数
+// TuneDataProcessorSize 调节协程并发数
 func TuneDataProcessorSize(n int) {
 	dataProcessorPool.Tune(n)
 }
 
-// 调节协程并发数
+// TuneESBulkWorkerSize 调节协程并发数
 func TuneESBulkWorkerSize(n int) {
 	esBulkPool.Tune(n)
 }

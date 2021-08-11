@@ -16,7 +16,7 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
-// 处理接口请求
+// V1APIHandler 处理接口请求
 func V1APIHandler(c *fiber.Ctx) error {
 	// Some values returned from *fiber.Ctx are not immutable by default
 	apiname := utils.CopyString(c.Params("apiname"))

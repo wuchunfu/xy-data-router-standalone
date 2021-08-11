@@ -10,7 +10,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// 获取监控平台源数据配置
+// GetMonitorSource 获取监控平台源数据配置
 func (c *TFilesConf) GetMonitorSource() error {
 	// Token: md5(timestamp + auth_key)
 	timestamp := utils.MustString(time.Now().Unix())

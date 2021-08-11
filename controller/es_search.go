@@ -23,7 +23,7 @@ type tESSearch struct {
 	ClientIP string
 }
 
-// ES 通用查询接口
+// ESSearchHandler ES 通用查询接口
 func ESSearchHandler(c *fiber.Ctx) error {
 	esSearch := new(tESSearch)
 	if err := c.BodyParser(esSearch); err != nil || esSearch.Index == "" || esSearch.Body == nil {

@@ -14,7 +14,7 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
-// 接口服务
+// InitWebServer 接口服务
 func InitWebServer() {
 	app := fiber.New(fiber.Config{
 		ServerHeader:          conf.WebAPPName,

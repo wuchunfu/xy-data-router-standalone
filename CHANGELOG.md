@@ -1,5 +1,10 @@
 # XY.DataRouter
 
+## 1.100.42.21080808
+
+- 稳定版本
+- 升级信赖包, 规范注释
+
 ## 1.100.41.21071515
 
 - 增加 `TunnelDataTotal` `TunnelTodoSendCount` 等, 规范统计字段名称
