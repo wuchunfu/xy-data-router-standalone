@@ -27,6 +27,7 @@ func InitTunClient() {
 
 	defer client.Stop()
 	client.Codec = &genCodec{}
+	client.Handler.SetLogTag("[Tunnel CLI]")
 
 	// 接收数据转发到通道 (支持创建多个 client, 每 client 支持多协程并发处理数据)
 	for item := range service.TunChan.Out {

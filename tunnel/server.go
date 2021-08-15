@@ -29,6 +29,7 @@ func newTunServer() error {
 
 	svr := arpc.NewServer()
 	svr.Codec = &genCodec{}
+	svr.Handler.SetLogTag("[Tunnel SVR]")
 	svr.Handler.Handle(tunMethod, onData)
 	if err = svr.Serve(ln); err != nil {
 		return err

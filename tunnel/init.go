@@ -13,6 +13,5 @@ var (
 
 func init() {
 	arpc.DefaultHandler.SetSendQueueSize(conf.Config.SYSConf.TunSendQueueSize)
-	arpc.DefaultHandler.SetLogTag("[Tunnel]")
 	log.SetLogger(&logger{})
 }
