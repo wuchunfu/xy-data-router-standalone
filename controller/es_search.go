@@ -6,12 +6,11 @@ import (
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v6/esapi"
-	"github.com/fufuok/utils"
-	"github.com/fufuok/utils/json"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/json"
 	"github.com/fufuok/xy-data-router/middleware"
 )
 
@@ -69,7 +68,7 @@ func parseESSearch(resp *esapi.Response, esSearch *tESSearch) (map[string]interf
 				Msg("es search, parsing the response body")
 		} else {
 			common.LogSampled.Warn().
-				Bytes("body", utils.MustJSON(esSearch)).Int("http_code", resp.StatusCode).
+				Bytes("body", json.MustJSON(esSearch)).Int("http_code", resp.StatusCode).
 				Msgf("es search, %s, %+v", msg, res["error"])
 		}
 
@@ -84,12 +83,16 @@ func parseESSearch(resp *esapi.Response, esSearch *tESSearch) (map[string]interf
 	}
 
 	// 慢查询日志
-	costTime := time.Duration(int(res["took"].(float64))) * time.Millisecond
+	took, _ := res["took"].(float64)
+	costTime := time.Duration(int(took)) * time.Millisecond
 	if costTime > conf.Config.SYSConf.ESSlowQueryDuration {
 		common.LogSampled.Warn().
-			Bytes("body", utils.MustJSON(esSearch)).Dur("duration", costTime).
+			Bytes("body", json.MustJSON(esSearch)).Dur("duration", costTime).
 			Msgf("es search slow, timeout: %s", res["timed_out"])
 	}
 
-	return res, int(res["hits"].(map[string]interface{})["total"].(float64)), ""
+	hits, _ := res["hits"].(map[string]interface{})
+	total, _ := hits["total"].(float64)
+
+	return res, int(total), ""
 }

@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
-	"github.com/fufuok/utils/json"
 	"github.com/panjf2000/ants/v2"
 	"github.com/rs/zerolog"
 	"github.com/tidwall/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/json"
 )
 
 // ES 批量写入响应

@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"github.com/fufuok/utils"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/internal/json"
 )
 
-var apiSuccessNil = utils.MustJSON(common.APISuccessNil())
+var apiSuccessNil = json.MustJSON(common.APISuccessNil())
 
 // APIException 通用异常处理
 func APIException(c *fiber.Ctx, code int, msg string) error {

@@ -6,8 +6,8 @@ import (
 
 const (
 	WebAPPName     = "XY.DataRouter"
-	CurrentVersion = "1.100.42.21080808"
-	LastChange     = "stable version"
+	CurrentVersion = "1.100.43.21082020"
+	LastChange     = "utils v0.2.0"
 	ProjectName    = "xydatarouter"
 
 	// LogLevel 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off

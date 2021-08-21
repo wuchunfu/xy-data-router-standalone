@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/fufuok/utils/timewheel"
+	"github.com/fufuok/timewheel"
 	"github.com/panjf2000/gnet/pool/goroutine"
 	"github.com/tidwall/gjson"
 )

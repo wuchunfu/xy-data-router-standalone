@@ -10,19 +10,20 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
-	"github.com/fufuok/utils/json"
+
+	"github.com/fufuok/xy-data-router/internal/json"
 )
 
-// TJSONConf 接口配置
-type TJSONConf struct {
-	SYSConf     TSYSConf   `json:"sys_conf"`
+// tJSONConf 接口配置
+type tJSONConf struct {
+	SYSConf     tSYSConf   `json:"sys_conf"`
 	APIConf     []TAPIConf `json:"api_conf"`
 	ESWhiteList []string   `json:"es_white_list"`
 	ESBlackList []string   `json:"es_black_list"`
 }
 
-// TSYSConf 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
-type TSYSConf struct {
+// tSYSConf 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
+type tSYSConf struct {
 	Debug                      bool       `json:"debug"`
 	Log                        tLogConf   `json:"log"`
 	PProfAddr                  string     `json:"pprof_addr"`
@@ -130,14 +131,14 @@ func LoadConf() error {
 }
 
 // 读取配置
-func readConf() (*TJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[*net.IPNet]struct{}, error) {
+func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[*net.IPNet]struct{}, error) {
 	body, err := ioutil.ReadFile(ConfigFile)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	var config *TJSONConf
-	if err := json.Unmarshal(body, &config); err != nil {
+	config := new(tJSONConf)
+	if err := json.Unmarshal(body, config); err != nil {
 		return nil, nil, nil, nil, err
 	}
 

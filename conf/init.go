@@ -25,7 +25,7 @@ var LogFile = filepath.Join(LogDir, ProjectName+".log")
 var LogDaemon = filepath.Join(LogDir, "daemon.log")
 
 // Config 所有配置
-var Config TJSONConf
+var Config tJSONConf
 
 // APIConfig 以接口名为键的配置
 var APIConfig map[string]*TAPIConf

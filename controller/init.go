@@ -4,12 +4,12 @@ import (
 	"log"
 	"sync/atomic"
 
-	"github.com/fufuok/utils/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/json"
 	"github.com/fufuok/xy-data-router/middleware"
 	"github.com/fufuok/xy-data-router/service"
 )

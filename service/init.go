@@ -24,7 +24,7 @@ type tDataItem struct {
 // 数据分发
 type tDataRouter struct {
 	// 数据接收信道
-	drChan chanx.UnboundedChan
+	drChan *chanx.UnboundedChan
 
 	// 接口配置
 	apiConf *conf.TAPIConf
@@ -35,8 +35,8 @@ type tDataRouter struct {
 
 // 数据分发信道
 type tDataRouterOut struct {
-	esChan  chanx.UnboundedChan
-	apiChan chanx.UnboundedChan
+	esChan  *chanx.UnboundedChan
+	apiChan *chanx.UnboundedChan
 }
 
 // 数据处理
@@ -57,10 +57,10 @@ var (
 	dataRouters = cmap.New()
 
 	// ES 数据接收信道
-	esChan chanx.UnboundedChan
+	esChan *chanx.UnboundedChan
 
 	// TunChan Tun 数据信道
-	TunChan chanx.UnboundedChan
+	TunChan *chanx.UnboundedChan
 
 	// 计数开始时间
 	counterStartTime = common.GetGlobalTime()
@@ -153,7 +153,7 @@ func TuneESBulkWorkerSize(n int) {
 }
 
 // 初始化无限缓冲信道
-func newChanx() chanx.UnboundedChan {
+func newChanx() *chanx.UnboundedChan {
 	return chanx.NewUnboundedChan(conf.Config.SYSConf.DataChanSize, conf.Config.SYSConf.DataChanMaxBufCap)
 }
 
