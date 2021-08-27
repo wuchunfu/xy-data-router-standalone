@@ -3,7 +3,6 @@ package tunnel
 import (
 	"log"
 	"net"
-	"sync/atomic"
 
 	"github.com/lesismal/arpc"
 
@@ -34,10 +33,10 @@ func InitTunClient() {
 		err = client.Notify(tunMethod, item, arpc.TimeZero)
 		if err != nil {
 			common.LogSampled.Info().Err(err).Msg("Failed to write Tunnel")
-			atomic.AddUint64(&service.TunSendErrors, 1)
+			service.TunSendErrors.Inc()
 			continue
 		}
 
-		atomic.AddUint64(&service.TunSendCount, 1)
+		service.TunSendCount.Inc()
 	}
 }

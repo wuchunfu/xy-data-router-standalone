@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"sync/atomic"
 	"time"
 
 	"github.com/fufuok/utils"
@@ -17,19 +16,20 @@ import (
 // InitDataRouter 根据接口配置初始化数据分发处理器
 func InitDataRouter() {
 	// 关闭配置中已取消的接口
-	for item := range dataRouters.IterBuffered() {
-		if _, ok := conf.APIConfig[item.Key]; !ok {
-			dataRouters.Remove(item.Key)
-			close(item.Val.(*tDataRouter).drChan.In)
+	dataRouters.Range(func(key string, value interface{}) bool {
+		if _, ok := conf.APIConfig[key]; !ok {
+			dataRouters.Delete(key)
+			close(value.(*tDataRouter).drChan.In)
 		}
-	}
+		return true
+	})
 
 	// 按接口创建数据分发处理器
 	ymd := common.GetGlobalDataTime("060102")
 	for apiname, cfg := range conf.APIConfig {
 		apiConf := cfg
 		apiConf.ESBulkHeader = getESBulkHeader(apiConf, ymd)
-		v, ok := dataRouters.Get(apiname)
+		v, ok := dataRouters.Load(apiname)
 		if ok {
 			// 更新接口配置
 			dr := v.(*tDataRouter)
@@ -37,7 +37,7 @@ func InitDataRouter() {
 		} else {
 			// 新建数据通道
 			dr := newDataRouter(apiConf)
-			dataRouters.Set(apiname, dr)
+			dataRouters.Store(apiname, dr)
 
 			// 开启数据分发处理器
 			go dataRouter(dr)
@@ -71,12 +71,12 @@ func dataRouter(dr *tDataRouter) {
 	for item := range dr.drChan.Out {
 		// 提交不阻塞, 有执行并发限制, 最大排队数限制
 		_ = common.Pool.Submit(func() {
-			atomic.AddInt64(&dataProcessorTodoCount, 1)
+			dataProcessorTodoCount.Inc()
 			if err := dataProcessorPool.Invoke(&tDataProcessor{
 				dr:   dr,
 				data: item.(*tDataItem),
 			}); err != nil {
-				atomic.AddUint64(&dataProcessorDiscards, 1)
+				dataProcessorDiscards.Inc()
 				common.LogSampled.Error().Err(err).Msg("go dataProcessor")
 			}
 		})
@@ -91,7 +91,7 @@ func dataRouter(dr *tDataRouter) {
 // 数据处理和分发
 // 格式化每个 JSON 数据, 附加系统字段, 发送给 ES 和 API 队列
 func dataProcessor(dp *tDataProcessor) {
-	defer atomic.AddInt64(&dataProcessorTodoCount, -1)
+	defer dataProcessorTodoCount.Dec()
 	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
 
 	// 兼容 {body} 或 {body}=-:-=[{body},{body}]

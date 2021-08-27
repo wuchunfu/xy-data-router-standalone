@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"strings"
-	"sync/atomic"
 	"time"
 
 	"github.com/fufuok/utils"
@@ -89,10 +88,11 @@ func updateESBulkHeader() {
 	for {
 		now := common.GetGlobalTime()
 		ymd := now.Format("060102")
-		for item := range dataRouters.IterBuffered() {
-			dr := item.Val.(*tDataRouter)
+		dataRouters.Range(func(_ string, value interface{}) bool {
+			dr := value.(*tDataRouter)
 			dr.apiConf.ESBulkHeader = getESBulkHeader(dr.apiConf, ymd)
-		}
+			return true
+		})
 		// 等待明天 0 点再执行
 		now = common.GetGlobalTime()
 		time.Sleep(utils.Get0Tomorrow(now).Sub(now))
@@ -143,7 +143,7 @@ func esWorker() {
 				}
 			}
 
-			atomic.AddUint64(&esDataTotal, 1)
+			esDataTotal.Inc()
 		}
 	}
 }
@@ -160,9 +160,9 @@ func postES(buf *bytes.Buffer) {
 // 提交批量任务, 提交不阻塞, 有执行并发限制, 最大排队数限制
 func submitESBulk(body *[]byte) {
 	_ = common.Pool.Submit(func() {
-		atomic.AddInt64(&esBulkTodoCount, 1)
+		esBulkTodoCount.Inc()
 		if err := esBulkPool.Invoke(body); err != nil {
-			atomic.AddUint64(&esBulkDiscards, 1)
+			esBulkDiscards.Inc()
 			common.LogSampled.Error().Err(err).Msg("go esBulk")
 		}
 	})
@@ -170,17 +170,17 @@ func submitESBulk(body *[]byte) {
 
 // 批量写入 ES
 func esBulk(body *[]byte) {
-	defer atomic.AddInt64(&esBulkTodoCount, -1)
+	defer esBulkTodoCount.Dec()
 
 	resp, err := common.ES.Bulk(bytes.NewReader(*body))
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("es bulk")
-		atomic.AddUint64(&esBulkErrors, 1)
+		esBulkErrors.Inc()
 		return
 	}
 
 	// 批量写入完成计数
-	atomic.AddUint64(&esBulkCount, 1)
+	esBulkCount.Inc()
 
 	defer func() {
 		_ = resp.Body.Close()
@@ -197,12 +197,11 @@ func esBulk(body *[]byte) {
 					Str("resp", resp.String()).
 					Msg("es bulk, parsing the response body")
 			} else {
-				atomic.AddUint64(&esBulkErrors, 1)
+				esBulkErrors.Inc()
 				common.LogSampled.Error().
 					Int("http_code", resp.StatusCode).
 					Msgf("es bulk, err: %+v", res["error"])
 			}
-
 			return
 		}
 
@@ -215,7 +214,7 @@ func esBulk(body *[]byte) {
 			} else if blk.Errors {
 				for _, d := range blk.Items {
 					if d.Index.Status > 201 {
-						atomic.AddUint64(&esBulkErrors, 1)
+						esBulkErrors.Inc()
 
 						// error: [429] es_rejected_execution_exception
 						// 等待一个提交周期, 重新排队

@@ -2,7 +2,6 @@ package controller
 
 import (
 	"log"
-	"sync/atomic"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
@@ -20,6 +19,7 @@ func InitWebServer() {
 		ServerHeader:          conf.WebAPPName,
 		BodyLimit:             conf.Config.SYSConf.LimitBody,
 		JSONEncoder:           json.Marshal,
+		JSONDecoder:           json.Unmarshal,
 		DisableStartupMessage: true,
 		StrictRouting:         true,
 		DisableKeepalive:      !conf.Config.SYSConf.EnableKeepalive,
@@ -49,7 +49,7 @@ func errorHandler(c *fiber.Ctx, err error) error {
 		code = e.Code
 	}
 
-	atomic.AddUint64(&service.HTTPBadRequestCount, 1)
+	service.HTTPBadRequestCount.Inc()
 	if conf.Config.SYSConf.Debug {
 		common.LogSampled.Error().Err(err).
 			Str("client_ip", c.IP()).Str("uri", c.OriginalURL()).

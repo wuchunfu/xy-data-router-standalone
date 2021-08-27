@@ -1,5 +1,10 @@
 # XY.DataRouter
 
+## 1.100.44.21082808
+
+- 使用 `xsync.NewMap` 替代 `cmap.New`, `xsync.Counter` 替代 `atomic`
+- 接口不存在日志记录客户端 IP
+
 ## 1.100.43.21082020
 
 - 升级 `go1.17` `utils 0.2.0` 等

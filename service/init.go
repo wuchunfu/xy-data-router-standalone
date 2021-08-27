@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/fufuok/chanx"
-	"github.com/fufuok/cmap"
 	"github.com/panjf2000/ants/v2"
+	"github.com/puzpuzpuz/xsync"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -54,7 +54,7 @@ var (
 	esBodySep = []byte(conf.ESBodySep)
 
 	// 以接口名为键的数据通道
-	dataRouters = cmap.New()
+	dataRouters = xsync.NewMap()
 
 	// ES 数据接收信道
 	esChan *chanx.UnboundedChan
@@ -66,39 +66,39 @@ var (
 	counterStartTime = common.GetGlobalTime()
 
 	// 待处理的数据项计数
-	dataProcessorTodoCount int64 = 0
+	dataProcessorTodoCount xsync.Counter
 
 	// 数据处理丢弃计数, 超过 DataProcessorMaxWorkerSize
-	dataProcessorDiscards uint64 = 0
+	dataProcessorDiscards xsync.Counter
 
 	// ES 收到数据数量计数
-	esDataTotal uint64 = 0
+	esDataTotal xsync.Counter
 
 	// ES Bulk 批量写入完成计数
-	esBulkCount uint64 = 0
+	esBulkCount xsync.Counter
 
 	// ES Bulk 写入错误次数
-	esBulkErrors uint64 = 0
+	esBulkErrors xsync.Counter
 
 	// ES Bulk 待处理项计数
-	esBulkTodoCount int64 = 0
+	esBulkTodoCount xsync.Counter
 
 	// ES Bulk 写入丢弃协程数, 超过 ESBulkMaxWorkerSize
-	esBulkDiscards uint64 = 0
+	esBulkDiscards xsync.Counter
 
 	// HTTPRequestCount HTTP 请求计数
-	HTTPRequestCount    uint64 = 0
-	HTTPBadRequestCount uint64 = 0
+	HTTPRequestCount    xsync.Counter
+	HTTPBadRequestCount xsync.Counter
 
 	// TunRecvCount Tunnel 服务端接收和客户端发送计数
-	TunRecvCount    uint64 = 0
-	TunRecvBadCount uint64 = 0
-	TunSendCount    uint64 = 0
-	TunSendErrors   uint64 = 0
-	TunDataTotal    uint64 = 0
+	TunRecvCount    xsync.Counter
+	TunRecvBadCount xsync.Counter
+	TunSendCount    xsync.Counter
+	TunSendErrors   xsync.Counter
+	TunDataTotal    xsync.Counter
 
-	// UDPRequestCount UDP 请求计数
-	UDPRequestCount uint64 = 0
+	// UDP 请求计数
+	udpRequestCount xsync.Counter
 
 	// 数据处理协程池
 	dataProcessorPool *ants.PoolWithFunc

@@ -258,7 +258,7 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		return nil, nil, nil, nil, err
 	}
 
-	// ES 查询接口 IP 白名单
+	// 接口访问 IP 黑名单
 	blackList, err := getIPNetList(config.ESBlackList)
 	if err != nil {
 		return nil, nil, nil, nil, err

@@ -24,7 +24,9 @@ func V1APIHandler(c *fiber.Ctx) error {
 	// 检查接口配置
 	apiConf, ok := conf.APIConfig[apiname]
 	if !ok || apiConf.APIName == "" {
-		common.LogSampled.Error().Str("uri", c.OriginalURL()).Int("len", len(apiname)).Msg("api not found")
+		common.LogSampled.Error().
+			Str("client_ip", c.IP()).Str("uri", c.OriginalURL()).Int("len", len(apiname)).
+			Msg("api not found")
 		return middleware.APIFailure(c, "接口配置有误")
 	}
 

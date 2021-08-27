@@ -4,7 +4,6 @@ import (
 	"log"
 	"net"
 	"runtime"
-	"sync/atomic"
 
 	"github.com/fufuok/utils"
 
@@ -110,8 +109,8 @@ func writeToUDP(conn *net.UDPConn, clientAddr *net.UDPAddr) {
 
 // 校验并保存数据
 func saveUDPData(body *[]byte, clientIP string) bool {
-	// 计数
-	atomic.AddUint64(&UDPRequestCount, 1)
+	// 请求计数
+	udpRequestCount.Inc()
 
 	if len(conf.ESBlackListConfig) > 0 && utils.InIPNetString(clientIP, conf.ESBlackListConfig) {
 		common.LogSampled.Info().Str("method", "UDP").Msg("非法访问: " + clientIP)
@@ -127,7 +126,9 @@ func saveUDPData(body *[]byte, clientIP string) bool {
 	// 接口配置检查
 	apiConf, ok := conf.APIConfig[esIndex]
 	if !ok || apiConf.APIName == "" {
-		common.LogSampled.Error().Str("udp_x", esIndex).Int("len", len(esIndex)).Msg("api not found")
+		common.LogSampled.Error().
+			Str("client_ip", clientIP).Str("udp_x", esIndex).Int("len", len(esIndex)).
+			Msg("api not found")
 		return false
 	}
 

@@ -3,7 +3,6 @@ package tunnel
 import (
 	"log"
 	"net"
-	"sync/atomic"
 
 	"github.com/lesismal/arpc"
 
@@ -42,13 +41,13 @@ func newTunServer() error {
 func onData(c *arpc.Context) {
 	d := &common.GenDataItem{}
 	if err := c.Bind(d); err != nil {
-		atomic.AddUint64(&service.TunRecvBadCount, 1)
+		service.TunRecvBadCount.Inc()
 		return
 	}
 
 	// 写入队列
 	_ = common.Pool.Submit(func() {
-		atomic.AddUint64(&service.TunRecvCount, 1)
+		service.TunRecvCount.Inc()
 		if d.APIName != "" {
 			service.PushDataToChanx(d.APIName, d.IP, &d.Body)
 		}

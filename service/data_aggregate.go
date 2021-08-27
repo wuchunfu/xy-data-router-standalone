@@ -1,8 +1,6 @@
 package service
 
 import (
-	"sync/atomic"
-
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 )
@@ -16,12 +14,11 @@ func PushDataToChanx(apiname, ip string, body *[]byte) {
 			IP:      ip,
 			Body:    *body,
 		}
-		atomic.AddUint64(&TunDataTotal, 1)
-
+		TunDataTotal.Inc()
 		return
 	}
 
-	dr, ok := dataRouters.Get(apiname)
+	dr, ok := dataRouters.Load(apiname)
 	if !ok {
 		common.LogSampled.Error().Str("apiname", apiname).Int("len", len(apiname)).Msg("nonexistence")
 		return

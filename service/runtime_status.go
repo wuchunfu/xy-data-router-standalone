@@ -2,7 +2,6 @@ package service
 
 import (
 	"runtime"
-	"sync/atomic"
 	"time"
 
 	"github.com/fufuok/utils"
@@ -121,9 +120,9 @@ func memStats() map[string]interface{} {
 
 // 数据处理信息
 func dataStats() map[string]interface{} {
-	tunSendErrors := atomic.LoadUint64(&TunSendErrors)
-	tunSendCount := atomic.LoadUint64(&TunSendCount)
-	tunTotal := atomic.LoadUint64(&TunDataTotal)
+	tunSendErrors := TunSendErrors.Value()
+	tunSendCount := TunSendCount.Value()
+	tunTotal := TunDataTotal.Value()
 
 	return map[string]interface{}{
 		// 数据传输到 ES 处理通道繁忙状态
@@ -143,28 +142,28 @@ func dataStats() map[string]interface{} {
 		"CommonPoolRunning": common.Pool.Running(),
 
 		// 数据处理协程池, 排队, 待处理数据量, 丢弃数据量, 繁忙状态
-		"DataProcessorTodoCount____": atomic.LoadInt64(&dataProcessorTodoCount),
-		"DataProcessorDiscards_____": atomic.LoadUint64(&dataProcessorDiscards),
+		"DataProcessorTodoCount____": dataProcessorTodoCount.Value(),
+		"DataProcessorDiscards_____": dataProcessorDiscards.Value(),
 		"DataProcessorWorkerRunning": dataProcessorPool.Running(),
 		"DataProcessorWorkerFree___": dataProcessorPool.Free(),
 
 		// ES 总数据量, 排队, 待批量写入任务数, 丢弃任务数, 写入错误任务数, 繁忙状态
-		"ESDataTotal":                utils.Commau(atomic.LoadUint64(&esDataTotal)),
-		"ESBulkTodoCount___________": atomic.LoadInt64(&esBulkTodoCount),
-		"ESBulkCount":                utils.Commau(atomic.LoadUint64(&esBulkCount)),
-		"ESBulkDiscards____________": atomic.LoadUint64(&esBulkDiscards),
-		"ESBulkErrors______________": atomic.LoadUint64(&esBulkErrors),
+		"ESDataTotal":                utils.Comma(esDataTotal.Value()),
+		"ESBulkTodoCount___________": esBulkTodoCount.Value(),
+		"ESBulkCount":                utils.Comma(esBulkCount.Value()),
+		"ESBulkDiscards____________": esBulkDiscards.Value(),
+		"ESBulkErrors______________": esBulkErrors.Value(),
 		"ESBulkWorkerRunning":        esBulkPool.Running(),
 		"ESBulkWorkerFree__________": esBulkPool.Free(),
 
 		// HTTP 请求数, 非法/错误请求数, UDP 请求数, Tunnel 收发数据数
-		"HTTPRequestCount":           utils.Commau(atomic.LoadUint64(&HTTPRequestCount)),
-		"HTTPBadRequestCount":        utils.Commau(atomic.LoadUint64(&HTTPBadRequestCount)),
-		"UDPRequestCount":            utils.Commau(atomic.LoadUint64(&UDPRequestCount)),
-		"TunnelRecvCount":            utils.Commau(atomic.LoadUint64(&TunRecvCount)),
-		"TunnelRecvBadCount":         utils.Commau(atomic.LoadUint64(&TunRecvBadCount)),
-		"TunnelDataTotal":            utils.Commau(tunTotal),
-		"TunnelSendCount":            utils.Commau(tunSendCount),
+		"HTTPRequestCount":           utils.Comma(HTTPRequestCount.Value()),
+		"HTTPBadRequestCount":        utils.Comma(HTTPBadRequestCount.Value()),
+		"UDPRequestCount":            utils.Comma(udpRequestCount.Value()),
+		"TunnelRecvCount":            utils.Comma(TunRecvCount.Value()),
+		"TunnelRecvBadCount________": TunRecvBadCount.Value(),
+		"TunnelDataTotal":            utils.Comma(tunTotal),
+		"TunnelSendCount":            utils.Comma(tunSendCount),
 		"TunnelSendErrors__________": tunSendErrors,
 		"TunnelTodoSendCount_______": tunTotal - tunSendCount - tunSendErrors,
 	}
@@ -173,9 +172,9 @@ func dataStats() map[string]interface{} {
 // 数据队列信息
 func chanStats() map[string]interface{} {
 	stats := map[string]interface{}{}
-	for item := range dataRouters.IterBuffered() {
-		dr := item.Val.(*tDataRouter)
-		stats[item.Key] = tDataRouterStats{
+	dataRouters.Range(func(key string, value interface{}) bool {
+		dr := value.(*tDataRouter)
+		stats[key] = tDataRouterStats{
 			DataRouterQueue: tChanLen{
 				AllLen:   dr.drChan.Len(),
 				BufLen:   dr.drChan.BufLen(),
@@ -187,7 +186,8 @@ func chanStats() map[string]interface{} {
 				Discards: dr.drOut.apiChan.Discards(),
 			},
 		}
-	}
+		return true
+	})
 
 	return stats
 }

@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"sync/atomic"
-
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/service"
@@ -11,7 +9,7 @@ import (
 // HTTPCounter 请求简单计数
 func HTTPCounter() fiber.Handler {
 	return func(c *fiber.Ctx) (err error) {
-		atomic.AddUint64(&service.HTTPRequestCount, 1)
+		service.HTTPRequestCount.Inc()
 		return c.Next()
 	}
 }
