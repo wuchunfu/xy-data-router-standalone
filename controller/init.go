@@ -33,7 +33,13 @@ func InitWebServer() {
 		app.Use(middleware.IPLimiter())
 	}
 
-	app.Use(middleware.CheckESBlackList(true), middleware.RecoverLogger(), middleware.HTTPCounter(), compress.New())
+	app.Use(
+		middleware.RecoverLogger(),
+		middleware.CheckESBlackList(true),
+		middleware.Favicon(),
+		middleware.HTTPCounter(),
+		compress.New(),
+	)
 	setupRouter(app)
 
 	common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerAddr).Msg("Listening and serving HTTP")
