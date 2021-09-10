@@ -5,6 +5,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/service"
 )
 
 func setupRouter(app *fiber.App) {
@@ -44,6 +45,14 @@ func setupRouter(app *fiber.App) {
 		return c.SendString("PONG")
 	})
 
+	// 客户端和服务端 IP
+	app.Get("/client_ip", func(c *fiber.Ctx) error {
+		return c.SendString(c.IP())
+	})
+	app.Get("/server_ip", func(c *fiber.Ctx) error {
+		return c.SendString(service.ExternalIPv4)
+	})
+
 	// 服务器状态
 	app.Get("/sys/status", runningStatusHandler)
 	app.Get("/sys/status/queue", runningQueueStatusHandler)
@@ -51,10 +60,10 @@ func setupRouter(app *fiber.App) {
 		return c.SendString(c.IP() + " - " + c.Get("x-forwarded-for"))
 	})
 
+	// 记录意外: https://github.com/gofiber/fiber/issues/1388
 	app.All("/", func(c *fiber.Ctx) error {
-		method := c.Method()
 		originalUrl := c.OriginalURL()
-		if originalUrl != "/" && method == "POST" {
+		if originalUrl != "/" && c.Method() == "POST" {
 			common.LogSampled.Error().
 				Str("client_ip", c.IP()).
 				Str("method", c.Method()).

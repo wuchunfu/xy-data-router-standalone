@@ -4,20 +4,20 @@ go 1.17
 
 require (
 	github.com/elastic/go-elasticsearch/v6 v6.8.10
-	github.com/fufuok/chanx v0.0.106
+	github.com/fufuok/chanx v0.0.107
 	github.com/fufuok/timewheel v1.0.100
-	github.com/fufuok/utils v0.2.2
-	github.com/goccy/go-json v0.7.7
+	github.com/fufuok/utils v0.2.3
+	github.com/goccy/go-json v0.7.8
 	github.com/gofiber/fiber/v2 v2.18.0
 	github.com/imroc/req v0.3.0
-	github.com/lesismal/arpc v1.1.10
+	github.com/lesismal/arpc v1.2.1
 	github.com/panjf2000/ants/v2 v2.4.6
 	github.com/panjf2000/gnet v1.5.3
-	github.com/puzpuzpuz/xsync v1.0.2
-	github.com/rs/zerolog v1.23.0
-	github.com/tidwall/gjson v1.8.1
+	github.com/puzpuzpuz/xsync v1.1.0
+	github.com/rs/zerolog v1.25.0
+	github.com/tidwall/gjson v1.9.0
 	github.com/tidwall/pretty v1.2.0
-	github.com/tidwall/sjson v1.1.7
+	github.com/tidwall/sjson v1.2.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 

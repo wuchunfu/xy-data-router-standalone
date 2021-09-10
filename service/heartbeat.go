@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
-	"github.com/fufuok/xy-data-router/common"
 
+	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 )
 
