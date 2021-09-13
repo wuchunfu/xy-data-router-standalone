@@ -2,7 +2,7 @@
 
 ## v1.100.45.21090909
 
-- 增加 `favicon.ico` 的中间件, 内嵌资源
+- 内嵌 `favicon.ico`
 - 增加 `/client_ip` `/server_ip` 显示客户端来访 IP 和当前服务器 IP
 - 升级依赖包
 

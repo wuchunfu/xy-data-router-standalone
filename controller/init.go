@@ -1,10 +1,13 @@
 package controller
 
 import (
+	"embed"
 	"log"
+	"net/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/favicon"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -12,6 +15,9 @@ import (
 	"github.com/fufuok/xy-data-router/middleware"
 	"github.com/fufuok/xy-data-router/service"
 )
+
+//go:embed assets/favicon.ico
+var fav embed.FS
 
 // InitWebServer 接口服务
 func InitWebServer() {
@@ -36,7 +42,10 @@ func InitWebServer() {
 	app.Use(
 		middleware.RecoverLogger(),
 		middleware.CheckESBlackList(true),
-		middleware.Favicon(),
+		favicon.New(favicon.Config{
+			File:       "assets/favicon.ico",
+			FileSystem: http.FS(fav),
+		}),
 		middleware.HTTPCounter(),
 		compress.New(),
 	)
