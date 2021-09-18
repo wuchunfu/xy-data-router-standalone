@@ -11,12 +11,11 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
-func InitTunClient() {
+func initTunClient() {
 	if conf.ForwardTunnel == "" {
 		return
 	}
 
-	common.Log.Info().Str("addr", conf.ForwardTunnel).Msg("Start Tunnel Client")
 	client, err := arpc.NewClient(func() (net.Conn, error) {
 		return net.DialTimeout("tcp", conf.ForwardTunnel, conf.TunDialTimeout)
 	})
@@ -26,13 +25,19 @@ func InitTunClient() {
 
 	defer client.Stop()
 	client.Codec = &genCodec{}
+	common.Log.Info().
+		Str("addr", conf.ForwardTunnel).
+		Int("send_queue_size", client.Handler.SendQueueSize()).
+		Int("send_buffer_size", client.Handler.SendBufferSize()).
+		Int("recv_buffer_size", client.Handler.RecvBufferSize()).
+		Msg("Start Tunnel Client")
 
 	// 接收数据转发到通道 (支持创建多个 client, 每 client 支持多协程并发处理数据)
 	for item := range service.TunChan.Out {
 		// 不超时, 直到 ErrClientOverstock
 		err = client.Notify(tunMethod, item, arpc.TimeZero)
 		if err != nil {
-			common.LogSampled.Info().Err(err).Msg("Failed to write Tunnel")
+			common.LogSampled.Warn().Err(err).Msg("Failed to write Tunnel")
 			service.TunSendErrors.Inc()
 			continue
 		}

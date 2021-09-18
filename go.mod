@@ -10,23 +10,23 @@ require (
 	github.com/goccy/go-json v0.7.8
 	github.com/gofiber/fiber/v2 v2.18.0
 	github.com/imroc/req v0.3.0
-	github.com/lesismal/arpc v1.2.1
+	github.com/lesismal/arpc v1.2.2
 	github.com/panjf2000/ants/v2 v2.4.6
 	github.com/panjf2000/gnet v1.5.3
 	github.com/puzpuzpuz/xsync v1.1.0
 	github.com/rs/zerolog v1.25.0
-	github.com/tidwall/gjson v1.9.0
+	github.com/tidwall/gjson v1.9.1
 	github.com/tidwall/pretty v1.2.0
-	github.com/tidwall/sjson v1.2.1
+	github.com/tidwall/sjson v1.2.2
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.0.3 // indirect
-	github.com/klauspost/compress v1.13.4 // indirect
+	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/tidwall/match v1.0.3 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.29.0 // indirect
+	github.com/valyala/fasthttp v1.30.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect

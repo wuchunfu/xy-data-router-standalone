@@ -17,17 +17,18 @@
 
 ## 分支
 
-- 分布式版本: https://github.com/fufuok/xy-data-router
+- 分布式版本(旧): https://github.com/fufuok/xy-data-router
 
 - **独立运行版本**: https://github.com/fufuok/xy-data-router-standalone
 
-## 依赖
+## 日志
 
-见: `go.mod`
+见: [CHANGELOG.md](CHANGELOG.md)
 
 ## 结构
 
     .
+    ├── bin         程序二进制
     ├── common      公共结构定义和方法, 全局变量
     ├── conf        配置文件目录
     ├── controller  控制器, 路由
@@ -56,9 +57,10 @@
 2. 运行 `./bin/xydatarouter` 默认使用程序文件夹下 `./etc/xydatarouter.json`
 3. 可以带配置文件路径运行 `./bin/xydatarouter -c /mydir/conf.json`
 4. 可指定将 HTTP/UDP 接收到的数据传递给上联服务器处理(本地只接收请求, 不处理数据) `./bin/xydatarouter -f 1.2.3.4:6633`
-5. 自动后台运行并守护自身, `Warn` 和守护日志在 `log/daemon.log`, 错误日志存放于 `log`
+5. 自动后台运行并守护自身, `Warn` 和守护日志在 `log/daemon.log`, 错误日志存放于 `log` 目录
 6. 系统状态访问: http://api.domain:6600/sys/status JSON 格式, 可用于报警
 7. 心跳检查地址: http://api.domain:6600/heartbeat 返回字符串 `OK`
+8. PING 地址: http://api.domain:6600/ping 返回字符串 `PONG`
 
 ## HTTP 接口
 

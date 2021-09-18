@@ -58,18 +58,17 @@ func RunningQueueStatus() map[string]interface{} {
 // 系统信息
 func sysStatus() map[string]interface{} {
 	return map[string]interface{}{
-		"APPName":      conf.WebAPPName,
-		"Version":      conf.CurrentVersion,
-		"Update":       conf.LastChange,
+		"APPName":      conf.APPName,
+		"Version":      conf.Version,
+		"GitCommit":    conf.GitCommit,
 		"Uptime":       time.Since(start).String(),
-		"Debug":        conf.Config.SYSConf.Debug,
+		"Debug":        conf.Debug,
 		"LogLevel":     zerolog.Level(conf.Config.SYSConf.Log.Level).String(),
 		"ConfigVer":    conf.Config.SYSConf.MainConfig.ConfigVer,
 		"ConfigMD5":    conf.Config.SYSConf.MainConfig.ConfigMD5,
-		"GoVersion":    runtime.Version(),
+		"GoVersion":    conf.GoVersion,
 		"NumCpus":      runtime.NumCPU(),
 		"NumGoroutine": runtime.NumGoroutine(),
-		"OS":           runtime.GOOS,
 		"NumCgoCall":   runtime.NumCgoCall(),
 		"InternalIPv4": InternalIPv4,
 		"ExternalIPv4": ExternalIPv4,

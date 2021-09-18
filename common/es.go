@@ -13,9 +13,12 @@ var ES *elasticsearch.Client
 
 func initES() {
 	// 首次初始化 ES 连接, 连接失败时允许启动程序
-	es, cfgErr, _ := newES()
+	es, cfgErr, esErr := newES()
 	if cfgErr != nil {
 		log.Fatalln("Failed to initialize ES:", cfgErr, "\nbye.")
+	}
+	if esErr != nil {
+		Log.Error().Err(esErr).Msg("es.Ping")
 	}
 
 	ES = es
@@ -40,6 +43,11 @@ func newES() (es *elasticsearch.Client, cfgErr error, esErr error) {
 	})
 	if cfgErr != nil {
 		return nil, cfgErr, nil
+	}
+
+	// 数据转发时不涉及 ES
+	if conf.ForwardTunnel != "" {
+		return
 	}
 
 	_, esErr = es.Ping()

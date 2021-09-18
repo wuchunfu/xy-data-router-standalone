@@ -22,7 +22,7 @@ var fav embed.FS
 // InitWebServer 接口服务
 func InitWebServer() {
 	app := fiber.New(fiber.Config{
-		ServerHeader:          conf.WebAPPName,
+		ServerHeader:          conf.APPName,
 		BodyLimit:             conf.Config.SYSConf.LimitBody,
 		JSONEncoder:           json.Marshal,
 		JSONDecoder:           json.Unmarshal,
@@ -65,7 +65,7 @@ func errorHandler(c *fiber.Ctx, err error) error {
 	}
 
 	service.HTTPBadRequestCount.Inc()
-	if conf.Config.SYSConf.Debug {
+	if conf.Debug {
 		common.LogSampled.Error().Err(err).
 			Str("client_ip", c.IP()).Str("uri", c.OriginalURL()).
 			Msg(c.Method())

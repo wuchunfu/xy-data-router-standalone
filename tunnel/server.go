@@ -11,9 +11,8 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
-// InitTunServer 数据通道(RPC)服务初始化
-func InitTunServer() {
-	common.Log.Info().Str("addr", conf.Config.SYSConf.TunServerAddr).Msg("Listening and serving Tunnel")
+// 数据通道(RPC)服务初始化
+func initTunServer() {
 	if err := newTunServer(); err != nil {
 		log.Fatalln("Failed to start Tunnel Server:", err, "\nbye.")
 	}
@@ -26,11 +25,17 @@ func newTunServer() error {
 		return err
 	}
 
-	svr := arpc.NewServer()
-	svr.Codec = &genCodec{}
-	svr.Handler.SetLogTag("[Tunnel SVR]")
-	svr.Handler.Handle(tunMethod, onData)
-	if err = svr.Serve(ln); err != nil {
+	srv := arpc.NewServer()
+	srv.Codec = &genCodec{}
+	srv.Handler.SetLogTag("[Tunnel SRV]")
+	srv.Handler.Handle(tunMethod, onData)
+	common.Log.Info().
+		Str("addr", conf.Config.SYSConf.TunServerAddr).
+		Int("send_queue_size", srv.Handler.SendQueueSize()).
+		Int("send_buffer_size", srv.Handler.SendBufferSize()).
+		Int("recv_buffer_size", srv.Handler.RecvBufferSize()).
+		Msg("Listening and serving Tunnel")
+	if err = srv.Serve(ln); err != nil {
 		return err
 	}
 

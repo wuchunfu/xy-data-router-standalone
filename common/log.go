@@ -54,7 +54,7 @@ func InitLogger() error {
 		ErrorSampler: sampler,
 	})
 
-	req.Debug = conf.Config.SYSConf.Debug
+	req.Debug = conf.Debug
 
 	return nil
 }
@@ -65,7 +65,7 @@ func InitLogger() error {
 func LogConfig() error {
 	basicLog := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "0102 15:04:05"}
 
-	if !conf.Config.SYSConf.Debug {
+	if !conf.Debug {
 		basicLog.NoColor = conf.Config.SYSConf.Log.NoColor
 		basicLog.Out = &lumberjack.Logger{
 			Filename:   conf.Config.SYSConf.Log.File,

@@ -9,6 +9,11 @@ import (
 )
 
 var (
+	Debug     bool
+	Version   = "v0.0.0"
+	GoVersion = ""
+	GitCommit = ""
+
 	// RootPath 运行绝对路径
 	RootPath = utils.ExecutableDir(true)
 
@@ -41,7 +46,7 @@ var (
 	UDPESIndexField = "_x"
 
 	// ReqUserAgent 请求名称
-	ReqUserAgent = req.Header{"User-Agent": WebAPPName + "/" + CurrentVersion}
+	ReqUserAgent = req.Header{"User-Agent": APPName + "/" + Version}
 
 	// ForwardTunnel 上联地址, 指定后将启动客户端, 将所有数据转交到 Tunnel Server
 	ForwardTunnel = ""

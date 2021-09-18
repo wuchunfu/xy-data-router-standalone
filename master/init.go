@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/controller"
 	"github.com/fufuok/xy-data-router/service"
 	"github.com/fufuok/xy-data-router/tunnel"
@@ -47,6 +48,9 @@ func Start() {
 }
 
 func initMaster() {
+	// 初始化配置
+	conf.InitConfig()
+
 	// 优先初始化公共变量
 	common.InitCommon()
 
@@ -54,8 +58,7 @@ func initMaster() {
 	service.InitService()
 
 	// 启动 Tunnel 服务
-	go tunnel.InitTunServer()
-	go tunnel.InitTunClient()
+	go tunnel.InitTunnel()
 
 	// 启动 Web 服务
 	go controller.InitWebServer()

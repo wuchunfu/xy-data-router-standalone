@@ -1,11 +1,10 @@
 package conf
 
 import (
-	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
+	"os"
 	"strings"
 	"time"
 
@@ -104,12 +103,8 @@ type TFilesConf struct {
 	ConfigVer       time.Time
 }
 
-func init() {
-	confFile := flag.String("c", ConfigFile, "配置文件绝对路径(可选)")
-	forwardTunnel := flag.String("f", "", "指定上联 Tunnel 地址(可选)")
-	flag.Parse()
-	ConfigFile = *confFile
-	ForwardTunnel = *forwardTunnel
+// InitConfig 初始化配置
+func InitConfig() {
 	if err := LoadConf(); err != nil {
 		log.Fatalln("Failed to initialize config:", err, "\nbye.")
 	}
@@ -122,6 +117,7 @@ func LoadConf() error {
 		return err
 	}
 
+	Debug = config.SYSConf.Debug
 	Config = *config
 	APIConfig = apiConfig
 	ESWhiteListConfig = whiteList
@@ -132,7 +128,7 @@ func LoadConf() error {
 
 // 读取配置
 func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[*net.IPNet]struct{}, error) {
-	body, err := ioutil.ReadFile(ConfigFile)
+	body, err := os.ReadFile(ConfigFile)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
