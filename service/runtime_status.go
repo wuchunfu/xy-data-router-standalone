@@ -105,6 +105,9 @@ func memStats() map[string]interface{} {
 		// 没被使用的内存, 包含了 HeapReleased, 可被再次申请和使用
 		"HeapIdle":  ms.HeapIdle,
 		"HeapIdle_": utils.HumanBytes(ms.HeapIdle),
+		// 分配的对象数
+		"HeapObjects":  ms.HeapObjects,
+		"HeapObjects_": utils.Commau(ms.HeapObjects),
 		// 下次 GC 的阈值, 当 HeapAlloc 达到该值触发 GC
 		"NextGC":  ms.NextGC,
 		"NextGC_": utils.HumanBytes(ms.NextGC),

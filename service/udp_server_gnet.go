@@ -36,7 +36,7 @@ func (s *tUDPServerG) React(frame []byte, c gnet.Conn) (out []byte, action gnet.
 		clientIP, _, err := net.SplitHostPort(c.RemoteAddr().String())
 		if err == nil {
 			_ = s.pool.Submit(func() {
-				saveUDPData(&body, clientIP)
+				saveUDPData(body, clientIP)
 			})
 		}
 	}

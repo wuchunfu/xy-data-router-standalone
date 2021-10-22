@@ -95,7 +95,7 @@ func dataProcessor(dp *tDataProcessor) {
 	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
 
 	// 兼容 {body} 或 {body}=-:-=[{body},{body}]
-	for _, js := range bytes.Split(pretty.Ugly(*dp.data.body), esBodySep) {
+	for _, js := range bytes.Split(pretty.Ugly(dp.data.body), esBodySep) {
 		if len(js) == 0 {
 			continue
 		}

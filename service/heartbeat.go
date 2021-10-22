@@ -18,6 +18,6 @@ func initHeartbeat() {
 	for range ticker.C {
 		data := utils.S2B(fmt.Sprintf(`{"type":"%s","version":"%s","internal_ipv4":"%s","external_ipv4":"%s"}`,
 			conf.APPName, conf.Version, InternalIPv4, ExternalIPv4))
-		PushDataToChanx(conf.Config.SYSConf.HeartbeatIndex, ExternalIPv4, &data)
+		PushDataToChanx(conf.Config.SYSConf.HeartbeatIndex, ExternalIPv4, data)
 	}
 }

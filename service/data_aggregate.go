@@ -6,13 +6,13 @@ import (
 )
 
 // PushDataToChanx 接收数据推入队列
-func PushDataToChanx(apiname, ip string, body *[]byte) {
+func PushDataToChanx(apiname, ip string, body []byte) {
 	if conf.ForwardTunnel != "" {
 		// 发送数据到 Tun
 		TunChan.In <- &common.GenDataItem{
 			APIName: apiname,
 			IP:      ip,
-			Body:    *body,
+			Body:    body,
 		}
 		TunDataTotal.Inc()
 		return

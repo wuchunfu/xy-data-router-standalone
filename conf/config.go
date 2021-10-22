@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -62,6 +63,7 @@ type tSYSConf struct {
 	WebSlowRespDuration        time.Duration
 	ESSlowQueryDuration        time.Duration
 	ESPostMaxIntervalDuration  time.Duration
+	UDPGoReadNum               int
 }
 
 type tLogConf struct {
@@ -118,7 +120,7 @@ func LoadConf() error {
 	}
 
 	Debug = config.SYSConf.Debug
-	Config = *config
+	Config = config
 	APIConfig = apiConfig
 	ESWhiteListConfig = whiteList
 	ESBlackListConfig = blackList
@@ -182,6 +184,7 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	if config.SYSConf.UDPGoReadNum1CPU < 10 {
 		config.SYSConf.UDPGoReadNum1CPU = UDPGoReadNum1CPU
 	}
+	config.SYSConf.UDPGoReadNum = utils.MinInt(config.SYSConf.UDPGoReadNum1CPU*runtime.NumCPU(), UDPGoReadNumMax)
 
 	// 数据分发通道缓存大小
 	if config.SYSConf.DataChanSize < 1 {

@@ -31,7 +31,7 @@ var (
 	LogDaemon = filepath.Join(LogDir, "daemon.log")
 
 	// Config 所有配置
-	Config tJSONConf
+	Config *tJSONConf
 
 	// APIConfig 以接口名为键的配置
 	APIConfig map[string]*TAPIConf
@@ -41,9 +41,6 @@ var (
 
 	// ESBlackListConfig ES 上报接口 IP 黑名单配置
 	ESBlackListConfig map[*net.IPNet]struct{}
-
-	// UDPESIndexField UDP 接口 ES 索引字段
-	UDPESIndexField = "_x"
 
 	// ReqUserAgent 请求名称
 	ReqUserAgent = req.Header{"User-Agent": APPName + "/" + Version}

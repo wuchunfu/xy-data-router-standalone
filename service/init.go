@@ -18,7 +18,7 @@ type tDataItem struct {
 	ip string
 
 	// HTTP / UDP 数据
-	body *[]byte
+	body []byte
 }
 
 // 数据分发
@@ -158,7 +158,7 @@ func newChanx() *chanx.UnboundedChan {
 }
 
 // 新数据项
-func newDataItem(apiname, ip string, body *[]byte) *tDataItem {
+func newDataItem(apiname, ip string, body []byte) *tDataItem {
 	return &tDataItem{apiname, ip, body}
 }
 

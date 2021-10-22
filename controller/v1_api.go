@@ -67,7 +67,7 @@ func V1APIHandler(c *fiber.Ctx) error {
 
 	if chkField {
 		// 检查必有字段
-		if !common.CheckRequiredField(&body, apiConf.RequiredField) {
+		if !common.CheckRequiredField(body, apiConf.RequiredField) {
 			return middleware.APIFailure(c, utils.AddString("必填字段: ", strings.Join(apiConf.RequiredField, ",")))
 		}
 	}
@@ -77,7 +77,7 @@ func V1APIHandler(c *fiber.Ctx) error {
 
 	// 写入队列
 	_ = common.Pool.Submit(func() {
-		service.PushDataToChanx(apiname, ip, &body)
+		service.PushDataToChanx(apiname, ip, body)
 	})
 
 	return middleware.APISuccessNil(c)

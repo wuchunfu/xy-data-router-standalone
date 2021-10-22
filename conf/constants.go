@@ -49,6 +49,9 @@ const (
 	UDPGoReadNum1CPU = 50
 	UDPGoReadNumMax  = 1000
 
+	// UDPESIndexField UDP 接口 ES 索引字段
+	UDPESIndexField = "_x"
+
 	// ESBodySep ES 数据分隔符
 	ESBodySep = "=-:-="
 	// ESPostBatchNum ES 单次批量写入最大条数或最大字节数, 最大写入时间间隔

@@ -3,7 +3,6 @@ package service
 import (
 	"log"
 	"net"
-	"runtime"
 
 	"github.com/fufuok/utils"
 
@@ -12,9 +11,6 @@ import (
 )
 
 var (
-	// UDP 接口并发读取数据协程数
-	udpGoLimit = utils.MinInt(conf.Config.SYSConf.UDPGoReadNum1CPU*runtime.NumCPU(), conf.UDPGoReadNumMax)
-
 	// UDP 返回值
 	outBytes = []byte("1")
 )
@@ -73,7 +69,8 @@ func udpServer(addr string, withSendTo bool) error {
 	// _ = conn.SetReadBuffer(1024 * 1024 * 20)
 	// _ = conn.SetWriteBuffer(1024 * 1024 * 20)
 
-	for i := 0; i < udpGoLimit; i++ {
+	// UDP 接口并发读取数据协程
+	for i := 0; i < conf.Config.SYSConf.UDPGoReadNum; i++ {
 		go udpReader(conn, withSendTo)
 	}
 
@@ -95,7 +92,7 @@ func udpReader(conn *net.UDPConn, withSendTo bool) {
 				body := utils.CopyBytes(readerBuf[:n])
 				clientIP := clientAddr.IP.String()
 				_ = common.Pool.Submit(func() {
-					saveUDPData(&body, clientIP)
+					saveUDPData(body, clientIP)
 				})
 			}
 		}
@@ -108,7 +105,7 @@ func writeToUDP(conn *net.UDPConn, clientAddr *net.UDPAddr) {
 }
 
 // 校验并保存数据
-func saveUDPData(body *[]byte, clientIP string) bool {
+func saveUDPData(body []byte, clientIP string) bool {
 	// 请求计数
 	udpRequestCount.Inc()
 

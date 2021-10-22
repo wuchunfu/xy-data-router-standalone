@@ -32,7 +32,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 
 		// 必有字段校验
 		body := utils.CopyBytes(c.Body())
-		if !common.CheckRequiredField(&body, apiConf.RequiredField) {
+		if !common.CheckRequiredField(body, apiConf.RequiredField) {
 			return c.SendString("0")
 		}
 
@@ -48,7 +48,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 
 		// 写入队列
 		_ = common.Pool.Submit(func() {
-			service.PushDataToChanx(apiname, ip, &body)
+			service.PushDataToChanx(apiname, ip, body)
 		})
 
 		// 旧接口返回值处理

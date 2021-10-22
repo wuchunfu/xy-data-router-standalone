@@ -10,14 +10,8 @@ import (
 )
 
 var (
-	IPv4Zero = "0.0.0.0"
-	CtxBG    = context.Background()
-
-	// GTimeSub 同步时间差值
+	// GTimeSub TODO: 同步时间差值
 	GTimeSub time.Duration
-
-	// Pool 协程池
-	Pool = goroutine.Default()
 
 	// TWms 时间轮, 精度 50ms, 1s, 1m
 	TWms *timewheel.TimeWheel
@@ -25,8 +19,14 @@ var (
 	TWm  *timewheel.TimeWheel
 
 	// Now3399UTC 当前时间
-	Now3399UTC string
-	Now3399    string
+	Now3399UTC = time.Now().Format("2006-01-02T15:04:05Z")
+	Now3399    = time.Now().Format(time.RFC3339)
+
+	IPv4Zero = "0.0.0.0"
+	CtxBG    = context.Background()
+
+	// Pool 协程池
+	Pool = goroutine.Default()
 )
 
 func InitCommon() {
@@ -42,25 +42,14 @@ func InitCommon() {
 	TWm, _ = timewheel.NewTimeWheel(time.Minute, 1440)
 	TWm.Start()
 
+	// 同步时间字段
+	go syncNow()
+
 	// 初始化日志环境
 	initLogger()
 
 	// 初始化 ES 连接
 	initES()
-
-	// 每秒格式化时间字符串
-	go func() {
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
-
-		for {
-			// TODO: GTimeSub
-			now := GetGlobalTime()
-			Now3399UTC = now.Format("2006-01-02T15:04:05Z")
-			Now3399 = now.Format(time.RFC3339)
-			<-ticker.C
-		}
-	}()
 }
 
 func TWStop() {
@@ -88,12 +77,24 @@ func GetGlobalDataTime(layout string) string {
 }
 
 // CheckRequiredField 检查必有字段: 只要存在该字段即可, 值可为空
-func CheckRequiredField(body *[]byte, fields []string) bool {
+func CheckRequiredField(body []byte, fields []string) bool {
 	for _, field := range fields {
-		if !gjson.GetBytes(*body, field).Exists() {
+		if !gjson.GetBytes(body, field).Exists() {
 			return false
 		}
 	}
 
 	return true
+}
+
+// 周期性更新全局时间字段
+func syncNow() {
+	ticker := TWms.NewTicker(50 * time.Millisecond)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		now := GetGlobalTime()
+		Now3399UTC = now.Format("2006-01-02T15:04:05Z")
+		Now3399 = now.Format(time.RFC3339)
+	}
 }

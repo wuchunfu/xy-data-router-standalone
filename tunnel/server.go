@@ -54,7 +54,7 @@ func onData(c *arpc.Context) {
 	_ = common.Pool.Submit(func() {
 		service.TunRecvCount.Inc()
 		if d.APIName != "" {
-			service.PushDataToChanx(d.APIName, d.IP, &d.Body)
+			service.PushDataToChanx(d.APIName, d.IP, d.Body)
 		}
 	})
 }

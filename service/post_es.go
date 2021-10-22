@@ -40,7 +40,7 @@ func initESBulkPool() {
 	esBulkPool, _ = ants.NewPoolWithFunc(
 		conf.Config.SYSConf.ESBulkWorkerSize,
 		func(i interface{}) {
-			esBulk(i.(*[]byte))
+			esBulk(i.([]byte))
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.SYSConf.ESBulkMaxWorkerSize),
@@ -51,8 +51,8 @@ func initESBulkPool() {
 }
 
 // 获取 ES 索引名称
-func getUDPESIndex(body *[]byte, key string) string {
-	index := gjson.GetBytes(*body, key).String()
+func getUDPESIndex(body []byte, key string) string {
+	index := gjson.GetBytes(body, key).String()
 	if index != "" {
 		return strings.ToLower(strings.TrimSpace(index))
 	}
@@ -152,13 +152,13 @@ func esWorker() {
 func postES(buf *bytes.Buffer) {
 	if buf.Len() > 0 {
 		body := utils.CopyBytes(buf.Bytes())
-		submitESBulk(&body)
+		submitESBulk(body)
 		buf.Reset()
 	}
 }
 
 // 提交批量任务, 提交不阻塞, 有执行并发限制, 最大排队数限制
-func submitESBulk(body *[]byte) {
+func submitESBulk(body []byte) {
 	_ = common.Pool.Submit(func() {
 		esBulkTodoCount.Inc()
 		if err := esBulkPool.Invoke(body); err != nil {
@@ -169,10 +169,10 @@ func submitESBulk(body *[]byte) {
 }
 
 // 批量写入 ES
-func esBulk(body *[]byte) {
+func esBulk(body []byte) {
 	defer esBulkTodoCount.Dec()
 
-	resp, err := common.ES.Bulk(bytes.NewReader(*body))
+	resp, err := common.ES.Bulk(bytes.NewReader(body))
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("es bulk")
 		esBulkErrors.Inc()
@@ -232,7 +232,7 @@ func esBulk(body *[]byte) {
 									d.Index.Error.Reason,
 									d.Index.Error.Cause.Type,
 									d.Index.Error.Cause.Reason,
-									utils.B2S(*body),
+									utils.B2S(body),
 								)
 						} else {
 							common.LogSampled.Error().
