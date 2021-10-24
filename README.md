@@ -29,20 +29,21 @@
 
     .
     ├── bin         程序二进制
+    ├── cli         程序入口 main.go
     ├── common      公共结构定义和方法, 全局变量
     ├── conf        配置文件目录
     ├── controller  控制器, 路由
     ├── doc         开发文档
+    ├── etc         配置文件
+    ├── internal    内部包
     ├── log         日志目录
     ├── master      服务端程序初始化
     ├── middleware  Web 中间件
+    ├── schema      数据项
+    ├── script      环境变量脚本
     ├── service     应用逻辑
-    ├── model       模型, 数据交互
     ├── tools       环境变量加密小工具
-    ├── tunnel      数据传递通道
-    ├── script      脚本
-    ├── util        工具类库
-    └── main.go     入口文件
+    └── tunnel      数据传递通道
 
 ## 设计
 
@@ -51,7 +52,6 @@
 ## 使用
 
 1. 先修改配置文件中的 ES 连接地址
-
    1. 环境变量及加密小工具见: `tools`
    2. 需要的环境变量见: `script`
 2. 运行 `./bin/xydatarouter` 默认使用程序文件夹下 `./etc/xydatarouter.json`
