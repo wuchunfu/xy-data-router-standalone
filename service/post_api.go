@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"time"
 
-	"github.com/fufuok/utils"
 	"github.com/imroc/req"
+	bbPool "github.com/valyala/bytebufferpool"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -54,15 +54,23 @@ func apiWorker(dr *tDataRouter) {
 
 // 推送数据到 API
 func postAPI(buf *bytes.Buffer, api []string) {
-	if buf.Len() > 0 {
-		body := utils.JoinBytes(jsArrLeft, buf.Bytes()[1:], jsArrRight)
-		_ = common.Pool.Submit(func() {
-			for _, u := range api {
-				if _, err := req.Post(u, req.BodyJSON(body), conf.ReqUserAgent); err != nil {
-					common.LogSampled.Error().Err(err).Str("url", u).Msg("apiWorker")
-				}
-			}
-		})
-		buf.Reset()
+	if buf.Len() == 0 {
+		return
 	}
+
+	defer buf.Reset()
+
+	body := bbPool.Get()
+	_, _ = body.Write(jsArrLeft)
+	_, _ = body.Write(buf.Bytes()[1:])
+	_, _ = body.Write(jsArrRight)
+
+	_ = common.Pool.Submit(func() {
+		defer bbPool.Put(body)
+		for _, u := range api {
+			if _, err := req.Post(u, req.BodyJSON(body.Bytes()), conf.ReqUserAgent); err != nil {
+				common.LogSampled.Error().Err(err).Str("url", u).Msg("apiWorker")
+			}
+		}
+	})
 }

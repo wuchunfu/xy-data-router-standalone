@@ -1,0 +1,7 @@
+struct DataItem {
+	APIName string
+	IP      string
+	Body    []byte
+	Flag    int32
+	Mark    int32
+}

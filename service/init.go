@@ -7,19 +7,8 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/schema"
 )
-
-// 数据项
-type tDataItem struct {
-	// 接口名称
-	apiname string
-
-	// 客户端 IP
-	ip string
-
-	// HTTP / UDP 数据
-	body []byte
-}
 
 // 数据分发
 type tDataRouter struct {
@@ -42,7 +31,7 @@ type tDataRouterOut struct {
 // 数据处理
 type tDataProcessor struct {
 	dr   *tDataRouter
-	data *tDataItem
+	data *schema.DataItem
 }
 
 var (
@@ -155,11 +144,6 @@ func TuneESBulkWorkerSize(n int) {
 // 初始化无限缓冲信道
 func newChanx() *chanx.UnboundedChan {
 	return chanx.NewUnboundedChan(conf.Config.SYSConf.DataChanSize, conf.Config.SYSConf.DataChanMaxBufCap)
-}
-
-// 新数据项
-func newDataItem(apiname, ip string, body []byte) *tDataItem {
-	return &tDataItem{apiname, ip, body}
 }
 
 // 新数据信道

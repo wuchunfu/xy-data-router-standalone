@@ -3,7 +3,7 @@ package tunnel
 import (
 	"errors"
 
-	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/schema"
 )
 
 var (
@@ -15,7 +15,7 @@ type genCodec struct{}
 
 // Marshal wraps GenDataItem.Marshal
 func (j *genCodec) Marshal(v interface{}) ([]byte, error) {
-	if d, ok := v.(*common.GenDataItem); ok {
+	if d, ok := v.(*schema.DataItem); ok {
 		return d.Marshal(nil)
 	}
 
@@ -24,7 +24,7 @@ func (j *genCodec) Marshal(v interface{}) ([]byte, error) {
 
 // Unmarshal wraps GenDataItem.Unmarshal
 func (j *genCodec) Unmarshal(data []byte, v interface{}) error {
-	if d, ok := v.(*common.GenDataItem); ok {
+	if d, ok := v.(*schema.DataItem); ok {
 		_, err := d.Unmarshal(data)
 		return err
 	}

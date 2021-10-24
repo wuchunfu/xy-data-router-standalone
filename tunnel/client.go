@@ -8,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/schema"
 	"github.com/fufuok/xy-data-router/service"
 )
 
@@ -35,7 +36,9 @@ func initTunClient() {
 	// 接收数据转发到通道 (支持创建多个 client, 每 client 支持多协程并发处理数据)
 	for item := range service.TunChan.Out {
 		// 不超时, 直到 ErrClientOverstock
-		err = client.Notify(tunMethod, item, arpc.TimeZero)
+		data := item.(*schema.DataItem)
+		err = client.Notify(tunMethod, data, arpc.TimeZero)
+		data.Release()
 		if err != nil {
 			common.LogSampled.Warn().Err(err).Msg("Failed to write Tunnel")
 			service.TunSendErrors.Inc()

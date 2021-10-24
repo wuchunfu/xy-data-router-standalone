@@ -3,25 +3,23 @@ package service
 import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/schema"
 )
 
 // PushDataToChanx 接收数据推入队列
-func PushDataToChanx(apiname, ip string, body []byte) {
+func PushDataToChanx(item *schema.DataItem) {
 	if conf.ForwardTunnel != "" {
 		// 发送数据到 Tun
-		TunChan.In <- &common.GenDataItem{
-			APIName: apiname,
-			IP:      ip,
-			Body:    body,
-		}
+		TunChan.In <- item
 		TunDataTotal.Inc()
 		return
 	}
 
-	dr, ok := dataRouters.Load(apiname)
+	dr, ok := dataRouters.Load(item.APIName)
 	if !ok {
-		common.LogSampled.Error().Str("apiname", apiname).Int("len", len(apiname)).Msg("nonexistence")
+		common.LogSampled.Error().Str("apiname", item.APIName).Int("len", len(item.APIName)).Msg("nonexistence")
+		item.Release()
 		return
 	}
-	dr.(*tDataRouter).drChan.In <- newDataItem(apiname, ip, body)
+	dr.(*tDataRouter).drChan.In <- item
 }

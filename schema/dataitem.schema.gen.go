@@ -1,4 +1,4 @@
-package common
+package schema
 
 import (
 	"errors"
@@ -8,25 +8,26 @@ import (
 )
 
 var (
-	_              = unsafe.Sizeof(0)
-	_              = io.ReadFull
-	_              = time.Now()
+	_ = unsafe.Sizeof(0)
+	_ = io.ReadFull
+	_ = time.Now()
+
 	unmarshalError = errors.New("failed to unmarshal data")
 )
 
-type GenDataItem struct {
+type DataItem struct {
 	APIName string
 	IP      string
 	Body    []byte
+	Flag    int32
+	Mark    int32
 }
 
-func (d *GenDataItem) Size() (s uint64) {
-
+func (d *DataItem) Size() (s uint64) {
 	{
 		l := uint64(len(d.APIName))
 
 		{
-
 			t := l
 			for t >= 0x80 {
 				t >>= 7
@@ -41,7 +42,6 @@ func (d *GenDataItem) Size() (s uint64) {
 		l := uint64(len(d.IP))
 
 		{
-
 			t := l
 			for t >= 0x80 {
 				t >>= 7
@@ -56,7 +56,6 @@ func (d *GenDataItem) Size() (s uint64) {
 		l := uint64(len(d.Body))
 
 		{
-
 			t := l
 			for t >= 0x80 {
 				t >>= 7
@@ -67,11 +66,11 @@ func (d *GenDataItem) Size() (s uint64) {
 		}
 		s += l
 	}
-
+	s += 8
 	return
 }
 
-func (d *GenDataItem) Marshal(buf []byte) ([]byte, error) {
+func (d *DataItem) Marshal(buf []byte) ([]byte, error) {
 	size := d.Size()
 	{
 		if uint64(cap(buf)) >= size {
@@ -86,7 +85,6 @@ func (d *GenDataItem) Marshal(buf []byte) ([]byte, error) {
 		l := uint64(len(d.APIName))
 
 		{
-
 			t := uint64(l)
 
 			for t >= 0x80 {
@@ -105,7 +103,6 @@ func (d *GenDataItem) Marshal(buf []byte) ([]byte, error) {
 		l := uint64(len(d.IP))
 
 		{
-
 			t := uint64(l)
 
 			for t >= 0x80 {
@@ -139,12 +136,36 @@ func (d *GenDataItem) Marshal(buf []byte) ([]byte, error) {
 		copy(buf[i+0:], d.Body)
 		i += l
 	}
+	{
 
-	return buf[:i+0], nil
+		buf[i+0+0] = byte(d.Flag >> 0)
+
+		buf[i+1+0] = byte(d.Flag >> 8)
+
+		buf[i+2+0] = byte(d.Flag >> 16)
+
+		buf[i+3+0] = byte(d.Flag >> 24)
+
+	}
+	{
+
+		buf[i+0+4] = byte(d.Mark >> 0)
+
+		buf[i+1+4] = byte(d.Mark >> 8)
+
+		buf[i+2+4] = byte(d.Mark >> 16)
+
+		buf[i+3+4] = byte(d.Mark >> 24)
+
+	}
+	return buf[:i+8], nil
 }
 
-func (d *GenDataItem) Unmarshal(buf []byte) (i uint64, err error) {
+func (d *DataItem) Unmarshal(buf []byte) (i uint64, err error) {
 	defer func() {
+		// 清除 Mark 数据
+		d.MarkReset()
+
 		if r := recover(); r != nil {
 			err = unmarshalError
 		}
@@ -217,6 +238,15 @@ func (d *GenDataItem) Unmarshal(buf []byte) (i uint64, err error) {
 		copy(d.Body, buf[i+0:])
 		i += l
 	}
+	{
 
-	return i + 0, nil
+		d.Flag = 0 | (int32(buf[i+0+0]) << 0) | (int32(buf[i+1+0]) << 8) | (int32(buf[i+2+0]) << 16) | (int32(buf[i+3+0]) << 24)
+
+	}
+	{
+
+		d.Mark = 0 | (int32(buf[i+0+4]) << 0) | (int32(buf[i+1+4]) << 8) | (int32(buf[i+2+4]) << 16) | (int32(buf[i+3+4]) << 24)
+
+	}
+	return i + 8, nil
 }

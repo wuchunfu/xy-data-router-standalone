@@ -9,10 +9,12 @@ import (
 	"github.com/panjf2000/ants/v2"
 	"github.com/rs/zerolog"
 	"github.com/tidwall/gjson"
+	bbPool "github.com/valyala/bytebufferpool"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/internal/reader"
 )
 
 // ES 批量写入响应
@@ -40,7 +42,7 @@ func initESBulkPool() {
 	esBulkPool, _ = ants.NewPoolWithFunc(
 		conf.Config.SYSConf.ESBulkWorkerSize,
 		func(i interface{}) {
-			esBulk(i.([]byte))
+			esBulk(i.(*bbPool.ByteBuffer))
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.SYSConf.ESBulkMaxWorkerSize),
@@ -54,7 +56,7 @@ func initESBulkPool() {
 func getUDPESIndex(body []byte, key string) string {
 	index := gjson.GetBytes(body, key).String()
 	if index != "" {
-		return strings.ToLower(strings.TrimSpace(index))
+		return utils.ToLower(strings.TrimSpace(index))
 	}
 
 	return ""
@@ -99,10 +101,10 @@ func updateESBulkHeader() {
 	}
 }
 
-// 附加系统字段: 数据必定为 {JSON字典}
+// 附加系统字段: 数据必定为 {JSON字典}, Immutable
 func appendSYSField(js []byte, ip string) []byte {
 	if gjson.GetBytes(js, "_cip").Exists() {
-		return js
+		return utils.CopyBytes(js)
 	}
 	return append(
 		utils.AddStringBytes(
@@ -133,14 +135,15 @@ func esWorker() {
 				return
 			}
 
-			if !conf.Config.SYSConf.ESDisableWrite {
-				buf.Write(data.([]byte))
-				n += 1
-				if n%conf.Config.SYSConf.ESPostBatchNum == 0 || buf.Len() > conf.Config.SYSConf.ESPostBatchBytes {
-					// 达到限定数量或大小写入 ES
-					postES(&buf)
-					n = 0
-				}
+			esData := data.(*bbPool.ByteBuffer)
+			buf.Write(esData.Bytes())
+			bbPool.Put(esData)
+
+			n += 1
+			if n%conf.Config.SYSConf.ESPostBatchNum == 0 || buf.Len() > conf.Config.SYSConf.ESPostBatchBytes {
+				// 达到限定数量或大小写入 ES
+				postES(&buf)
+				n = 0
 			}
 
 			esDataTotal.Inc()
@@ -150,15 +153,20 @@ func esWorker() {
 
 // 创建写入协程
 func postES(buf *bytes.Buffer) {
-	if buf.Len() > 0 {
-		body := utils.CopyBytes(buf.Bytes())
-		submitESBulk(body)
-		buf.Reset()
+	if buf.Len() == 0 {
+		return
 	}
+
+	defer buf.Reset()
+
+	body := bbPool.Get()
+	_, _ = body.Write(buf.Bytes())
+
+	submitESBulk(body)
 }
 
 // 提交批量任务, 提交不阻塞, 有执行并发限制, 最大排队数限制
-func submitESBulk(body []byte) {
+func submitESBulk(body *bbPool.ByteBuffer) {
 	_ = common.Pool.Submit(func() {
 		esBulkTodoCount.Inc()
 		if err := esBulkPool.Invoke(body); err != nil {
@@ -169,10 +177,16 @@ func submitESBulk(body []byte) {
 }
 
 // 批量写入 ES
-func esBulk(body []byte) {
-	defer esBulkTodoCount.Dec()
+func esBulk(body *bbPool.ByteBuffer) {
+	r := reader.New(body.Bytes())
 
-	resp, err := common.ES.Bulk(bytes.NewReader(body))
+	defer func() {
+		esBulkTodoCount.Dec()
+		bbPool.Put(body)
+		reader.Release(r)
+	}()
+
+	resp, err := common.ES.Bulk(r)
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("es bulk")
 		esBulkErrors.Inc()
@@ -220,7 +234,10 @@ func esBulk(body []byte) {
 						// 等待一个提交周期, 重新排队
 						if utils.InInts(conf.Config.SYSConf.ESReentryCodes, d.Index.Status) {
 							time.Sleep(conf.Config.SYSConf.ESPostMaxIntervalDuration)
-							submitESBulk(body)
+							bodyNew := bbPool.Get()
+							if n, err := bodyNew.Write(body.Bytes()); n > 0 && err == nil {
+								submitESBulk(bodyNew)
+							}
 						}
 
 						// Warn 级别时, 抽样数据详情
@@ -232,7 +249,7 @@ func esBulk(body []byte) {
 									d.Index.Error.Reason,
 									d.Index.Error.Cause.Type,
 									d.Index.Error.Cause.Reason,
-									utils.B2S(body),
+									body.String(),
 								)
 						} else {
 							common.LogSampled.Error().

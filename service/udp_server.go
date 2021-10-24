@@ -8,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/schema"
 )
 
 var (
@@ -79,9 +80,9 @@ func udpServer(addr string, withSendTo bool) error {
 
 // UDP 数据读取
 func udpReader(conn *net.UDPConn, withSendTo bool) {
-	readerBuf := make([]byte, conf.UDPMaxRW)
+	buf := make([]byte, conf.UDPMaxRW)
 	for {
-		n, clientAddr, err := conn.ReadFromUDP(readerBuf)
+		n, clientAddr, err := conn.ReadFromUDP(buf)
 		if err == nil && n > 0 {
 			if withSendTo || n < 7 {
 				_ = common.Pool.Submit(func() {
@@ -89,10 +90,11 @@ func udpReader(conn *net.UDPConn, withSendTo bool) {
 				})
 			}
 			if n >= 7 {
-				body := utils.CopyBytes(readerBuf[:n])
-				clientIP := clientAddr.IP.String()
+				item := schema.New("", clientAddr.IP.String(), buf[:n])
 				_ = common.Pool.Submit(func() {
-					saveUDPData(body, clientIP)
+					if !saveUDPData(item) {
+						item.Release()
+					}
 				})
 			}
 		}
@@ -105,17 +107,17 @@ func writeToUDP(conn *net.UDPConn, clientAddr *net.UDPAddr) {
 }
 
 // 校验并保存数据
-func saveUDPData(body []byte, clientIP string) bool {
+func saveUDPData(item *schema.DataItem) bool {
 	// 请求计数
 	udpRequestCount.Inc()
 
-	if len(conf.ESBlackListConfig) > 0 && utils.InIPNetString(clientIP, conf.ESBlackListConfig) {
-		common.LogSampled.Info().Str("method", "UDP").Msg("非法访问: " + clientIP)
+	if len(conf.ESBlackListConfig) > 0 && utils.InIPNetString(item.IP, conf.ESBlackListConfig) {
+		common.LogSampled.Info().Str("method", "UDP").Msg("非法访问: " + item.IP)
 		return false
 	}
 
 	// 接口名称与索引名称相同, 存放在 _x 字段
-	esIndex := getUDPESIndex(body, conf.UDPESIndexField)
+	esIndex := getUDPESIndex(item.Body, conf.UDPESIndexField)
 	if esIndex == "" {
 		return false
 	}
@@ -124,18 +126,19 @@ func saveUDPData(body []byte, clientIP string) bool {
 	apiConf, ok := conf.APIConfig[esIndex]
 	if !ok || apiConf.APIName == "" {
 		common.LogSampled.Error().
-			Str("client_ip", clientIP).Str("udp_x", esIndex).Int("len", len(esIndex)).
+			Str("client_ip", item.IP).Str("udp_x", esIndex).Int("len", len(esIndex)).
 			Msg("api not found")
 		return false
 	}
 
 	// 必有字段校验
-	if !common.CheckRequiredField(body, apiConf.RequiredField) {
+	if !common.CheckRequiredField(item.Body, apiConf.RequiredField) {
 		return false
 	}
 
 	// 保存数据
-	PushDataToChanx(esIndex, clientIP, body)
+	item.APIName = esIndex
+	PushDataToChanx(item)
 
 	return true
 }

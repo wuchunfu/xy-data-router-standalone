@@ -10,6 +10,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/schema"
 	"github.com/fufuok/xy-data-router/service"
 )
 
@@ -31,12 +32,10 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		}
 
 		// 必有字段校验
-		body := utils.CopyBytes(c.Body())
+		body := c.Body()
 		if !common.CheckRequiredField(body, apiConf.RequiredField) {
 			return c.SendString("0")
 		}
-
-		apiname = utils.CopyString(apiname)
 
 		// 删除可能非法中文编码的字段
 		for _, k := range delKeys {
@@ -44,12 +43,11 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		}
 
 		// 请求 IP
-		ip := utils.GetSafeString(c.IP(), common.IPv4Zero)
+		ip := utils.GetString(c.IP(), common.IPv4Zero)
 
 		// 写入队列
-		_ = common.Pool.Submit(func() {
-			service.PushDataToChanx(apiname, ip, body)
-		})
+		item := schema.New(apiname, ip, body)
+		service.PushDataToChanx(item)
 
 		// 旧接口返回值处理
 		return c.SendString("1")

@@ -1,9 +1,6 @@
 package controller
 
 import (
-	"bytes"
-	"compress/gzip"
-	"io/ioutil"
 	"strings"
 
 	"github.com/fufuok/utils"
@@ -13,13 +10,14 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/schema"
 	"github.com/fufuok/xy-data-router/service"
 )
 
 // V1APIHandler 处理接口请求
 func V1APIHandler(c *fiber.Ctx) error {
-	// Some values returned from *fiber.Ctx are not immutable by default
-	apiname := utils.CopyString(c.Params("apiname"))
+	// not immutable by default
+	apiname := c.Params("apiname")
 
 	// 检查接口配置
 	apiConf, ok := conf.APIConfig[apiname]
@@ -40,7 +38,7 @@ func V1APIHandler(c *fiber.Ctx) error {
 			return middleware.APIFailure(c, "数据为空")
 		}
 	} else {
-		body = utils.CopyBytes(c.Body())
+		body = c.Body()
 		if len(body) == 0 {
 			return middleware.APIFailure(c, "数据为空")
 		}
@@ -48,14 +46,11 @@ func V1APIHandler(c *fiber.Ctx) error {
 		uri := strings.TrimRight(c.Path(), "/")
 		if strings.HasSuffix(uri, "/gzip") {
 			// 请求体解压缩
+			var err error
 			uri = uri[:len(uri)-5]
-			unRaw, err := gzip.NewReader(bytes.NewReader(body))
+			body, err = utils.Unzip(body)
 			if err != nil {
 				return middleware.APIFailure(c, "数据解压失败")
-			}
-			body, err = ioutil.ReadAll(unRaw)
-			if err != nil {
-				return middleware.APIFailure(c, "数据读取失败")
 			}
 		}
 
@@ -73,12 +68,11 @@ func V1APIHandler(c *fiber.Ctx) error {
 	}
 
 	// 请求 IP
-	ip := utils.GetSafeString(c.IP(), common.IPv4Zero)
+	ip := utils.GetString(c.IP(), common.IPv4Zero)
 
 	// 写入队列
-	_ = common.Pool.Submit(func() {
-		service.PushDataToChanx(apiname, ip, body)
-	})
+	item := schema.New(apiname, ip, body)
+	service.PushDataToChanx(item)
 
 	return middleware.APISuccessNil(c)
 }

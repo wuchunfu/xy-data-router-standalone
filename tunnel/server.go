@@ -8,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/schema"
 	"github.com/fufuok/xy-data-router/service"
 )
 
@@ -44,17 +45,16 @@ func newTunServer() error {
 
 // 处理通道数据
 func onData(c *arpc.Context) {
-	d := &common.GenDataItem{}
-	if err := c.Bind(d); err != nil {
+	item := schema.Make()
+	if err := c.Bind(item); err != nil || item.APIName == "" {
 		service.TunRecvBadCount.Inc()
+		item.Release()
 		return
 	}
 
 	// 写入队列
 	_ = common.Pool.Submit(func() {
 		service.TunRecvCount.Inc()
-		if d.APIName != "" {
-			service.PushDataToChanx(d.APIName, d.IP, d.Body)
-		}
+		service.PushDataToChanx(item)
 	})
 }

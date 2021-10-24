@@ -1,11 +1,11 @@
 package service
 
 import (
-	"net"
-
 	"github.com/fufuok/utils"
 	"github.com/panjf2000/gnet"
 	"github.com/panjf2000/gnet/pool/goroutine"
+
+	"github.com/fufuok/xy-data-router/schema"
 )
 
 type tUDPServerG struct {
@@ -32,13 +32,16 @@ func (s *tUDPServerG) React(frame []byte, c gnet.Conn) (out []byte, action gnet.
 		out = outBytes
 	}
 	if n >= 7 {
-		body := utils.CopyBytes(frame)
-		clientIP, _, err := net.SplitHostPort(c.RemoteAddr().String())
-		if err == nil {
-			_ = s.pool.Submit(func() {
-				saveUDPData(body, clientIP)
-			})
+		clientIP, _, err := utils.GetIPPort(c.RemoteAddr())
+		if err != nil {
+			return
 		}
+		item := schema.New("", clientIP.String(), frame)
+		_ = s.pool.Submit(func() {
+			if !saveUDPData(item) {
+				item.Release()
+			}
+		})
 	}
 
 	return
