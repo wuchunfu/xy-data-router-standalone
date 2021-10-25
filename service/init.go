@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/fufuok/chanx"
+	"github.com/fufuok/utils/xsync"
 	"github.com/panjf2000/ants/v2"
-	"github.com/puzpuzpuz/xsync"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
