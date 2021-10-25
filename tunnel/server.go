@@ -47,6 +47,10 @@ func newTunServer() error {
 func onData(c *arpc.Context) {
 	item := schema.Make()
 	if err := c.Bind(item); err != nil || item.APIName == "" {
+		common.LogSampled.Warn().
+			Err(err).Str("apiname", item.APIName).Str("client_ip", item.IP).
+			Str("remote_addr", c.Client.Conn.RemoteAddr().String()).
+			Msg("TunRecvBad")
 		service.TunRecvBadCount.Inc()
 		item.Release()
 		return
