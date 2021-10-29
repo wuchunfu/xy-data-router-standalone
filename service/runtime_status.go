@@ -164,6 +164,7 @@ func dataStats() map[string]interface{} {
 		"UDPRequestCount":            utils.Comma(udpRequestCount.Value()),
 		"TunnelRecvCount":            utils.Comma(TunRecvCount.Value()),
 		"TunnelRecvBadCount________": TunRecvBadCount.Value(),
+		"TunnelCompressTotal":        utils.Comma(TunCompressTotal.Value()),
 		"TunnelDataTotal":            utils.Comma(tunTotal),
 		"TunnelSendCount":            utils.Comma(tunSendCount),
 		"TunnelSendErrors__________": tunSendErrors,

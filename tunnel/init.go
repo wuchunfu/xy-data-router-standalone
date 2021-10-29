@@ -7,9 +7,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-var (
-	tunMethod = "tunnel"
-)
+const tunMethod = "tunnel"
 
 func InitTunnel() {
 	arpc.DefaultHandler.SetSendQueueSize(conf.Config.SYSConf.TunSendQueueSize)

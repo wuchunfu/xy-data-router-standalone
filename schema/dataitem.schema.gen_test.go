@@ -6,7 +6,7 @@ import (
 	"github.com/fufuok/utils"
 )
 
-func TestDataItem_Marshal(t *testing.T) {
+func TestDataItem(t *testing.T) {
 	data := New("test", "7.7.7.7", utils.FastRandBytes(512))
 	dec, err := data.Marshal(nil)
 	utils.AssertEqual(t, true, err == nil)
@@ -68,8 +68,8 @@ func BenchmarkDataItem_Unmarshal_Parallel(b *testing.B) {
 // cpu: Intel(R) Xeon(R) Gold 6151 CPU @ 3.00GHz
 // BenchmarkDataItem_Marshal-4                      8294629               136.6 ns/op           576 B/op          1 allocs/op
 // BenchmarkDataItem_Marshal-4                      9026492               135.6 ns/op           576 B/op          1 allocs/op
-// BenchmarkDataItem_Unmarshal-4                   18264658                65.75 ns/op           16 B/op          2 allocs/op
-// BenchmarkDataItem_Unmarshal-4                   18336759                65.68 ns/op           16 B/op          2 allocs/op
+// BenchmarkDataItem_Unmarshal-4                   18264658               65.75 ns/op            16 B/op          2 allocs/op
+// BenchmarkDataItem_Unmarshal-4                   18336759               65.68 ns/op            16 B/op          2 allocs/op
 // BenchmarkDataItem_Marshal_Parallel-4            12356250               100.3 ns/op           576 B/op          1 allocs/op
 // BenchmarkDataItem_Marshal_Parallel-4            12638331               101.1 ns/op           576 B/op          1 allocs/op
 // BenchmarkDataItem_Unmarshal_Parallel-4           7288165               165.4 ns/op            16 B/op          2 allocs/op

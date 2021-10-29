@@ -47,6 +47,8 @@
     "limit_request": 10000,
     "__TunSendQueueSize": "数据代理客户端发送数据最大队列长度, 默认: 8192, 公网大丢包可能超过队列长度而丢弃数据",
     "tun_send_queue_size": 65536,
+    "__TunCompressMinSize": "Tunnel 压缩传输数据最小字节数, 小于该值不压缩, 默认: 256",
+    "tun_compress_min_size": 256,
     "__DataChanMaxBufCap": "无限缓冲信道最大缓冲数量, 0 为无限(默认), 超过限制(DataChanSize + DataChanMaxBufCap)丢弃数据",
     "data_chan_max_buf_cap": 500000,
     "__DataProcessorSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",

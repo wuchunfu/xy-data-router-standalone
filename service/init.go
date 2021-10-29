@@ -80,11 +80,12 @@ var (
 	HTTPBadRequestCount xsync.Counter
 
 	// TunRecvCount Tunnel 服务端接收和客户端发送计数
-	TunRecvCount    xsync.Counter
-	TunRecvBadCount xsync.Counter
-	TunSendCount    xsync.Counter
-	TunSendErrors   xsync.Counter
-	TunDataTotal    xsync.Counter
+	TunRecvCount     xsync.Counter
+	TunRecvBadCount  xsync.Counter
+	TunSendCount     xsync.Counter
+	TunSendErrors    xsync.Counter
+	TunDataTotal     xsync.Counter
+	TunCompressTotal xsync.Counter
 
 	// UDP 请求计数
 	udpRequestCount xsync.Counter

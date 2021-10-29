@@ -7,10 +7,11 @@ import (
 	"github.com/fufuok/utils"
 )
 
-type Pool struct {
-	capLimit uint64
-	pool     sync.Pool
-}
+const (
+	// FlagDefault 0 (默认) 数据不压缩, 1 压缩
+	FlagDefault FlagType = iota
+	FlagZstd
+)
 
 var defaultPool = &Pool{
 	capLimit: 8192,
@@ -19,6 +20,13 @@ var defaultPool = &Pool{
 			return new(DataItem)
 		},
 	},
+}
+
+type FlagType int32
+
+type Pool struct {
+	capLimit uint64
+	pool     sync.Pool
 }
 
 // Get 获取空数据项

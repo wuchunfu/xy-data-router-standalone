@@ -30,6 +30,7 @@ type tSYSConf struct {
 	WebServerAddr              string     `json:"web_server_addr"`
 	TunServerAddr              string     `json:"tun_server_addr"`
 	TunSendQueueSize           int        `json:"tun_send_queue_size"`
+	TunCompressMinSize         uint64     `json:"tun_compress_min_size"`
 	EnableKeepalive            bool       `json:"enable_keepalive"`
 	ReduceMemoryUsage          bool       `json:"reduce_memory_usage"`
 	LimitBody                  int        `json:"limit_body"`
@@ -219,6 +220,11 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	// Tunnel 发送队列容量
 	if config.SYSConf.TunSendQueueSize < TunSendQueueSize {
 		config.SYSConf.TunSendQueueSize = TunSendQueueSize
+	}
+
+	// Tunnel 压缩传输数据最小字节数
+	if config.SYSConf.TunCompressMinSize < TunCompressMinSize {
+		config.SYSConf.TunCompressMinSize = TunCompressMinSize
 	}
 
 	// ES 慢查询日志时间设置

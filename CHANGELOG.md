@@ -1,5 +1,10 @@
 # XY.DataRouter
 
+## v1.100.56.21102822
+
+- 增加通道数据压缩传输
+- 使用 [github.com/fufuok/bytespool](https://github.com/fufuok/bytespool) 替换 `bytebufferpool`
+
 ## v1.100.55.21102323
 
 - 优化对象复用

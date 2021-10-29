@@ -2,6 +2,7 @@ package schema
 
 import (
 	"fmt"
+	"runtime/debug"
 	"testing"
 
 	"github.com/fufuok/utils"
@@ -31,6 +32,9 @@ func TestDataItem_Pool(t *testing.T) {
 	utils.AssertEqual(t, 0, len(b.Body))
 	utils.AssertEqual(t, 512, cap(b.Body))
 
+	// Disable GC to test re-acquire the same data
+	gc := debug.SetGCPercent(-1)
+
 	b.MarkInc()
 	b.Release()
 
@@ -47,6 +51,9 @@ func TestDataItem_Pool(t *testing.T) {
 
 	g := Make()
 	utils.AssertEqual(t, true, fmt.Sprintf("%p", g) != fmt.Sprintf("%p", f), "&g!=&f")
+
+	// Re-enable GC
+	debug.SetGCPercent(gc)
 
 	// 注意, Release 后的变量不要再使用, 不可预料
 	c.IP = "7.7.7.7"

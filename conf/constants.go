@@ -33,6 +33,8 @@ const (
 	// TunDialTimeout Tunnel 连接超时时间和数据发送队列容量
 	TunDialTimeout   = 3 * time.Second
 	TunSendQueueSize = 8192
+	// TunCompressMinSize Tunnel 压缩传输数据最小字节数, 小于该值不压缩
+	TunCompressMinSize uint64 = 256
 
 	// UDPServerRAddr UDP 接口端口, 不应答(Echo包除外)
 	UDPServerRAddr = ":6611"
