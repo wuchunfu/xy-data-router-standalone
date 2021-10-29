@@ -24,11 +24,8 @@ func initES() {
 // InitES 重新初始化 ES 连接, 成功则更新连接
 func InitES() error {
 	es, cfgErr, esErr := newES()
-	if cfgErr != nil || esErr != nil {
+	if cfgErr != nil {
 		return fmt.Errorf("%s%s", cfgErr, esErr)
-	}
-	if esErr != nil {
-		Log.Error().Err(esErr).Msg("es.Ping")
 	}
 
 	ES = es
@@ -37,6 +34,7 @@ func InitES() error {
 }
 
 func newES() (es *elasticsearch.Client, cfgErr error, esErr error) {
+	Log.Info().Strs("hosts", conf.Config.SYSConf.ESAddress).Msg("Initialize ES connection")
 	es, cfgErr = elasticsearch.NewClient(elasticsearch.Config{
 		Addresses:    conf.Config.SYSConf.ESAddress,
 		DisableRetry: !conf.Config.SYSConf.ESEnableRetry,
@@ -51,6 +49,9 @@ func newES() (es *elasticsearch.Client, cfgErr error, esErr error) {
 	}
 
 	_, esErr = es.Ping()
+	if esErr != nil {
+		Log.Error().Err(esErr).Msg("es.Ping")
+	}
 
 	return
 }
