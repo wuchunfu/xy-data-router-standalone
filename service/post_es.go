@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
+	readerpool "github.com/fufuok/utils/pools/reader"
 	"github.com/panjf2000/ants/v2"
 	"github.com/rs/zerolog"
 	"github.com/tidwall/gjson"
@@ -14,7 +15,6 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
-	"github.com/fufuok/xy-data-router/internal/reader"
 )
 
 // ES 批量写入响应
@@ -178,12 +178,12 @@ func submitESBulk(body *bbPool.ByteBuffer) {
 
 // 批量写入 ES
 func esBulk(body *bbPool.ByteBuffer) {
-	r := reader.New(body.Bytes())
+	r := readerpool.New(body.Bytes())
 
 	defer func() {
 		esBulkTodoCount.Dec()
 		bbPool.Put(body)
-		reader.Release(r)
+		readerpool.Release(r)
 	}()
 
 	resp, err := common.ES.Bulk(r)
