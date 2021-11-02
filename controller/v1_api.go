@@ -9,6 +9,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/gzip"
 	"github.com/fufuok/xy-data-router/middleware"
 	"github.com/fufuok/xy-data-router/schema"
 	"github.com/fufuok/xy-data-router/service"
@@ -43,12 +44,12 @@ func V1APIHandler(c *fiber.Ctx) error {
 			return middleware.APIFailure(c, "数据为空")
 		}
 
-		uri := strings.TrimRight(c.Path(), "/")
+		uri := utils.TrimRight(c.Path(), '/')
 		if strings.HasSuffix(uri, "/gzip") {
 			// 请求体解压缩
 			var err error
 			uri = uri[:len(uri)-5]
-			body, err = utils.Unzip(body)
+			body, err = gzip.Unzip(body)
 			if err != nil {
 				return middleware.APIFailure(c, "数据解压失败")
 			}
@@ -61,7 +62,7 @@ func V1APIHandler(c *fiber.Ctx) error {
 	}
 
 	if chkField {
-		// 检查必有字段
+		// 检查必有字段, POST 非标准 JSON 时(多条数据), 不一定准确
 		if !common.CheckRequiredField(body, apiConf.RequiredField) {
 			return middleware.APIFailure(c, utils.AddString("必填字段: ", strings.Join(apiConf.RequiredField, ",")))
 		}
@@ -82,6 +83,5 @@ func query2JSON(c *fiber.Ctx) (body []byte) {
 	c.Request().URI().QueryArgs().VisitAll(func(key []byte, val []byte) {
 		body, _ = sjson.SetBytes(body, utils.B2S(key), val)
 	})
-
 	return
 }

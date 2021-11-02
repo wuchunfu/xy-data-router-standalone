@@ -4,7 +4,6 @@
 package zstd
 
 import (
-	"bytes"
 	"math/rand"
 	"testing"
 
@@ -108,8 +107,8 @@ func BenchmarkName(b *testing.B) {
 				if err != nil {
 					b.Fatal(err)
 				}
-				if !bytes.Equal(src, bs) {
-					b.Fatal(src, bs)
+				if !utils.EqualFoldBytes(src, bs) {
+					b.Fatal("src != bs")
 				}
 				// _ = dec
 			}
@@ -125,8 +124,8 @@ func BenchmarkName(b *testing.B) {
 				if err != nil {
 					b.Fatal(err)
 				}
-				if !bytes.Equal(src, bs) {
-					b.Fatal(src, bs)
+				if !utils.EqualFoldBytes(src, bs) {
+					b.Fatal("src != bs")
 				}
 				// _ = dec
 			}
@@ -142,8 +141,8 @@ func BenchmarkName(b *testing.B) {
 				if err != nil {
 					b.Fatal(err)
 				}
-				if !bytes.Equal(src, bs) {
-					b.Fatal(src, bs)
+				if !utils.EqualFoldBytes(src, bs) {
+					b.Fatal("src != bs")
 				}
 				// _ = dec
 			}
@@ -154,11 +153,33 @@ func BenchmarkName(b *testing.B) {
 // go test -run=^$ -benchmem -benchtime=1s -count=2 -bench=.
 // goos: linux
 // goarch: amd64
+// pkg: github.com/fufuok/xy-data-router/internal/zstd
+// cpu: Intel(R) Xeon(R) Gold 6151 CPU @ 3.00GHz
+// BenchmarkName/gzip-4              201576              5922 ns/op            1783 B/op          2 allocs/op
+// BenchmarkName/gzip-4              202632              6204 ns/op            1759 B/op          2 allocs/op
+// BenchmarkName/pure-4              304629              3899 ns/op            1024 B/op          2 allocs/op
+// BenchmarkName/pure-4              316008              3897 ns/op            1024 B/op          2 allocs/op
+// BenchmarkName/cgo-4               577648              2225 ns/op            1216 B/op          2 allocs/op
+// BenchmarkName/cgo-4               565663              2231 ns/op            1216 B/op          2 allocs/op
+
+// goos: linux
+// goarch: amd64
 // pkg: github.com/fufuok/internal/zstd
-// cpu: Intel(R) Xeon(R) CPU E5-2667 v2 @ 3.30GHz
-// BenchmarkName/gzip-4              187963              6692 ns/op            1748 B/op          2 allocs/op
-// BenchmarkName/gzip-4              183778              6285 ns/op            1827 B/op          2 allocs/op
-// BenchmarkName/pure-4              338545              3632 ns/op            1024 B/op          2 allocs/op
-// BenchmarkName/pure-4              342086              3606 ns/op            1024 B/op          2 allocs/op
-// BenchmarkName/cgo-4               440370              2562 ns/op            1216 B/op          2 allocs/op
-// BenchmarkName/cgo-4               487807              2587 ns/op            1216 B/op          2 allocs/op
+// cpu: Intel(R) Xeon(R) Gold 6161 CPU @ 2.20GHz
+// BenchmarkName/gzip-8              273086              4276 ns/op            1875 B/op          2 allocs/op
+// BenchmarkName/gzip-8              282141              4446 ns/op            1836 B/op          2 allocs/op
+// BenchmarkName/pure-8              403152              2943 ns/op            1024 B/op          2 allocs/op
+// BenchmarkName/pure-8              380551              2942 ns/op            1024 B/op          2 allocs/op
+// BenchmarkName/cgo-8               906164              1521 ns/op            1216 B/op          2 allocs/op
+// BenchmarkName/cgo-8               891444              1462 ns/op            1216 B/op          2 allocs/op
+
+// goos: linux
+// goarch: amd64
+// pkg: github.com/fufuok/internal/zstd
+// cpu: Intel(R) Xeon(R) Silver 4114 CPU @ 2.20GHz
+// BenchmarkName/gzip-20             447502              2652 ns/op            1898 B/op          2 allocs/op
+// BenchmarkName/gzip-20             446084              2660 ns/op            1964 B/op          2 allocs/op
+// BenchmarkName/pure-20             662720              1814 ns/op            1024 B/op          2 allocs/op
+// BenchmarkName/pure-20             652315              1836 ns/op            1024 B/op          2 allocs/op
+// BenchmarkName/cgo-20             1317346              907.7 ns/op           1216 B/op          2 allocs/op
+// BenchmarkName/cgo-20             1322730              908.1 ns/op           1216 B/op          2 allocs/op

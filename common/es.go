@@ -12,7 +12,7 @@ import (
 var ES *elasticsearch.Client
 
 func initES() {
-	// 首次初始化 ES 连接, 连接失败时允许启动程序
+	// 首次初始化 ES 连接, PING 失败时允许启动程序
 	es, cfgErr, _ := newES()
 	if cfgErr != nil {
 		log.Fatalln("Failed to initialize ES:", cfgErr, "\nbye.")
@@ -21,10 +21,10 @@ func initES() {
 	ES = es
 }
 
-// InitES 重新初始化 ES 连接, 成功则更新连接
+// InitES 重新初始化 ES 连接, PING 成功则更新连接
 func InitES() error {
 	es, cfgErr, esErr := newES()
-	if cfgErr != nil {
+	if cfgErr != nil || esErr != nil {
 		return fmt.Errorf("%s%s", cfgErr, esErr)
 	}
 

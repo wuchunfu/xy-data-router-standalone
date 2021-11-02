@@ -22,7 +22,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		}
 
 		// 接口名
-		apiname := strings.Trim(strings.Replace(c.Path(), "/bulk", "", 1), "/")
+		apiname := utils.Trim(strings.Replace(c.Path(), "/bulk", "", 1), '/')
 
 		// 接口配置检查
 		apiConf, ok := conf.APIConfig[apiname]
