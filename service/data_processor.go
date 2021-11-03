@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
 	"github.com/panjf2000/ants/v2"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/pretty"
-	bbPool "github.com/valyala/bytebufferpool"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -76,37 +76,64 @@ func dataProcessor(dp *tDataProcessor) {
 		}
 
 		switch js[0] {
-		case '[':
-			// 字典列表 [{body},{body}]
+		case '[': // 字典列表 [{body},{body}]
 			gjson.Result{Type: gjson.JSON, Raw: utils.B2S(js)}.ForEach(func(_, v gjson.Result) bool {
 				if v.IsObject() {
-					body := appendSYSField(utils.S2B(v.String()), dp.data.IP)
-					if isPostToES {
-						esData := bbPool.Get()
-						_, _ = esData.Write(dp.dr.apiConf.ESBulkHeader)
-						_, _ = esData.Write(body)
-						_, _ = esData.Write(ln)
-						dp.dr.drOut.esChan.In <- esData
-					}
-					if isPostToAPI {
-						dp.dr.drOut.apiChan.In <- body
-					}
+					sendOneData(dp, utils.S2B(v.String()), isPostToES, isPostToAPI)
 				}
 				return true
 			})
-		case '{':
-			// 批量文本数据 {body}=-:-={body}
-			js = appendSYSField(js, dp.data.IP)
-			if isPostToES {
-				esData := bbPool.Get()
-				_, _ = esData.Write(dp.dr.apiConf.ESBulkHeader)
-				_, _ = esData.Write(js)
-				_, _ = esData.Write(ln)
-				dp.dr.drOut.esChan.In <- esData
-			}
-			if isPostToAPI {
-				dp.dr.drOut.apiChan.In <- js
-			}
+		case '{': // 批量文本数据 {body}=-:-={body}
+			sendOneData(dp, js, isPostToES, isPostToAPI)
 		}
 	}
+}
+
+func sendOneData(dp *tDataProcessor, js []byte, isPostToES, isPostToAPI bool) {
+	jsData := appendSYSField(js, dp.data.IP)
+	if isPostToES {
+		esData := bytespool.Make(dp.dr.apiConf.ESBulkHeaderLength + len(jsData) + 1)
+		esData = append(esData, dp.dr.apiConf.ESBulkHeader...)
+		esData = append(esData, jsData...)
+		esData = append(esData, '\n')
+		// 需要在 ES 使用后回收 esData
+		dp.dr.drOut.esChan.In <- esData
+	}
+	if isPostToAPI {
+		// 需要在 API 使用后回收 jsData
+		dp.dr.drOut.apiChan.In <- jsData
+	} else {
+		bytespool.Release(jsData)
+	}
+}
+
+// 附加系统字段: 入参 JS 数据必须为 {JSON字典}, Immutable
+// 返回值使用完成后可以回收:
+// jsData := appendSYSField([]byte(`{"f":"f"}`, "1.1.1.1")
+// bytespool.Release(jsData)
+func appendSYSField(js []byte, ip string) []byte {
+	n := len(js)
+	exist := gjson.GetBytes(js, "_cip").Exists()
+	if !exist {
+		// 加系统字段 JSON 长度
+		n += len(ip) + 79
+	}
+
+	buf := bytespool.Make(n)
+
+	i := 0
+	if !exist {
+		buf = append(buf, `{"_cip":"`...)
+		buf = append(buf, ip...)
+		buf = append(buf, `","_ctime":"`...)
+		buf = append(buf, common.Now3399UTC...)
+		buf = append(buf, `","_gtime":"`...)
+		buf = append(buf, common.Now3399...)
+		buf = append(buf, `",`...)
+		i = 1
+	}
+
+	buf = append(buf, js[i:]...)
+
+	return buf
 }

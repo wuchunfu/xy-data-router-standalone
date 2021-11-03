@@ -35,10 +35,6 @@ type tDataProcessor struct {
 }
 
 var (
-	ln         = []byte("\n")
-	jsArrLeft  = []byte("[")
-	jsArrRight = []byte("]")
-
 	// ES 数据分隔符
 	esBodySep = []byte(conf.ESBodySep)
 

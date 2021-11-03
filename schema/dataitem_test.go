@@ -8,17 +8,25 @@ import (
 	"github.com/fufuok/utils"
 )
 
+var (
+	testAPIName = "test"
+	testIP      = "192.168.1.1"
+	testBody    = utils.FastRandBytes(510)
+)
+
 func TestDataItem_Pool(t *testing.T) {
-	apiname := "test"
-	ip := "192.168.1.1"
-	body := utils.FastRandBytes(512)
 	a := Make()
-	b := New(apiname, ip, body)
+	utils.AssertEqual(t, true, a.Body == nil)
+
+	b := New(testAPIName, testIP, testBody)
 	utils.AssertEqual(t, true, fmt.Sprintf("%p", a) != fmt.Sprintf("%p", b), "&a!=&b")
+
+	// Disable GC to test re-acquire the same data
+	gc := debug.SetGCPercent(-1)
 
 	a.Release()
 
-	c := New(apiname, ip, body)
+	c := New(testAPIName, testIP, testBody)
 	utils.AssertEqual(t, true, fmt.Sprintf("%p", c) == fmt.Sprintf("%p", a), "&c==&a")
 
 	d := Make()
@@ -32,9 +40,6 @@ func TestDataItem_Pool(t *testing.T) {
 	utils.AssertEqual(t, 0, len(b.Body))
 	utils.AssertEqual(t, 512, cap(b.Body))
 
-	// Disable GC to test re-acquire the same data
-	gc := debug.SetGCPercent(-1)
-
 	b.MarkInc()
 	b.Release()
 
@@ -46,12 +51,6 @@ func TestDataItem_Pool(t *testing.T) {
 	f := Make()
 	utils.AssertEqual(t, true, fmt.Sprintf("%p", f) == fmt.Sprintf("%p", b), "&f==&b")
 
-	SetCapLimit(511)
-	f.Release()
-
-	g := Make()
-	utils.AssertEqual(t, true, fmt.Sprintf("%p", g) != fmt.Sprintf("%p", f), "&g!=&f")
-
 	// Re-enable GC
 	debug.SetGCPercent(gc)
 
@@ -61,34 +60,34 @@ func TestDataItem_Pool(t *testing.T) {
 }
 
 func BenchmarkDataItemMake(b *testing.B) {
-	x := Make()
-	b.Run("pool", func(b *testing.B) {
+	b.Run("pool.Make", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			x = Make()
+			x := Make()
 			x.Release()
 		}
 	})
-	b.Run("new", func(b *testing.B) {
+	b.Run("pool.New", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			x = new(DataItem)
+			x := New(testAPIName, testIP, testBody)
+			x.Release()
 		}
 	})
 }
 
 func BenchmarkDataItemMakeParallel(b *testing.B) {
-	x := Make()
-	b.Run("pool", func(b *testing.B) {
+	b.Run("pool.Make", func(b *testing.B) {
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
-				x = Make()
+				x := Make()
 				x.Release()
 			}
 		})
 	})
-	b.Run("new", func(b *testing.B) {
+	b.Run("pool.New", func(b *testing.B) {
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
-				x = new(DataItem)
+				x := New(testAPIName, testIP, testBody)
+				x.Release()
 			}
 		})
 	})
@@ -99,11 +98,11 @@ func BenchmarkDataItemMakeParallel(b *testing.B) {
 // goarch: amd64
 // pkg: github.com/fufuok/xy-data-router/schema
 // cpu: Intel(R) Xeon(R) Gold 6151 CPU @ 3.00GHz
-// BenchmarkDataItemMake/pool-4                    33962113                35.48 ns/op            0 B/op          0 allocs/op
-// BenchmarkDataItemMake/pool-4                    33198151                35.66 ns/op            0 B/op          0 allocs/op
-// BenchmarkDataItemMake/new-4                     27157551                41.87 ns/op           64 B/op          1 allocs/op
-// BenchmarkDataItemMake/new-4                     28881915                42.21 ns/op           64 B/op          1 allocs/op
-// BenchmarkDataItemMakeParallel/pool-4            25939573                46.37 ns/op            0 B/op          0 allocs/op
-// BenchmarkDataItemMakeParallel/pool-4            25888813                46.38 ns/op            0 B/op          0 allocs/op
-// BenchmarkDataItemMakeParallel/new-4             27567992                43.88 ns/op           64 B/op          1 allocs/op
-// BenchmarkDataItemMakeParallel/new-4             27806358                43.53 ns/op           64 B/op          1 allocs/op
+// BenchmarkDataItemMake/pool-4              33834816                35.54 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItemMake/pool-4              33093555                35.25 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItemMake/new-4               27697900                41.84 ns/op           64 B/op          1 allocs/op
+// BenchmarkDataItemMake/new-4               27687626                42.25 ns/op           64 B/op          1 allocs/op
+// BenchmarkDataItemMakeParallel/pool-4      27874159                43.08 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItemMakeParallel/pool-4      27840216                43.02 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItemMakeParallel/new-4       28916372                39.55 ns/op           64 B/op          1 allocs/op
+// BenchmarkDataItemMakeParallel/new-4       30574990                39.75 ns/op           64 B/op          1 allocs/op

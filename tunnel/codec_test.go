@@ -3,6 +3,7 @@ package tunnel
 import (
 	"testing"
 
+	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
 
 	"github.com/fufuok/xy-data-router/schema"
@@ -36,12 +37,14 @@ func TestCodecCompress(t *testing.T) {
 }
 
 func BenchmarkCodec_Marshal(b *testing.B) {
+	var dec []byte
 	data := schema.New("test", "7.7.7.7", utils.FastRandBytes(512))
 	coder := new(genCodec)
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = coder.Marshal(data)
+		dec, _ = coder.Marshal(data)
+		bytespool.Release(dec)
 	}
 }
 
@@ -58,13 +61,15 @@ func BenchmarkCodec_Unmarshal(b *testing.B) {
 }
 
 func BenchmarkCodec_Marshal_Compress(b *testing.B) {
+	var dec []byte
 	data := schema.New("test", "7.7.7.7", utils.FastRandBytes(512))
 	data.Flag = 1
 	coder := new(genCodec)
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = coder.Marshal(data)
+		dec, _ = coder.Marshal(data)
+		bytespool.Release(dec)
 	}
 }
 
@@ -87,8 +92,10 @@ func BenchmarkCodec_Marshal_Parallel(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
+		var dec []byte
 		for pb.Next() {
-			_, _ = coder.Marshal(data)
+			dec, _ = coder.Marshal(data)
+			bytespool.Release(dec)
 		}
 	})
 }
@@ -96,11 +103,11 @@ func BenchmarkCodec_Marshal_Parallel(b *testing.B) {
 func BenchmarkCodec_Unmarshal_Parallel(b *testing.B) {
 	data := schema.New("test", "7.7.7.7", utils.FastRandBytes(512))
 	coder := new(genCodec)
-	dec, _ := coder.Marshal(data)
 	item := schema.Make()
 	b.ReportAllocs()
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
+		dec, _ := coder.Marshal(data)
 		for pb.Next() {
 			_ = coder.Unmarshal(dec, item)
 		}
@@ -114,8 +121,10 @@ func BenchmarkCodec_Marshal_Compress_Parallel(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
+		var dec []byte
 		for pb.Next() {
-			_, _ = coder.Marshal(data)
+			dec, _ = coder.Marshal(data)
+			bytespool.Release(dec)
 		}
 	})
 }
@@ -124,11 +133,11 @@ func BenchmarkCodec_Unmarshal_Compress_Parallel(b *testing.B) {
 	data := schema.New("test", "7.7.7.7", utils.FastRandBytes(512))
 	data.Flag = 1
 	coder := new(genCodec)
-	dec, _ := coder.Marshal(data)
 	item := schema.Make()
 	b.ReportAllocs()
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
+		dec, _ := coder.Marshal(data)
 		for pb.Next() {
 			_ = coder.Unmarshal(dec, item)
 		}
@@ -140,19 +149,19 @@ func BenchmarkCodec_Unmarshal_Compress_Parallel(b *testing.B) {
 // goarch: amd64
 // pkg: github.com/fufuok/xy-data-router/tunnel
 // cpu: Intel(R) Xeon(R) Gold 6151 CPU @ 3.00GHz
-// BenchmarkCodec_Marshal-4                         5919986               204.3 ns/op           576 B/op          1 allocs/op
-// BenchmarkCodec_Marshal-4                         5932430               201.0 ns/op           576 B/op          1 allocs/op
-// BenchmarkCodec_Unmarshal-4                      16941763               70.85 ns/op            16 B/op          2 allocs/op
-// BenchmarkCodec_Unmarshal-4                      17128773               70.66 ns/op            16 B/op          2 allocs/op
-// BenchmarkCodec_Marshal_Compress-4                 170994                6624 ns/op           480 B/op          1 allocs/op
-// BenchmarkCodec_Marshal_Compress-4                 179944                6470 ns/op           480 B/op          1 allocs/op
-// BenchmarkCodec_Unmarshal_Compress-4               241256                4697 ns/op         16425 B/op          5 allocs/op
-// BenchmarkCodec_Unmarshal_Compress-4               275373                4639 ns/op         16425 B/op          5 allocs/op
-// BenchmarkCodec_Marshal_Parallel-4               10878728               118.0 ns/op           576 B/op          1 allocs/op
-// BenchmarkCodec_Marshal_Parallel-4               10519323               109.9 ns/op           576 B/op          1 allocs/op
-// BenchmarkCodec_Unmarshal_Parallel-4              6563950               174.4 ns/op            16 B/op          2 allocs/op
-// BenchmarkCodec_Unmarshal_Parallel-4              7055163               182.6 ns/op            16 B/op          2 allocs/op
-// BenchmarkCodec_Marshal_Compress_Parallel-4        708220                1993 ns/op           480 B/op          1 allocs/op
-// BenchmarkCodec_Marshal_Compress_Parallel-4        710470                2008 ns/op           480 B/op          1 allocs/op
-// BenchmarkCodec_Unmarshal_Compress_Parallel-4      344793                3157 ns/op         16425 B/op          5 allocs/op
-// BenchmarkCodec_Unmarshal_Compress_Parallel-4      422097                3117 ns/op         16425 B/op          5 allocs/op
+// BenchmarkCodec_Marshal-4                        10929298               110.2 ns/op             0 B/op          0 allocs/op
+// BenchmarkCodec_Marshal-4                        10828400               111.1 ns/op             0 B/op          0 allocs/op
+// BenchmarkCodec_Unmarshal-4                       9805401               120.5 ns/op            45 B/op          2 allocs/op
+// BenchmarkCodec_Unmarshal-4                      10154618               121.8 ns/op            46 B/op          2 allocs/op
+// BenchmarkCodec_Marshal_Compress-4                 139848                8582 ns/op             0 B/op          0 allocs/op
+// BenchmarkCodec_Marshal_Compress-4                 140238                8599 ns/op             0 B/op          0 allocs/op
+// BenchmarkCodec_Unmarshal_Compress-4              2446064               481.6 ns/op            79 B/op          1 allocs/op
+// BenchmarkCodec_Unmarshal_Compress-4              2520304               654.8 ns/op            84 B/op          1 allocs/op
+// BenchmarkCodec_Marshal_Parallel-4               42292669               28.15 ns/op            0 B/op           0 allocs/op
+// BenchmarkCodec_Marshal_Parallel-4               41839184               28.13 ns/op            0 B/op           0 allocs/op
+// BenchmarkCodec_Unmarshal_Parallel-4              6645628               180.7 ns/op            35 B/op          2 allocs/op
+// BenchmarkCodec_Unmarshal_Parallel-4              6321154               179.3 ns/op            36 B/op          2 allocs/op
+// BenchmarkCodec_Marshal_Compress_Parallel-4        504944                2316 ns/op             0 B/op          0 allocs/op
+// BenchmarkCodec_Marshal_Compress_Parallel-4        503425                2374 ns/op             0 B/op          0 allocs/op
+// BenchmarkCodec_Unmarshal_Compress_Parallel-4     7723346               178.5 ns/op            69 B/op          1 allocs/op
+// BenchmarkCodec_Unmarshal_Compress_Parallel-4     6893208               219.7 ns/op            72 B/op          1 allocs/op

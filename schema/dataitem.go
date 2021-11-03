@@ -4,17 +4,17 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
 )
 
 const (
-	// FlagDefault 0 (默认) 数据不压缩, 1 压缩
-	FlagDefault FlagType = iota
+	// FlagData 0 (默认) 数据不压缩, 1 压缩
+	FlagData FlagType = iota
 	FlagZstd
 )
 
 var defaultPool = &Pool{
-	capLimit: 8192,
 	pool: sync.Pool{
 		New: func() interface{} {
 			return new(DataItem)
@@ -25,13 +25,13 @@ var defaultPool = &Pool{
 type FlagType int32
 
 type Pool struct {
-	capLimit uint64
-	pool     sync.Pool
+	pool sync.Pool
 }
 
 // Get 获取空数据项
 func (p *Pool) Get() *DataItem {
 	v := p.pool.Get().(*DataItem)
+	v.Body = nil
 	v.MarkReset()
 	v.FlagReset()
 	return v
@@ -40,25 +40,24 @@ func (p *Pool) Get() *DataItem {
 // Put 释放数据项对象, 只回收一次
 func (p *Pool) Put(d *DataItem) {
 	if d.MarkSwap() == 0 {
-		capLimit := int(atomic.LoadUint64(&p.capLimit))
-		if capLimit == 0 || cap(d.Body) <= capLimit {
-			d.Reset()
-			p.pool.Put(d)
-		}
+		d.Reset()
+		bytespool.Release(d.Body)
+		p.pool.Put(d)
 	}
 }
 
-// SetCapLimit 设置 Body 容量最大可被回收值
-func (p *Pool) SetCapLimit(n uint64) {
-	atomic.StoreUint64(&p.capLimit, n)
-}
-
 // New 新数据项, Immutable
-func New(apiname, ip string, body []byte) *DataItem {
-	d := Make()
+func New(apiname, ip string, body []byte, releaseBody ...bool) *DataItem {
+	d := defaultPool.Get()
 	d.APIName = utils.CopyString(apiname)
-	d.Body = utils.CopyBytes(body)
 	d.IP = utils.CopyString(ip)
+	d.Body = bytespool.New(len(body))
+	copy(d.Body, body)
+
+	if len(releaseBody) > 0 && releaseBody[0] {
+		bytespool.Release(body)
+	}
+
 	return d
 }
 
@@ -68,10 +67,6 @@ func Make() *DataItem {
 
 func Release(d *DataItem) {
 	defaultPool.Put(d)
-}
-
-func SetCapLimit(n uint64) {
-	defaultPool.SetCapLimit(n)
 }
 
 // MarkInc Mark 数值加 1
@@ -144,4 +139,8 @@ func (d *DataItem) Reset() {
 // Release 释放自身
 func (d *DataItem) Release() {
 	defaultPool.Put(d)
+}
+
+func (d *DataItem) String() string {
+	return d.APIName + ", " + d.IP + ", " + utils.B2S(d.Body)
 }

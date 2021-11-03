@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/fufuok/bytespool"
-	"github.com/fufuok/utils"
 
 	"github.com/fufuok/xy-data-router/internal/zstd"
 	"github.com/fufuok/xy-data-router/schema"
@@ -16,13 +15,7 @@ const (
 	flagZstd byte = 'z'
 )
 
-var (
-	// 普通数据和压缩数据标识
-	flagDatas = []byte{flagData}
-	flagZstds = []byte{flagZstd}
-
-	codecError = errors.New("invalid schema.DataItem")
-)
+var codecError = errors.New("invalid schema.DataItem")
 
 // genCodec wraps schema.DataItem
 type genCodec struct{}
@@ -34,21 +27,25 @@ func (j *genCodec) Marshal(v interface{}) ([]byte, error) {
 		return nil, codecError
 	}
 
+	n := d.Size() + 1
+	bs := bytespool.New64(n)
+	buf := bs[1:]
+
 	// 编码数据
-	bs := bytespool.Make()
-	defer bytespool.Release(bs)
-	bs, _ = d.Marshal(bs)
+	buf, _ = d.Marshal(buf)
 
 	if schema.FlagType(d.Flag) != schema.FlagZstd {
-		return utils.JoinBytes(flagDatas, bs), nil
+		bs[0] = flagData
+		return bs, nil
 	}
 
 	// 压缩数据
-	dec := bytespool.Make()
-	defer bytespool.Release(dec)
-	dec = zstd.Compress(dec, bs)
+	dec := bytespool.Make64(n)
+	dec = append(dec, flagZstd)
+	dec = zstd.Compress(dec, buf)
+	bytespool.Release(bs)
 
-	return utils.JoinBytes(flagZstds, dec), nil
+	return dec, nil
 }
 
 // Unmarshal wraps schema.DataItem.Unmarshal
@@ -64,10 +61,12 @@ func (j *genCodec) Unmarshal(data []byte, v interface{}) (err error) {
 	}
 
 	// 先解压
-	enc := bytespool.Make()
+	enc := bytespool.Make(len(data) * 2)
 	enc, err = zstd.Decompress(enc, data[1:])
 
 	// 再解码
 	_, err = d.Unmarshal(enc)
+	bytespool.Release(enc)
+
 	return
 }

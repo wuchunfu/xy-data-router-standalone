@@ -5,6 +5,8 @@ import (
 	"io"
 	"time"
 	"unsafe"
+
+	"github.com/fufuok/bytespool"
 )
 
 var (
@@ -76,7 +78,7 @@ func (d *DataItem) Marshal(buf []byte) ([]byte, error) {
 		if uint64(cap(buf)) >= size {
 			buf = buf[:size]
 		} else {
-			buf = make([]byte, size)
+			buf = bytespool.New64(size)
 		}
 	}
 	i := uint64(0)
@@ -165,7 +167,6 @@ func (d *DataItem) Unmarshal(buf []byte) (i uint64, err error) {
 	defer func() {
 		// 清除 Mark 数据
 		d.MarkReset()
-
 		if r := recover(); r != nil {
 			err = unmarshalError
 		}
@@ -233,7 +234,7 @@ func (d *DataItem) Unmarshal(buf []byte) (i uint64, err error) {
 		if uint64(cap(d.Body)) >= l {
 			d.Body = d.Body[:l]
 		} else {
-			d.Body = make([]byte, l)
+			d.Body = bytespool.New64(l)
 		}
 		copy(d.Body, buf[i+0:])
 		i += l

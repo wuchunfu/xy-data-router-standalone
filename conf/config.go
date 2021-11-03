@@ -81,12 +81,13 @@ type tLogConf struct {
 }
 
 type TAPIConf struct {
-	APIName       string       `json:"api_name"`
-	ESIndex       string       `json:"es_index"`
-	ESIndexSplit  string       `json:"es_index_split"`
-	RequiredField []string     `json:"required_field"`
-	PostAPI       TPostAPIConf `json:"post_api"`
-	ESBulkHeader  []byte
+	APIName            string       `json:"api_name"`
+	ESIndex            string       `json:"es_index"`
+	ESIndexSplit       string       `json:"es_index_split"`
+	RequiredField      []string     `json:"required_field"`
+	PostAPI            TPostAPIConf `json:"post_api"`
+	ESBulkHeader       []byte
+	ESBulkHeaderLength int
 }
 
 type TPostAPIConf struct {

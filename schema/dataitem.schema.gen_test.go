@@ -3,6 +3,7 @@ package schema
 import (
 	"testing"
 
+	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
 )
 
@@ -19,10 +20,11 @@ func TestDataItem(t *testing.T) {
 
 func BenchmarkDataItem_Marshal(b *testing.B) {
 	data := New("test", "7.7.7.7", utils.FastRandBytes(512))
+	buf := bytespool.New64(data.Size())
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, _ = data.Marshal(nil)
+		_, _ = data.Marshal(buf)
 	}
 }
 
@@ -42,8 +44,9 @@ func BenchmarkDataItem_Marshal_Parallel(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
+		buf := bytespool.New64(data.Size())
 		for pb.Next() {
-			_, _ = data.Marshal(nil)
+			_, _ = data.Marshal(buf)
 		}
 	})
 }
@@ -51,12 +54,13 @@ func BenchmarkDataItem_Marshal_Parallel(b *testing.B) {
 func BenchmarkDataItem_Unmarshal_Parallel(b *testing.B) {
 	data := New("test", "7.7.7.7", utils.FastRandBytes(512))
 	dec, _ := data.Marshal(nil)
-	item := Make()
 	b.ReportAllocs()
 	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
+			item := Make()
 			_, _ = item.Unmarshal(dec)
+			item.Release()
 		}
 	})
 }
@@ -66,11 +70,11 @@ func BenchmarkDataItem_Unmarshal_Parallel(b *testing.B) {
 // goarch: amd64
 // pkg: github.com/fufuok/xy-data-router/schema
 // cpu: Intel(R) Xeon(R) Gold 6151 CPU @ 3.00GHz
-// BenchmarkDataItem_Marshal-4                      8294629               136.6 ns/op           576 B/op          1 allocs/op
-// BenchmarkDataItem_Marshal-4                      9026492               135.6 ns/op           576 B/op          1 allocs/op
-// BenchmarkDataItem_Unmarshal-4                   18264658               65.75 ns/op            16 B/op          2 allocs/op
-// BenchmarkDataItem_Unmarshal-4                   18336759               65.68 ns/op            16 B/op          2 allocs/op
-// BenchmarkDataItem_Marshal_Parallel-4            12356250               100.3 ns/op           576 B/op          1 allocs/op
-// BenchmarkDataItem_Marshal_Parallel-4            12638331               101.1 ns/op           576 B/op          1 allocs/op
-// BenchmarkDataItem_Unmarshal_Parallel-4           7288165               165.4 ns/op            16 B/op          2 allocs/op
-// BenchmarkDataItem_Unmarshal_Parallel-4           7345234               165.7 ns/op            16 B/op          2 allocs/op
+// BenchmarkDataItem_Marshal-4                     40845681                30.71 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItem_Marshal-4                     35584504                29.36 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItem_Unmarshal-4                   16268248                70.31 ns/op           16 B/op          2 allocs/op
+// BenchmarkDataItem_Unmarshal-4                   17582056                69.78 ns/op           16 B/op          2 allocs/op
+// BenchmarkDataItem_Marshal_Parallel-4           149579329                8.014 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItem_Marshal_Parallel-4           150980236                7.934 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItem_Unmarshal_Parallel-4          28453246                41.69 ns/op           16 B/op          2 allocs/op
+// BenchmarkDataItem_Unmarshal_Parallel-4          27080328                40.97 ns/op           16 B/op          2 allocs/op

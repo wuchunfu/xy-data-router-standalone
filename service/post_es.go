@@ -2,15 +2,14 @@ package service
 
 import (
 	"bytes"
-	"strings"
 	"time"
 
+	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
-	readerpool "github.com/fufuok/utils/pools/reader"
+	"github.com/fufuok/utils/pools/readerpool"
 	"github.com/panjf2000/ants/v2"
 	"github.com/rs/zerolog"
 	"github.com/tidwall/gjson"
-	bbPool "github.com/valyala/bytebufferpool"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -42,7 +41,7 @@ func initESBulkPool() {
 	esBulkPool, _ = ants.NewPoolWithFunc(
 		conf.Config.SYSConf.ESBulkWorkerSize,
 		func(i interface{}) {
-			esBulk(i.(*bbPool.ByteBuffer))
+			esBulk(i.([]byte))
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.SYSConf.ESBulkMaxWorkerSize),
@@ -56,7 +55,7 @@ func initESBulkPool() {
 func getUDPESIndex(body []byte, key string) string {
 	index := gjson.GetBytes(body, key).String()
 	if index != "" {
-		return utils.ToLower(strings.TrimSpace(index))
+		return utils.ToLower(utils.Trim(index, ' '))
 	}
 
 	return ""
@@ -93,6 +92,7 @@ func updateESBulkHeader() {
 		dataRouters.Range(func(_ string, value interface{}) bool {
 			dr := value.(*tDataRouter)
 			dr.apiConf.ESBulkHeader = getESBulkHeader(dr.apiConf, ymd)
+			dr.apiConf.ESBulkHeaderLength = len(dr.apiConf.ESBulkHeader)
 			return true
 		})
 		// 等待明天 0 点再执行
@@ -101,21 +101,7 @@ func updateESBulkHeader() {
 	}
 }
 
-// 附加系统字段: 数据必定为 {JSON字典}, Immutable
-func appendSYSField(js []byte, ip string) []byte {
-	if gjson.GetBytes(js, "_cip").Exists() {
-		return utils.CopyBytes(js)
-	}
-	return append(
-		utils.AddStringBytes(
-			`{"_cip":"`, ip,
-			`","_ctime":"`, common.Now3399UTC,
-			`","_gtime":"`, common.Now3399, `",`,
-		),
-		js[1:]...,
-	)
-}
-
+// ES 数据入口
 func esWorker() {
 	ticker := common.TWms.NewTicker(conf.Config.SYSConf.ESPostMaxIntervalDuration)
 	defer ticker.Stop()
@@ -127,7 +113,7 @@ func esWorker() {
 		case <-ticker.C:
 			// 达到最大时间间隔写入 ES
 			postES(&buf)
-		case data, ok := <-esChan.Out:
+		case v, ok := <-esChan.Out:
 			if !ok {
 				// 消费所有数据
 				postES(&buf)
@@ -135,9 +121,9 @@ func esWorker() {
 				return
 			}
 
-			esData := data.(*bbPool.ByteBuffer)
-			buf.Write(esData.Bytes())
-			bbPool.Put(esData)
+			esData := v.([]byte)
+			buf.Write(esData)
+			bytespool.Release(esData)
 
 			n += 1
 			if n%conf.Config.SYSConf.ESPostBatchNum == 0 || buf.Len() > conf.Config.SYSConf.ESPostBatchBytes {
@@ -157,19 +143,18 @@ func postES(buf *bytes.Buffer) {
 		return
 	}
 
-	defer buf.Reset()
+	esBody := bytespool.New(buf.Len())
+	copy(esBody, buf.Bytes())
+	buf.Reset()
 
-	body := bbPool.Get()
-	_, _ = body.Write(buf.Bytes())
-
-	submitESBulk(body)
+	submitESBulk(esBody)
 }
 
 // 提交批量任务, 提交不阻塞, 有执行并发限制, 最大排队数限制
-func submitESBulk(body *bbPool.ByteBuffer) {
+func submitESBulk(esBody []byte) {
 	_ = common.Pool.Submit(func() {
 		esBulkTodoCount.Inc()
-		if err := esBulkPool.Invoke(body); err != nil {
+		if err := esBulkPool.Invoke(esBody); err != nil {
 			esBulkDiscards.Inc()
 			common.LogSampled.Error().Err(err).Msg("go esBulk")
 		}
@@ -177,12 +162,12 @@ func submitESBulk(body *bbPool.ByteBuffer) {
 }
 
 // 批量写入 ES
-func esBulk(body *bbPool.ByteBuffer) {
-	r := readerpool.New(body.Bytes())
+func esBulk(esBody []byte) {
+	r := readerpool.New(esBody)
 
 	defer func() {
 		esBulkTodoCount.Dec()
-		bbPool.Put(body)
+		bytespool.Release(esBody)
 		readerpool.Release(r)
 	}()
 
@@ -234,10 +219,10 @@ func esBulk(body *bbPool.ByteBuffer) {
 						// 等待一个提交周期, 重新排队
 						if utils.InInts(conf.Config.SYSConf.ESReentryCodes, d.Index.Status) {
 							time.Sleep(conf.Config.SYSConf.ESPostMaxIntervalDuration)
-							bodyNew := bbPool.Get()
-							if n, err := bodyNew.Write(body.Bytes()); n > 0 && err == nil {
-								submitESBulk(bodyNew)
-							}
+							// 拷贝数据重新提交
+							esBodyNew := bytespool.New(len(esBody))
+							copy(esBodyNew, esBody)
+							submitESBulk(esBodyNew)
 						}
 
 						// Warn 级别时, 抽样数据详情
@@ -249,7 +234,7 @@ func esBulk(body *bbPool.ByteBuffer) {
 									d.Index.Error.Reason,
 									d.Index.Error.Cause.Type,
 									d.Index.Error.Cause.Reason,
-									body.String(),
+									utils.B2S(esBody),
 								)
 						} else {
 							common.LogSampled.Error().

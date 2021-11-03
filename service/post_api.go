@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"time"
 
+	"github.com/fufuok/bytespool"
 	"github.com/imroc/req"
-	bbPool "github.com/valyala/bytebufferpool"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -39,15 +39,18 @@ func apiWorker(dr *tDataRouter) {
 				// 指定时间间隔推送数据
 				postAPI(&buf, dr.apiConf.PostAPI.API)
 			}
-		case js, ok := <-dr.drOut.apiChan.Out:
+		case v, ok := <-dr.drOut.apiChan.Out:
 			if !ok {
 				// 消费所有数据
 				postAPI(&buf, dr.apiConf.PostAPI.API)
 				common.Log.Warn().Str("apiname", dr.apiConf.APIName).Msg("apiWorker exited")
 				return
 			}
+
+			jsData := v.([]byte)
 			buf.WriteByte(',')
-			buf.Write(js.([]byte))
+			buf.Write(jsData)
+			bytespool.Release(jsData)
 		}
 	}
 }
@@ -60,15 +63,15 @@ func postAPI(buf *bytes.Buffer, api []string) {
 
 	defer buf.Reset()
 
-	body := bbPool.Get()
-	_, _ = body.Write(jsArrLeft)
-	_, _ = body.Write(buf.Bytes()[1:])
-	_, _ = body.Write(jsArrRight)
+	apiBody := bytespool.Make(buf.Len() + 1)
+	apiBody = append(apiBody, '[')
+	apiBody = append(apiBody, buf.Bytes()[1:]...)
+	apiBody = append(apiBody, ']')
 
 	_ = common.Pool.Submit(func() {
-		defer bbPool.Put(body)
+		defer bytespool.Release(apiBody)
 		for _, u := range api {
-			if _, err := req.Post(u, req.BodyJSON(body.Bytes()), conf.ReqUserAgent); err != nil {
+			if _, err := req.Post(u, req.BodyJSON(apiBody), conf.ReqUserAgent); err != nil {
 				common.LogSampled.Error().Err(err).Str("url", u).Msg("apiWorker")
 			}
 		}

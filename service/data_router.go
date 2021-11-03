@@ -24,6 +24,7 @@ func InitDataRouter() {
 	for apiname, cfg := range conf.APIConfig {
 		apiConf := cfg
 		apiConf.ESBulkHeader = getESBulkHeader(apiConf, ymd)
+		apiConf.ESBulkHeaderLength = len(apiConf.ESBulkHeader)
 		v, ok := dataRouters.Load(apiname)
 		if ok {
 			// 更新接口配置
