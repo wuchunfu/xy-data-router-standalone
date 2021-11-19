@@ -55,8 +55,8 @@ func dataRouter(dr *tDataRouter) {
 		_ = common.Pool.Submit(func() {
 			dataProcessorTodoCount.Inc()
 			if err := dataProcessorPool.Invoke(dp); err != nil {
-				dataProcessorDiscards.Inc()
 				releaseDataProcessor(dp)
+				dataProcessorDiscards.Inc()
 				common.LogSampled.Error().Err(err).Msg("go dataProcessor")
 			}
 		})

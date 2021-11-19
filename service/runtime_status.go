@@ -69,7 +69,7 @@ func sysStatus() map[string]interface{} {
 		"GoVersion":    conf.GoVersion,
 		"NumCpus":      runtime.NumCPU(),
 		"NumGoroutine": runtime.NumGoroutine(),
-		"NumCgoCall":   runtime.NumCgoCall(),
+		"NumCgoCall":   utils.Comma(runtime.NumCgoCall()),
 		"InternalIPv4": InternalIPv4,
 		"ExternalIPv4": ExternalIPv4,
 
@@ -79,6 +79,8 @@ func sysStatus() map[string]interface{} {
 		"EnableKeepalive": conf.Config.SYSConf.EnableKeepalive,
 		// Tun 数据转发地址, 为空时本地处理数据
 		"ForwardTunnel": conf.ForwardTunnel,
+		// 是否关闭了 ES 写入
+		"ESDisableWrite": conf.Config.SYSConf.ESDisableWrite,
 	}
 }
 
