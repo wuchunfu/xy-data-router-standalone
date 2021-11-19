@@ -156,6 +156,7 @@ func submitESBulk(esBody []byte) {
 		esBulkTodoCount.Inc()
 		if err := esBulkPool.Invoke(esBody); err != nil {
 			esBulkDiscards.Inc()
+			esBulkTodoCount.Dec()
 			common.LogSampled.Error().Err(err).Msg("go esBulk")
 		}
 	})
