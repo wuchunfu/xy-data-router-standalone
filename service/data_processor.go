@@ -16,11 +16,17 @@ import (
 	"github.com/fufuok/xy-data-router/schema"
 )
 
-var dpPool = sync.Pool{
-	New: func() interface{} {
-		return new(tDataProcessor)
-	},
-}
+var (
+	// 为真时, 接口配置了该选项的数据将不会写入 ES
+	esOptionalWrite bool
+
+	// 数据处理池
+	dpPool = sync.Pool{
+		New: func() interface{} {
+			return new(tDataProcessor)
+		},
+	}
+)
 
 func newDataPorcessor(dr *tDataRouter, data *schema.DataItem) *tDataProcessor {
 	dp := dpPool.Get().(*tDataProcessor)
@@ -51,12 +57,25 @@ func initDataProcessorPool() {
 	)
 }
 
+// ES 繁忙时禁止可选写入的状态初始化
+func initESOptionalWrite() {
+	ticker := common.TWm.NewTicker(1 * time.Minute)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		// ES 批量写入排队数 > 100 且 > 最大排队数 * 0.9
+		n := esBulkTodoCount.Value()
+		m := int64(float64(conf.Config.SYSConf.ESBulkMaxWorkerSize) * conf.ESBusyPercent)
+		esOptionalWrite = n > int64(conf.ESBulkMinWorkerSize) && n > m
+	}
+}
+
 // 数据处理和分发
 // 格式化每个 JSON 数据, 附加系统字段, 发送给 ES 和 API 队列, 释放 DataItem
 func dataProcessor(dp *tDataProcessor) {
 	defer releaseDataProcessor(dp)
 
-	isPostToES := !conf.Config.SYSConf.ESDisableWrite
+	isPostToES := !(conf.Config.SYSConf.ESDisableWrite || esOptionalWrite && dp.dr.apiConf.ESOptionalWrite)
 	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
 	if !isPostToES && !isPostToAPI {
 		return

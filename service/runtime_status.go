@@ -81,6 +81,8 @@ func sysStatus() map[string]interface{} {
 		"ForwardTunnel": conf.ForwardTunnel,
 		// 是否关闭了 ES 写入
 		"ESDisableWrite": conf.Config.SYSConf.ESDisableWrite,
+		// 可选 ES 写入状态是否开启, 开启时所有设置了该标识的接口数据将不会写入 ES
+		"ESOptionalWrite": esOptionalWrite,
 	}
 }
 

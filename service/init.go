@@ -115,8 +115,9 @@ func InitService() {
 	// ES 索引头信息更新
 	go updateESBulkHeader()
 
-	// 初始化协程池
+	// 初始化数据处理
 	go initDataProcessorPool()
+	go initESOptionalWrite()
 	go initESBulkPool()
 
 	// 初始化运行时参数

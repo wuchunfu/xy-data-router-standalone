@@ -82,6 +82,7 @@ type tLogConf struct {
 
 type TAPIConf struct {
 	APIName            string       `json:"api_name"`
+	ESOptionalWrite    bool         `json:"es_optional_write"`
 	ESIndex            string       `json:"es_index"`
 	ESIndexSplit       string       `json:"es_index_split"`
 	RequiredField      []string     `json:"required_field"`
@@ -311,7 +312,7 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	if config.SYSConf.ESBulkWorkerSize < 1 {
 		config.SYSConf.ESBulkWorkerSize = ESBulkWorkerSize
 	}
-	if config.SYSConf.ESBulkMaxWorkerSize < 100 {
+	if config.SYSConf.ESBulkMaxWorkerSize < ESBulkMinWorkerSize {
 		config.SYSConf.ESBulkMaxWorkerSize = ESBulkMaxWorkerSize
 	}
 

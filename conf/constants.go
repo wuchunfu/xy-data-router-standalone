@@ -60,9 +60,11 @@ const (
 	ESPostBatchNum    = 4500
 	ESPostBatchBytes  = 5 << 20
 	ESPostMaxInterval = 500 * time.Millisecond
-	// ESBulkWorkerSize ES 批量写入并发协程数, 最大排队数
+	// ESBulkWorkerSize ES 批量写入并发协程数, 最大最小排队数, 基于排队数的繁忙比率定义
 	ESBulkWorkerSize    = 30
 	ESBulkMaxWorkerSize = 800
+	ESBulkMinWorkerSize = 100
+	ESBusyPercent       = 0.9
 
 	// DataChanSize 无限缓冲信道默认初始化缓冲大小
 	DataChanSize = 50
