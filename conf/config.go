@@ -29,6 +29,7 @@ type tSYSConf struct {
 	PProfAddr                  string     `json:"pprof_addr"`
 	WebServerAddr              string     `json:"web_server_addr"`
 	TunServerAddr              string     `json:"tun_server_addr"`
+	TunClientNum1CPU           int        `json:"tun_client_num_1_cpu"`
 	TunSendQueueSize           int        `json:"tun_send_queue_size"`
 	TunCompressMinSize         uint64     `json:"tun_compress_min_size"`
 	EnableKeepalive            bool       `json:"enable_keepalive"`
@@ -65,6 +66,7 @@ type tSYSConf struct {
 	ESSlowQueryDuration        time.Duration
 	ESPostMaxIntervalDuration  time.Duration
 	UDPGoReadNum               int
+	TunClientNum               int
 }
 
 type tLogConf struct {
@@ -183,8 +185,8 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		config.SYSConf.Log.MaxAge = LogFileMaxAge
 	}
 
-	// 单个 CPU 的 UDP 并发读取协程数, 默认为 50
-	if config.SYSConf.UDPGoReadNum1CPU < 10 {
+	// 单个 CPU 的 UDP 并发读取协程数, 默认为 2
+	if config.SYSConf.UDPGoReadNum1CPU < 1 {
 		config.SYSConf.UDPGoReadNum1CPU = UDPGoReadNum1CPU
 	}
 	config.SYSConf.UDPGoReadNum = utils.MinInt(config.SYSConf.UDPGoReadNum1CPU*runtime.NumCPU(), UDPGoReadNumMax)
@@ -228,6 +230,12 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	if config.SYSConf.TunCompressMinSize < TunCompressMinSize {
 		config.SYSConf.TunCompressMinSize = TunCompressMinSize
 	}
+
+	// Tunnel 单个 CPU 的发送客户端数, 默认为 2
+	if config.SYSConf.TunClientNum1CPU < 1 {
+		config.SYSConf.TunClientNum1CPU = TunClientNum1CPU
+	}
+	config.SYSConf.TunClientNum = utils.MinInt(config.SYSConf.TunClientNum1CPU*runtime.NumCPU(), TunClientNumMax)
 
 	// ES 慢查询日志时间设置
 	if config.SYSConf.ESSlowQuery < 1 {

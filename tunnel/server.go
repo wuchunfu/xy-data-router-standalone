@@ -28,7 +28,7 @@ func newTunServer() error {
 
 	srv := arpc.NewServer()
 	srv.Codec = &genCodec{}
-	srv.Handler.SetLogTag("[Tunnel SRV]")
+	srv.Handler.SetLogTag("[Tunnel SRV" + logType + "]")
 	srv.Handler.Handle(tunMethod, onData)
 	common.Log.Info().
 		Str("addr", conf.Config.SYSConf.TunServerAddr).
@@ -44,6 +44,9 @@ func newTunServer() error {
 }
 
 // 处理通道数据
+// handler 函数的结束不代表 Context 的结束, 是可以在 handler 之外异步执行后再调用 ctx.Write 的
+// 可以设置使用异步接收, 并自定义异步执行器, SetAsyncExecutor, 默认 go util.Safe(f)
+// 也可以使用默认的同步接收, 把 onData 中所有操作都起协程处理: func onData(c *arpc.Context) { go func() { c.Bind... } }
 func onData(c *arpc.Context) {
 	item := schema.Make()
 	if err := c.Bind(item); err != nil || item.APIName == "" {
@@ -57,8 +60,6 @@ func onData(c *arpc.Context) {
 	}
 
 	// 写入队列
-	_ = common.Pool.Submit(func() {
-		service.TunRecvCount.Inc()
-		service.PushDataToChanx(item)
-	})
+	service.TunRecvCount.Inc()
+	service.PushDataToChanx(item)
 }

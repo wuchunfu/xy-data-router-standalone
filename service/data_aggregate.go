@@ -9,6 +9,7 @@ import (
 // PushDataToChanx 接收数据推入队列
 func PushDataToChanx(item *schema.DataItem) {
 	if conf.ForwardTunnel != "" {
+		TunDataTotal.Inc()
 		// 设置压缩标识
 		if item.Size() >= conf.Config.SYSConf.TunCompressMinSize {
 			item.Flag = 1
@@ -16,7 +17,6 @@ func PushDataToChanx(item *schema.DataItem) {
 		}
 		// 发送数据到 Tun
 		TunChan.In <- item
-		TunDataTotal.Inc()
 		return
 	}
 

@@ -1,6 +1,7 @@
 package tunnel
 
 import (
+	"fmt"
 	"log"
 	"net"
 
@@ -17,33 +18,66 @@ func initTunClient() {
 		return
 	}
 
-	client, err := arpc.NewClient(func() (net.Conn, error) {
-		return net.DialTimeout("tcp", conf.ForwardTunnel, conf.TunDialTimeout)
-	})
-	if err != nil {
-		log.Fatalln("Failed to start Tunnel Client:", err, "\nbye.")
-	}
-
-	defer client.Stop()
-	client.Codec = &genCodec{}
+	clients := newTunClients()
 	common.Log.Info().
 		Str("addr", conf.ForwardTunnel).
-		Int("send_queue_size", client.Handler.SendQueueSize()).
-		Int("send_buffer_size", client.Handler.SendBufferSize()).
-		Int("recv_buffer_size", client.Handler.RecvBufferSize()).
+		Int("client_num", conf.Config.SYSConf.TunClientNum).
+		Int("send_queue_size", arpc.DefaultHandler.SendQueueSize()).
+		Int("send_buffer_size", arpc.DefaultHandler.SendBufferSize()).
+		Int("recv_buffer_size", arpc.DefaultHandler.RecvBufferSize()).
 		Msg("Start Tunnel Client")
 
-	// 接收数据转发到通道 (支持创建多个 client, 每 client 支持多协程并发处理数据)
-	for item := range service.TunChan.Out {
-		data := item.(*schema.DataItem)
-		_ = common.Pool.Submit(func() {
-			// 不超时, 直到 ErrClientOverstock
-			if err := client.Notify(tunMethod, data, arpc.TimeZero); err != nil {
-				common.LogSampled.Warn().Err(err).Msg("Failed to write Tunnel")
-				service.TunSendErrors.Inc()
-				return
+	// 支持创建多个 client, 每 client 支持多协程并发处理数据
+	for i := range clients {
+		client := clients[i]
+		common.Log.Debug().Msgf("tunnel client[%d] is working: %p", i, &client.Conn)
+		go func() {
+			defer client.Stop()
+			// 接收数据转发到通道
+			for item := range service.TunChan.Out {
+				data := item.(*schema.DataItem)
+				_ = common.Pool.Submit(func() {
+					// 不超时, 直到 ErrClientOverstock
+					if err := client.Notify(tunMethod, data, arpc.TimeZero); err != nil {
+						common.LogSampled.Warn().Err(err).Msg("Failed to write Tunnel")
+						service.TunSendErrors.Inc()
+						return
+					}
+					service.TunSendCount.Inc()
+				})
 			}
-			service.TunSendCount.Inc()
-		})
+		}()
 	}
+}
+
+// 支持创建多个 client, 每 client 支持多协程并发处理数据
+func newTunClients() []*arpc.Client {
+	clients := make([]*arpc.Client, conf.Config.SYSConf.TunClientNum)
+
+	for i := 0; i < conf.Config.SYSConf.TunClientNum; i++ {
+		handler := arpc.DefaultHandler.Clone()
+		handler.SetLogTag(fmt.Sprintf("[Tunnel CLI-%d%s]", i, logType))
+
+		client, err := arpc.NewClient(dialer, handler)
+		if err != nil {
+			log.Fatalln("Failed to start Tunnel Client:", err, "\nbye.")
+		}
+
+		client.Codec = &genCodec{}
+		client.Handler.HandleOverstock(onOverstock)
+		clients[i] = client
+
+		common.Log.Debug().Msgf("new tunnel client: %p", &client.Conn)
+	}
+
+	return clients
+}
+
+func dialer() (net.Conn, error) {
+	return net.DialTimeout("tcp", conf.ForwardTunnel, conf.TunDialTimeout)
+}
+
+// 不应出现该情况, 线路不畅? 关闭连接, 强制重连
+func onOverstock(c *arpc.Client, _ *arpc.Message) {
+	_ = c.Conn.Close()
 }

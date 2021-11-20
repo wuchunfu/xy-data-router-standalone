@@ -30,8 +30,12 @@ const (
 	BodyLimit = 500 << 20
 	// ESSlowQueryDuration ES 慢查询日志时间设置, 默认: > 10秒则记录
 	ESSlowQueryDuration = 10 * time.Second
-	// TunDialTimeout Tunnel 连接超时时间和数据发送队列容量
-	TunDialTimeout   = 3 * time.Second
+	// TunClientNum1CPU Tunnel 发送数据客户端数量 / CPU
+	TunClientNum1CPU = 2
+	TunClientNumMax  = 1000
+	// TunDialTimeout Tunnel 连接超时时间
+	TunDialTimeout = 3 * time.Second
+	// TunSendQueueSize Tunnel 数据发送队列容量
 	TunSendQueueSize = 8192
 	// TunCompressMinSize Tunnel 压缩传输数据最小字节数, 小于该值不压缩
 	TunCompressMinSize uint64 = 256
@@ -48,7 +52,7 @@ const (
 	// 4. UDP 协议中有 16 位的 UDP 报文长度, 即 UDP 报文长度不能超过 65536, 则数据最大为 65507
 	UDPMaxRW = 65507
 	// UDPGoReadNum1CPU UDP Goroutine 并发读取的数量 / CPU
-	UDPGoReadNum1CPU = 50
+	UDPGoReadNum1CPU = 2
 	UDPGoReadNumMax  = 1000
 
 	// UDPESIndexField UDP 接口 ES 索引字段
