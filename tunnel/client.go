@@ -51,9 +51,7 @@ func initTunClient() {
 }
 
 // 支持创建多个 client, 每 client 支持多协程并发处理数据
-func newTunClients() []*arpc.Client {
-	clients := make([]*arpc.Client, conf.Config.SYSConf.TunClientNum)
-
+func newTunClients() (clients []*arpc.Client) {
 	for i := 0; i < conf.Config.SYSConf.TunClientNum; i++ {
 		handler := arpc.DefaultHandler.Clone()
 		handler.SetLogTag(fmt.Sprintf("[Tunnel CLI-%d%s]", i, logType))
@@ -65,12 +63,11 @@ func newTunClients() []*arpc.Client {
 
 		client.Codec = &genCodec{}
 		client.Handler.HandleOverstock(onOverstock)
-		clients[i] = client
+		clients = append(clients, client)
 
 		common.Log.Debug().Msgf("new tunnel client: %p", &client.Conn)
 	}
-
-	return clients
+	return
 }
 
 func dialer() (net.Conn, error) {
