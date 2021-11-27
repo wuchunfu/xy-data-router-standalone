@@ -125,7 +125,7 @@ func saveUDPData(item *schema.DataItem) bool {
 	// 接口配置检查
 	apiConf, ok := conf.APIConfig[esIndex]
 	if !ok || apiConf.APIName == "" {
-		common.LogSampled.Error().
+		common.LogSampled.Info().
 			Str("client_ip", item.IP).Str("udp_x", esIndex).Int("len", len(esIndex)).
 			Msg("api not found")
 		return false

@@ -27,7 +27,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		// 接口配置检查
 		apiConf, ok := conf.APIConfig[apiname]
 		if !ok || apiConf.APIName == "" {
-			common.LogSampled.Error().Str("uri", c.OriginalURL()).Int("len", len(apiname)).Msg("api not found")
+			common.LogSampled.Info().Str("uri", c.OriginalURL()).Int("len", len(apiname)).Msg("api not found")
 			return c.SendString("0")
 		}
 
