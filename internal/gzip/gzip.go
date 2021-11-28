@@ -2,7 +2,7 @@ package gzip
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"sync"
 
 	"github.com/klauspost/compress/gzip"
@@ -79,7 +79,7 @@ func Unzip(data []byte) (src []byte, err error) {
 		_ = zr.Close()
 	}()
 
-	src, err = ioutil.ReadAll(zr)
+	src, err = io.ReadAll(zr)
 	if err != nil {
 		return
 	}
