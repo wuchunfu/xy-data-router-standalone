@@ -3,6 +3,7 @@ package conf
 import (
 	"net"
 	"path/filepath"
+	"sync"
 
 	"github.com/fufuok/utils"
 	"github.com/imroc/req"
@@ -47,4 +48,7 @@ var (
 
 	// ForwardTunnel 上联地址, 指定后将启动客户端, 将所有数据转交到 Tunnel Server
 	ForwardTunnel = ""
+
+	// FilesVer 配置文件版本信息
+	FilesVer sync.Map
 )

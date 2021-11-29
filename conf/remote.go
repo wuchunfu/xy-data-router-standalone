@@ -2,7 +2,7 @@ package conf
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/fufuok/utils"
@@ -32,14 +32,16 @@ func (c *TFilesConf) GetMonitorSource() error {
 				body += x.String() + "\n"
 			}
 
+			// 当前版本信息
+			ver := GetFilesVer(c.Path)
 			md5New := utils.MD5Hex(body)
-			if md5New != c.ConfigMD5 {
+			if md5New != ver.MD5 {
 				// 保存到配置文件
-				if err := ioutil.WriteFile(c.Path, []byte(body), 0644); err != nil {
+				if err := os.WriteFile(c.Path, []byte(body), 0644); err != nil {
 					return err
 				}
-				c.ConfigMD5 = md5New
-				c.ConfigVer = time.Now()
+				ver.MD5 = md5New
+				ver.LastUpdate = time.Now()
 			}
 
 			return nil
