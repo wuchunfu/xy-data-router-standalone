@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fufuok/timewheel"
-	"github.com/panjf2000/gnet/pool/goroutine"
+	"github.com/panjf2000/gnet/pkg/pool/goroutine"
 	"github.com/tidwall/gjson"
 )
 

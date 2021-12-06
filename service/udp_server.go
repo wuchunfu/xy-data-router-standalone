@@ -45,7 +45,9 @@ func initUDPServer() {
 	}
 
 	common.Log.Info().
-		Str("raddr", conf.Config.SYSConf.UDPServerRAddr).Str("rwaddr", conf.Config.SYSConf.UDPServerRWAddr).
+		Str("raddr", conf.Config.SYSConf.UDPServerRAddr).
+		Str("rwaddr", conf.Config.SYSConf.UDPServerRWAddr).
+		Str("proto", conf.Config.SYSConf.UDPProto).
 		Msg("Listening and serving UDP")
 
 	err := <-exitUDPChan
@@ -83,27 +85,37 @@ func udpReader(conn *net.UDPConn, withSendTo bool) {
 	buf := make([]byte, conf.UDPMaxRW)
 	for {
 		n, clientAddr, err := conn.ReadFromUDP(buf)
-		if err == nil && n > 0 {
-			if withSendTo || n < 7 {
-				_ = common.Pool.Submit(func() {
-					writeToUDP(conn, clientAddr)
-				})
+		if err != nil || n == 0 {
+			return
+		}
+
+		clientIP := clientAddr.IP.String()
+
+		if withSendTo || n < 7 {
+			out := outBytes
+			if n == 2 {
+				// 返回客户端 IP
+				out = utils.S2B(clientIP)
 			}
-			if n >= 7 {
-				item := schema.New("", clientAddr.IP.String(), buf[:n])
-				_ = common.Pool.Submit(func() {
-					if !saveUDPData(item) {
-						item.Release()
-					}
-				})
-			}
+			_ = common.Pool.Submit(func() {
+				writeToUDP(conn, clientAddr, out)
+			})
+		}
+
+		if n >= 7 {
+			item := schema.New("", clientIP, buf[:n])
+			_ = common.Pool.Submit(func() {
+				if !saveUDPData(item) {
+					item.Release()
+				}
+			})
 		}
 	}
 }
 
 // UDP 应答
-func writeToUDP(conn *net.UDPConn, clientAddr *net.UDPAddr) {
-	_, _ = conn.WriteToUDP(outBytes, clientAddr)
+func writeToUDP(conn *net.UDPConn, clientAddr *net.UDPAddr, out []byte) {
+	_, _ = conn.WriteToUDP(out, clientAddr)
 }
 
 // 校验并保存数据
