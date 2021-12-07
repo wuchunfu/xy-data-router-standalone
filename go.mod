@@ -9,12 +9,12 @@ require (
 	github.com/fufuok/timewheel v1.1.100
 	github.com/fufuok/utils v0.3.8
 	github.com/goccy/go-json v0.8.1
-	github.com/gofiber/fiber/v2 v2.22.0
+	github.com/gofiber/fiber/v2 v2.23.0
 	github.com/imroc/req v0.3.2
 	github.com/klauspost/compress v1.13.6
 	github.com/lesismal/arpc v1.2.3
 	github.com/panjf2000/ants/v2 v2.4.7
-	github.com/panjf2000/gnet v1.6.0
+	github.com/panjf2000/gnet v1.6.1
 	github.com/rs/zerolog v1.26.0
 	github.com/tidwall/gjson v1.12.1
 	github.com/tidwall/pretty v1.2.0
