@@ -84,6 +84,8 @@ func sysStatus() map[string]interface{} {
 		"ESDisableWrite": conf.Config.SYSConf.ESDisableWrite,
 		// 可选 ES 写入状态是否开启, 开启时所有设置了该标识的接口数据将不会写入 ES
 		"ESOptionalWrite": esOptionalWrite,
+		// UDP 协议原型
+		"UDPProto": conf.Config.SYSConf.UDPProto,
 	}
 }
 

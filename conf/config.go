@@ -208,6 +208,11 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	}
 	config.SYSConf.UDPGoReadNum = utils.MinInt(config.SYSConf.UDPGoReadNum1CPU*runtime.NumCPU(), UDPGoReadNumMax)
 
+	// UDP 协议原型
+	if config.SYSConf.UDPProto != "gnet" {
+		config.SYSConf.UDPProto = "default"
+	}
+
 	// 数据分发通道缓存大小
 	if config.SYSConf.DataChanSize < 1 {
 		config.SYSConf.DataChanSize = DataChanSize

@@ -27,7 +27,7 @@
     "__udpReader 协程数": "可选, 标准模式有效, UDP Goroutine 并发启动 ReadFromUDP 的数量 / CPU, 默认 2, 总数最大 1000",
     "udp_go_read_num_1cpu": 3,
     "__UDPProto": "可选, 使用 UDP 标准包 go-net(空值, 默认) 或 gnet",
-    "udp_proto": "gnet",
+    "udp_proto": "go-net",
     "udp_server_raddr": ":6611",
     "udp_server_rwaddr": ":6622",
     "web_server_addr": ":6600",
