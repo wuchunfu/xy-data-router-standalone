@@ -14,7 +14,7 @@ require (
 	github.com/klauspost/compress v1.13.6
 	github.com/lesismal/arpc v1.2.3
 	github.com/panjf2000/ants/v2 v2.4.7
-	github.com/panjf2000/gnet v1.6.1
+	github.com/panjf2000/gnet v1.6.2-0.20211207165603-ad0f237badb9
 	github.com/rs/zerolog v1.26.0
 	github.com/tidwall/gjson v1.12.1
 	github.com/tidwall/pretty v1.2.0
