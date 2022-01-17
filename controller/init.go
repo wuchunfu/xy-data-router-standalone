@@ -51,6 +51,16 @@ func InitWebServer() {
 	)
 	setupRouter(app)
 
+	if conf.Config.SYSConf.WebServerHttpsAddr != "" {
+		go func() {
+			common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerHttpsAddr).Msg("Listening and serving HTTPS")
+			if err := app.ListenTLS(conf.Config.SYSConf.WebServerHttpsAddr,
+				conf.Config.SYSConf.WebCertFile, conf.Config.SYSConf.WebKeyFile); err != nil {
+				log.Fatalln("Failed to start HTTPS Server:", err, "\nbye.")
+			}
+		}()
+	}
+
 	common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerAddr).Msg("Listening and serving HTTP")
 	if err := app.Listen(conf.Config.SYSConf.WebServerAddr); err != nil {
 		log.Fatalln("Failed to start HTTP Server:", err, "\nbye.")

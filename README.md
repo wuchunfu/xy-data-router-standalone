@@ -62,7 +62,7 @@
 7. 心跳检查地址: http://api.domain:6600/heartbeat 返回字符串 `OK`
 8. PING 地址: http://api.domain:6600/ping 返回字符串 `PONG`
 
-## HTTP 接口
+## HTTP/HTTPS 接口
 
 ### 1. 接口配置
 

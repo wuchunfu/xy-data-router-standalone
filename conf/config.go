@@ -28,6 +28,7 @@ type tSYSConf struct {
 	Log                        tLogConf   `json:"log"`
 	PProfAddr                  string     `json:"pprof_addr"`
 	WebServerAddr              string     `json:"web_server_addr"`
+	WebServerHttpsAddr         string     `json:"web_server_https_addr"`
 	TunServerAddr              string     `json:"tun_server_addr"`
 	TunClientNum1CPU           int        `json:"tun_client_num_1_cpu"`
 	TunSendQueueSize           int        `json:"tun_send_queue_size"`
@@ -67,6 +68,8 @@ type tSYSConf struct {
 	ESPostMaxIntervalDuration  time.Duration
 	UDPGoReadNum               int
 	TunClientNum               int
+	WebCertFile                string
+	WebKeyFile                 string
 }
 
 type tLogConf struct {
@@ -226,6 +229,18 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	// 优先使用配置中的绑定参数(HTTP)
 	if config.SYSConf.WebServerAddr == "" {
 		config.SYSConf.WebServerAddr = WebServerAddr
+	}
+
+	// 证书文件存在时开启 HTTPS
+	config.SYSConf.WebCertFile = os.Getenv(WebCertFile)
+	config.SYSConf.WebKeyFile = os.Getenv(WebKeyFile)
+	if utils.IsFile(config.SYSConf.WebCertFile) && utils.IsFile(config.SYSConf.WebKeyFile) {
+		// 优先使用配置中的绑定参数(HTTPS)
+		if config.SYSConf.WebServerHttpsAddr == "" {
+			config.SYSConf.WebServerHttpsAddr = WebServerHttpsAddr
+		}
+	} else {
+		config.SYSConf.WebServerHttpsAddr = ""
 	}
 
 	// 优先使用配置中的绑定参数(Tunnel)

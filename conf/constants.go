@@ -20,6 +20,11 @@ const (
 
 	// WebServerAddr HTTP 接口端口
 	WebServerAddr = ":6600"
+	// WebServerHttpsAddr HTTPS 接口端口
+	WebServerHttpsAddr = ":6699"
+	// WebCertFile 默认证书路径环境变量
+	WebCertFile = "DR_WEB_CERT_FILE"
+	WebKeyFile  = "DR_WEB_KEY_FILE"
 	// TunServerAddr Tunnel 绑定端口
 	TunServerAddr = ":6633"
 	// WebSlowRespDuration Web 慢响应日志时间设置, 默认: > 1秒则记录

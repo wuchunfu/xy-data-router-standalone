@@ -86,6 +86,8 @@ func sysStatus() map[string]interface{} {
 		"ESOptionalWrite": esOptionalWrite,
 		// UDP 协议原型
 		"UDPProto": conf.Config.SYSConf.UDPProto,
+		// 是否启用了 HTTPS
+		"HTTPS": conf.Config.SYSConf.WebServerHttpsAddr != "",
 	}
 }
 
