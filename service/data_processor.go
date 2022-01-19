@@ -88,7 +88,7 @@ func dataProcessor(dp *tDataProcessor) {
 		}
 
 		if !gjson.ValidBytes(js) {
-			common.LogSampled.Warn().
+			common.LogSampled.Info().
 				Bytes("body", js).Str("apiname", dp.data.APIName).Str("client_ip", dp.data.IP).
 				Msg("Invalid JSON")
 			continue
