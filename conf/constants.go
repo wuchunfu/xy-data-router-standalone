@@ -68,7 +68,7 @@ const (
 	// ESPostBatchNum ES 单次批量写入最大条数或最大字节数, 最大写入时间间隔
 	ESPostBatchNum    = 4500
 	ESPostBatchBytes  = 5 << 20
-	ESPostMaxInterval = 500 * time.Millisecond
+	ESPostMaxInterval = 1 * time.Second
 	// ESBulkWorkerSize ES 批量写入并发协程数, 最大最小排队数, 基于排队数的繁忙比率定义
 	ESBulkWorkerSize    = 30
 	ESBulkMaxWorkerSize = 800
