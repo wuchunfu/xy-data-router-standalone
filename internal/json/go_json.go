@@ -8,6 +8,7 @@ import (
 )
 
 var (
+	Name          = "go_json"
 	Marshal       = json.Marshal
 	Unmarshal     = json.Unmarshal
 	MarshalIndent = json.MarshalIndent

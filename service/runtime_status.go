@@ -10,6 +10,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/json"
 )
 
 type tDataRouterStats struct {
@@ -88,6 +89,8 @@ func sysStatus() map[string]interface{} {
 		"UDPProto": conf.Config.SYSConf.UDPProto,
 		// 是否启用了 HTTPS
 		"HTTPS": conf.Config.SYSConf.WebServerHttpsAddr != "",
+		// JSON 库信息
+		"JSON": json.Name,
 	}
 }
 
