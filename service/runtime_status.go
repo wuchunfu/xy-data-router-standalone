@@ -91,6 +91,10 @@ func sysStatus() map[string]interface{} {
 		"HTTPS": conf.Config.SYSConf.WebServerHttpsAddr != "",
 		// JSON 库信息
 		"JSON": json.Name,
+
+		// ES 版本信息
+		"ESVersionServer": common.ESVersionServer,
+		"ESVersionClient": common.ESVersionClient,
 	}
 }
 
