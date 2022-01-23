@@ -192,12 +192,12 @@ func esBulk(esBody []byte) {
 		var blk tESBulkResponse
 
 		if resp.IsError() {
+			esBulkErrors.Inc()
 			if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 				common.LogSampled.Error().Err(err).
 					Str("resp", resp.String()).
 					Msg("es bulk, parsing the response body")
 			} else {
-				esBulkErrors.Inc()
 				common.LogSampled.Error().
 					Int("http_code", resp.StatusCode).
 					Msgf("es bulk, err: %+v", res["error"])
@@ -212,10 +212,9 @@ func esBulk(esBody []byte) {
 					Str("resp", resp.String()).
 					Msg("es bulk, parsing the response body")
 			} else if blk.Errors {
+				esBulkErrors.Inc()
 				for _, d := range blk.Items {
 					if d.Index.Status > 201 {
-						esBulkErrors.Inc()
-
 						// error: [429] es_rejected_execution_exception
 						// 等待一个提交周期, 重新排队
 						if utils.InInts(conf.Config.SYSConf.ESReentryCodes, d.Index.Status) {
