@@ -26,7 +26,7 @@ func Start() {
 
 	go func() {
 		for {
-			cancelCtx, cancel := context.WithCancel(common.CtxBG)
+			cancelCtx, cancel := context.WithCancel(context.Background())
 			ctx := context.WithValue(cancelCtx, "start", time.Now())
 
 			// 获取远程配置

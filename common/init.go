@@ -1,7 +1,6 @@
 package common
 
 import (
-	"context"
 	"time"
 
 	"github.com/fufuok/timewheel"
@@ -23,7 +22,6 @@ var (
 	Now3399    = time.Now().Format(time.RFC3339)
 
 	IPv4Zero = "0.0.0.0"
-	CtxBG    = context.Background()
 
 	// Pool 协程池
 	Pool = goroutine.Default()
