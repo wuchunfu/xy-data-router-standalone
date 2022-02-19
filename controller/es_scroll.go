@@ -37,5 +37,5 @@ func ESScrollHandler(c *fiber.Ctx) error {
 		return middleware.APIFailure(c, msg)
 	}
 
-	return middleware.APISuccess(c, res, count)
+	return middleware.APISuccessBytes(c, res, count)
 }

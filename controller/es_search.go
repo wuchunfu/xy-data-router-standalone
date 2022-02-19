@@ -3,10 +3,12 @@ package controller
 import (
 	"bytes"
 	"context"
+	"io"
 	"time"
 
-	"github.com/elastic/go-elasticsearch/v6/esapi"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/gofiber/fiber/v2"
+	"github.com/tidwall/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -54,45 +56,36 @@ func ESSearchHandler(c *fiber.Ctx) error {
 		return middleware.APIFailure(c, msg)
 	}
 
-	return middleware.APISuccess(c, res, count)
+	return middleware.APISuccessBytes(c, res, count)
 }
 
 // 处理搜索结果
-func parseESSearch(resp *esapi.Response, esSearch *tESSearch) (map[string]interface{}, int, string) {
-	var res map[string]interface{}
-	if resp.IsError() {
-		msg := "查询失败, 查询语句有误"
-		if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-			common.LogSampled.Warn().Err(err).
-				Str("resp", resp.String()).
-				Msg("es search, parsing the response body")
-		} else {
-			common.LogSampled.Warn().
-				Bytes("body", json.MustJSON(esSearch)).Int("http_code", resp.StatusCode).
-				Msgf("es search, %s, %+v", msg, res["error"])
-		}
-
-		return nil, 0, msg
+func parseESSearch(resp *esapi.Response, esSearch *tESSearch) (res []byte, count int, msg string) {
+	res, err := io.ReadAll(resp.Body)
+	if err != nil {
+		msg = "查询失败, 请稍后重试"
+		return
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		common.LogSampled.Warn().Err(err).
-			Str("resp", resp.String()).
-			Msg("es search, parsing the response body")
-		return nil, 0, "查询失败, 请稍后重试"
+	if resp.IsError() {
+		msg = "查询失败, 查询语句有误"
+		common.LogSampled.Warn().
+			Bytes("body", json.MustJSON(esSearch)).Int("http_code", resp.StatusCode).
+			Str("error_type", gjson.GetBytes(res, "error.type").String()).
+			Str("error_reason", gjson.GetBytes(res, "error.reason").String()).
+			Str("msg", msg).Msg("es search")
+		return
 	}
 
 	// 慢查询日志
-	took, _ := res["took"].(float64)
-	costTime := time.Duration(int(took)) * time.Millisecond
+	took := gjson.GetBytes(res, "took").Int()
+	costTime := time.Duration(took) * time.Millisecond
 	if costTime > conf.Config.SYSConf.ESSlowQueryDuration {
 		common.LogSampled.Warn().
 			Bytes("body", json.MustJSON(esSearch)).Dur("duration", costTime).
-			Msgf("es search slow, timeout: %s", res["timed_out"])
+			Msgf("es search slow, timeout: %v", gjson.GetBytes(res, "timed_out"))
 	}
 
-	hits, _ := res["hits"].(map[string]interface{})
-	total, _ := hits["total"].(float64)
-
-	return res, int(total), ""
+	count = int(gjson.GetBytes(res, "hits.total").Int())
+	return
 }

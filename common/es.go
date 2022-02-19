@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/elastic/go-elasticsearch/v6"
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/fufuok/utils"
 	"github.com/tidwall/gjson"
 	"github.com/valyala/bytebufferpool"
 	"github.com/valyala/fasthttp"
@@ -21,6 +22,12 @@ var (
 	// ESVersionServer ESVersionClient 版本信息
 	ESVersionServer string
 	ESVersionClient string
+
+	// ESVersionMain 大版本号: 6 / 7 / 8
+	ESVersionMain int
+
+	// ESLessThan7 大版本号小于 7
+	ESLessThan7 bool
 )
 
 func initES() {
@@ -79,8 +86,10 @@ func newES() (es *elasticsearch.Client, cfgErr error, esErr error) {
 		Log.Error().Err(err).Msg("es.Info")
 		return nil, nil, err
 	}
-	ESVersionServer = gjson.GetBytes(bb.Bytes(), "version.number").String()
+	ESVersionServer = gjson.GetBytes(bb.B, "version.number").String()
 	ESVersionClient = elasticsearch.Version
+	ESVersionMain = utils.MustInt(strings.SplitN(ESVersionServer, ".", 2)[0])
+	ESLessThan7 = ESVersionMain < 7
 
 	return
 }
