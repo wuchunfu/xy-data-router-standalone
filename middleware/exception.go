@@ -27,6 +27,12 @@ func APISuccess(c *fiber.Ctx, data interface{}, count int) error {
 	return c.JSON(common.APISuccessData(data, count))
 }
 
+// APISuccessBytes 返回成功, JSON 字节数据, 状态码: 200
+func APISuccessBytes(c *fiber.Ctx, data []byte, count int) error {
+	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+	return c.Send(common.APISuccessBytes(data, count))
+}
+
 // APISuccessNil 返回成功, 无数据, 状态码: 200
 func APISuccessNil(c *fiber.Ctx) error {
 	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
