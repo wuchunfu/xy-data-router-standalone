@@ -27,6 +27,11 @@ func ESScrollHandler(c *fiber.Ctx) error {
 		return middleware.APIFailure(c, "查询失败, 服务繁忙")
 	}
 
+	if resp.Body == nil {
+		common.LogSampled.Error().Err(err).Msg("es scroll, resp.Body is nil")
+		return middleware.APIFailure(c, "查询失败, 服务异常")
+	}
+
 	defer func() {
 		_ = resp.Body.Close()
 	}()

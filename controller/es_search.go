@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"bytes"
 	"context"
 	"io"
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v7/esapi"
+	"github.com/fufuok/utils/pools/bufferpool"
 	"github.com/gofiber/fiber/v2"
 	"github.com/tidwall/gjson"
 
@@ -31,19 +31,26 @@ func ESSearchHandler(c *fiber.Ctx) error {
 		return middleware.APIFailure(c, "查询参数有误")
 	}
 
-	var bodyBuf bytes.Buffer
-	_ = json.NewEncoder(&bodyBuf).Encode(esSearch.Body)
+	bodyBuf := bufferpool.Get()
+	defer bufferpool.Put(bodyBuf)
+
+	_ = json.NewEncoder(bodyBuf).Encode(esSearch.Body)
 
 	resp, err := common.ES.Search(
 		common.ES.Search.WithContext(context.Background()),
 		common.ES.Search.WithIndex(esSearch.Index),
 		common.ES.Search.WithScroll(time.Duration(esSearch.Scroll)*time.Second),
-		common.ES.Search.WithBody(&bodyBuf),
+		common.ES.Search.WithBody(bodyBuf),
 		common.ES.Search.WithTrackTotalHits(true),
 	)
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("es search, getting response")
 		return middleware.APIFailure(c, "查询失败, 服务繁忙")
+	}
+
+	if resp.Body == nil {
+		common.LogSampled.Error().Err(err).Msg("es search, resp.Body is nil")
+		return middleware.APIFailure(c, "查询失败, 服务异常")
 	}
 
 	defer func() {
