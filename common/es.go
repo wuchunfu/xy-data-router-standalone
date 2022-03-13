@@ -9,8 +9,8 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/fufuok/utils"
+	"github.com/fufuok/utils/pools/bufferpool"
 	"github.com/tidwall/gjson"
-	"github.com/valyala/bytebufferpool"
 	"github.com/valyala/fasthttp"
 
 	"github.com/fufuok/xy-data-router/conf"
@@ -78,15 +78,15 @@ func newES() (es *elasticsearch.Client, cfgErr error, esErr error) {
 		return nil, nil, err
 	}
 
-	bb := bytebufferpool.Get()
-	defer bytebufferpool.Put(bb)
-	n, _ := bb.ReadFrom(res.Body)
+	buf := bufferpool.Get()
+	defer bufferpool.Put(buf)
+	n, _ := buf.ReadFrom(res.Body)
 	if n == 0 {
 		err = fmt.Errorf("ES info error: nil")
 		Log.Error().Err(err).Msg("es.Info")
 		return nil, nil, err
 	}
-	ESVersionServer = gjson.GetBytes(bb.B, "version.number").String()
+	ESVersionServer = gjson.GetBytes(buf.Bytes(), "version.number").String()
 	ESVersionClient = elasticsearch.Version
 	ESVersionMain = utils.MustInt(strings.SplitN(ESVersionServer, ".", 2)[0])
 	ESLessThan7 = ESVersionMain < 7
