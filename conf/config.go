@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
+	"github.com/rs/zerolog"
 
 	"github.com/fufuok/xy-data-router/internal/json"
 )
@@ -20,6 +21,7 @@ type tJSONConf struct {
 	APIConf     []TAPIConf `json:"api_conf"`
 	ESWhiteList []string   `json:"es_white_list"`
 	ESBlackList []string   `json:"es_black_list"`
+	StateConf   tStateConf
 }
 
 // tSYSConf 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
@@ -70,6 +72,12 @@ type tSYSConf struct {
 	TunClientNum               int
 	WebCertFile                string
 	WebKeyFile                 string
+}
+
+type tStateConf struct {
+	CheckESBulkResult bool
+	CheckESBulkErrors bool
+	RecordESBulkBody  bool
 }
 
 type tLogConf struct {
@@ -380,6 +388,11 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	} else {
 		config.SYSConf.ESPostMaxIntervalDuration = time.Duration(config.SYSConf.ESPostMaxInterval) * time.Millisecond
 	}
+
+	// 更新状态类配置
+	config.StateConf.CheckESBulkResult = config.SYSConf.Log.Level <= int(zerolog.WarnLevel)
+	config.StateConf.CheckESBulkErrors = config.SYSConf.Log.ESBulkLevel <= int(zerolog.WarnLevel)
+	config.StateConf.RecordESBulkBody = config.SYSConf.Log.ESBulkLevel <= int(zerolog.InfoLevel)
 
 	return config, apiConfig, whiteList, blackList, nil
 }
