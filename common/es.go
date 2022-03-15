@@ -55,9 +55,11 @@ func InitES() error {
 func newES() (es *elasticsearch.Client, cfgErr error, esErr error) {
 	Log.Info().Strs("hosts", conf.Config.SYSConf.ESAddress).Msg("Initialize ES connection")
 	es, cfgErr = elasticsearch.NewClient(elasticsearch.Config{
-		Addresses:    conf.Config.SYSConf.ESAddress,
-		DisableRetry: !conf.Config.SYSConf.ESEnableRetry,
-		Transport:    &transport{},
+		Addresses:     conf.Config.SYSConf.ESAddress,
+		RetryOnStatus: conf.Config.SYSConf.ESRetryOnStatus,
+		MaxRetries:    conf.Config.SYSConf.ESMaxRetries,
+		DisableRetry:  conf.Config.SYSConf.ESDisableRetry,
+		Transport:     &transport{},
 	})
 	if cfgErr != nil {
 		return nil, cfgErr, nil

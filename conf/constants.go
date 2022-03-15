@@ -33,8 +33,8 @@ const (
 	WebErrorCodeLog = 500
 	// BodyLimit POST 最大 500M, Request Entity Too Large
 	BodyLimit = 500 << 20
-	// ESSlowQueryDuration ES 慢查询日志时间设置, 默认: > 10秒则记录
-	ESSlowQueryDuration = 10 * time.Second
+	// ESSlowQueryDuration ES 慢查询日志时间设置, 默认: > 5秒则记录
+	ESSlowQueryDuration = 5 * time.Second
 	// TunClientNum1CPU Tunnel 发送数据客户端数量 / CPU
 	TunClientNum1CPU = 2
 	TunClientNumMax  = 1000
@@ -72,7 +72,7 @@ const (
 	// ESBulkWorkerSize ES 批量写入并发协程数, 最大最小排队数, 基于排队数的繁忙比率定义
 	ESBulkWorkerSize    = 30
 	ESBulkMaxWorkerSize = 800
-	ESBulkMinWorkerSize = 100
+	ESBulkMinWorkerSize = 10
 	ESBusyPercent       = 0.9
 
 	// DataChanSize 无限缓冲信道默认初始化缓冲大小

@@ -37,7 +37,7 @@
     "enable_keepalive": false,
     "__ReduceMemoryUsage": "减少内存占用(可能增加CPU占用), 默认关闭",
     "reduce_memory_usage": true,
-    "__ESSlowQueryDuration": "可选, ES 慢查询日志时间设置, 默认: > 10(秒)则记录",
+    "__ESSlowQueryDuration": "可选, ES 慢查询日志时间设置, 默认: > 5(秒)则记录",
     "es_slow_query": 10,
     "__WebSlowRespDuration": "可选, Web 慢响应日志时间设置, 默认: > 1(秒)则记录",
     "web_slow_response": 1,
@@ -68,8 +68,17 @@
     "es_post_batch_mb": 5,
     "__ESPostMaxInterval": "ES 单次批量最大写入时间间隔, 单位: 毫秒, 最低: 100, 默认: 1000, 即 1 秒至少 1 次",
     "es_post_max_interval": 1000,
-    "__ESReentryCodes": "ES 批量写入错误时, 配置中的状态码会重新进入排队, 比如: 429, 注: 有重复数据风险",
-    "es_reentry_codes": [],
+    "__ESRetryOnStatus": "ES 重试状态码, 留空则默认: [502, 503, 504]",
+    "es_retry_on_status": [
+      502,
+      503,
+      504,
+      429
+    ],
+    "__ESMaxRetries": "ES 重试次数, 填 0 则默认: 3",
+    "es_max_retries": 2,
+    "__ESDisableRetry": "是否禁止 ES 重试, 默认: false",
+    "es_disable_retry": false,
     "__MainConfig": "远端配置接口, 获取的配置内容将替换掉该文件",
     "main_config": {
       "method": "GetMonitorSource",
@@ -115,6 +124,7 @@
     {
       "__UDP 接口示例": "_x 字段表示 ES 索引名称, 值要与这里配置的 api_name 相同",
       "api_name": "udp_demo",
+      "es_optional_write": true,
       "__额外必有字段": "除 _x 外, 其他的必有字段",
       "required_field": [
         "timestamp"

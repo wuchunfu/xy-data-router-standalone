@@ -50,15 +50,16 @@ type tSYSConf struct {
 	ESPostBatchNum             int        `json:"es_post_batch_num"`
 	ESPostBatchBytes           int        `json:"es_post_batch_mb"`
 	ESPostMaxInterval          int        `json:"es_post_max_interval"`
-	ESEnableRetry              bool       `json:"es_enable_retry"`
+	ESRetryOnStatus            []int      `json:"es_retry_on_status"`
+	ESMaxRetries               int        `json:"es_max_retries"`
+	ESDisableRetry             bool       `json:"es_disable_retry"`
 	ESDisableWrite             bool       `json:"es_disable_write"`
 	ESSlowQuery                int        `json:"es_slow_query"`
-	ESReentryCodes             []int      `json:"es_reentry_codes"`
+	ESBulkWorkerSize           int        `json:"es_bulk_worker_size"`
+	ESBulkMaxWorkerSize        int        `json:"es_bulk_max_worker_size"`
 	DataChanSize               int        `json:"data_chan_size"`
 	DataChanMaxBufCap          int        `json:"data_chan_max_buf_cap"`
 	DataProcessorSize          int        `json:"data_processor_size"`
-	ESBulkWorkerSize           int        `json:"es_bulk_worker_size"`
-	ESBulkMaxWorkerSize        int        `json:"es_bulk_max_worker_size"`
 	DataProcessorMaxWorkerSize int        `json:"data_processor_max_worker_size"`
 	MainConfig                 TFilesConf `json:"main_config"`
 	RestartMain                bool       `json:"restart_main"`
