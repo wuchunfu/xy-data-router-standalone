@@ -1,7 +1,6 @@
 package service
 
 import (
-	"bytes"
 	"time"
 
 	"github.com/fufuok/bytespool"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/schema"
 )
 
 func apiWorker(dr *tDataRouter) {
@@ -23,7 +23,7 @@ func apiWorker(dr *tDataRouter) {
 	ticker := common.TWs.NewTicker(time.Duration(interval) * time.Second)
 	defer ticker.Stop()
 
-	var buf bytes.Buffer
+	dis := getDataItems()
 	for {
 		select {
 		case <-ticker.C:
@@ -36,40 +36,39 @@ func apiWorker(dr *tDataRouter) {
 						Int("interval", interval).Str("apiname", dr.apiConf.APIName).
 						Msg("apiWorker restart")
 				}
+				if dis.count == 0 {
+					continue
+				}
 				// 指定时间间隔推送数据
-				postAPI(&buf, dr.apiConf.PostAPI.API)
+				postAPI(dis, dr.apiConf.PostAPI.API)
+				dis = getDataItems()
 			}
 		case v, ok := <-dr.drOut.apiChan.Out:
 			if !ok {
 				// 消费所有数据
-				postAPI(&buf, dr.apiConf.PostAPI.API)
+				if dis.count > 0 {
+					postAPI(dis, dr.apiConf.PostAPI.API)
+				}
 				common.Log.Warn().Str("apiname", dr.apiConf.APIName).Msg("apiWorker exited")
 				return
 			}
-
-			jsData := v.([]byte)
-			buf.WriteByte(',')
-			buf.Write(jsData)
-			bytespool.Release(jsData)
+			dis.add(v.(*schema.DataItem))
 		}
 	}
 }
 
 // 推送数据到 API
-func postAPI(buf *bytes.Buffer, api []string) {
-	if buf.Len() == 0 {
-		return
-	}
-
-	defer buf.Reset()
-
-	apiBody := bytespool.Make(buf.Len() + 1)
+func postAPI(dis *tDataItems, api []string) {
+	// [json,json]
+	apiBody := bytespool.Make(dis.size + dis.count + 1)
 	apiBody = append(apiBody, '[')
-	apiBody = append(apiBody, buf.Bytes()[1:]...)
-	apiBody = append(apiBody, ']')
-
+	for i := 0; i < dis.count; i++ {
+		apiBody = append(apiBody, dis.items[i].Body...)
+		apiBody = append(apiBody, ',')
+	}
+	apiBody[len(apiBody)-1] = ']'
+	dis.release()
 	_ = common.Pool.Submit(func() {
-		defer bytespool.Release(apiBody)
 		for _, u := range api {
 			if _, err := req.Post(u, req.BodyJSON(apiBody), conf.ReqUserAgent); err != nil {
 				common.LogSampled.Error().Err(err).Str("url", u).Msg("apiWorker")

@@ -63,7 +63,7 @@ func initESOptionalWrite() {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		// ES 批量写入排队数 > 100 且 > 最大排队数 * 0.9
+		// ES 批量写入排队数 > 10 且 > 最大排队数 * 0.9
 		n := esBulkTodoCount.Value()
 		m := int64(float64(conf.Config.SYSConf.ESBulkMaxWorkerSize) * conf.ESBusyPercent)
 		esOptionalWrite = n > int64(conf.ESBulkMinWorkerSize) && n > m
@@ -115,12 +115,16 @@ func sendOneData(dp *tDataProcessor, js []byte, isPostToES, isPostToAPI bool) {
 		esData = append(esData, dp.dr.apiConf.ESBulkHeader...)
 		esData = append(esData, jsData...)
 		esData = append(esData, '\n')
-		// 需要在 ES 使用后回收 esData
-		dp.dr.drOut.esChan.In <- esData
+		// 需要在 ES 使用后回收 DataItem
+		item := schema.Make()
+		item.Body = esData
+		dp.dr.drOut.esChan.In <- item
 	}
 	if isPostToAPI {
-		// 需要在 API 使用后回收 jsData
-		dp.dr.drOut.apiChan.In <- jsData
+		// 需要在 API 使用后回收 DataItem
+		item := schema.Make()
+		item.Body = jsData
+		dp.dr.drOut.apiChan.In <- item
 	} else {
 		bytespool.Release(jsData)
 	}
