@@ -32,9 +32,9 @@ var (
 
 func initES() {
 	// 首次初始化 ES 连接, PING 失败时允许启动程序
-	es, cfgErr, _ := newES()
-	if cfgErr != nil {
-		log.Fatalln("Failed to initialize ES:", cfgErr, "\nbye.")
+	es, cfgErr, esErr := newES()
+	if cfgErr != nil || esErr != nil {
+		log.Fatalln("Failed to initialize ES:", cfgErr, esErr, "\nbye.")
 	}
 
 	ES = es
