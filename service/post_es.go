@@ -203,7 +203,6 @@ func esBulkResult(resp *esapi.Response, esBody []byte) bool {
 		}
 		common.LogSampled.Warn().
 			Int("http_code", resp.StatusCode).
-			Bytes("esBody", esBody).
 			Str("error_type", gjson.GetBytes(buf.Bytes(), "error.type").String()).
 			Str("error_reason", gjson.GetBytes(buf.Bytes(), "error.reason").String()).
 			Msg("es bulk")
