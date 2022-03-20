@@ -1,5 +1,25 @@
 # XY.DataRouter
 
+## v1.101.0.22010709
+
+- 调整配置项:
+  - 无效 JSON 数据日志由 `Warn` 改为 `Info`
+  - ES 慢查询默认值由 `10s` 改为 `5s`
+  - ES 默认写入时间间隔由 `0.5s` 改为 `1s`
+  - ES 批量写入最小排队数最小值由 `100` 改为 `10`
+  - 增加 `es_retry_on_status` ES 重试状态码, 默认: `[502, 503, 504]`
+  - 增加 `es_max_retries` ES 重试次数, 默认: `3`
+  - 增加 `es_disable_retry` 是否禁止 ES 重试, 默认: `false`
+  - 移除 ES 批量写入状态码重试配置
+- 运行时状态增加:
+  - JSON 库信息
+  - ES 服务端和客户端版本信息
+- ES `Transport` 使用 `fasthttp`
+- 接口响应增加 `APISuccessBytes` 快捷方法
+- ES 客户端 SDK 由 `v6.8.10` 升级为 `v7.16.0`
+- ES 搜索接口结果解析性能优化
+- ES 批量写入方法代码重构
+
 ## v1.100.67.21120909
 
 - 启用 HTTPS
