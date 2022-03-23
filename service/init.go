@@ -56,6 +56,9 @@ var (
 	// 数据处理丢弃计数, 超过 DataProcessorMaxWorkerSize
 	dataProcessorDiscards xsync.Counter
 
+	// 数据丢弃计数, 繁忙时丢弃可选接口的数据, 不写 ES
+	esDataItemDiscards xsync.Counter
+
 	// ES 收到数据数量计数
 	esDataTotal xsync.Counter
 

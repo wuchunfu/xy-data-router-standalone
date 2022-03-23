@@ -57,6 +57,7 @@ type tSYSConf struct {
 	ESSlowQuery                int        `json:"es_slow_query"`
 	ESBulkWorkerSize           int        `json:"es_bulk_worker_size"`
 	ESBulkMaxWorkerSize        int        `json:"es_bulk_max_worker_size"`
+	ESBusyPercent              float64    `json:"es_busy_percent"`
 	DataChanSize               int        `json:"data_chan_size"`
 	DataChanMaxBufCap          int        `json:"data_chan_max_buf_cap"`
 	DataProcessorSize          int        `json:"data_processor_size"`
@@ -368,6 +369,11 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	}
 	if config.SYSConf.ESBulkMaxWorkerSize < ESBulkMinWorkerSize {
 		config.SYSConf.ESBulkMaxWorkerSize = ESBulkMaxWorkerSize
+	}
+
+	// ES 基于排队数的繁忙比率定义
+	if config.SYSConf.ESBusyPercent < 0.01 || config.SYSConf.ESBusyPercent > 1 {
+		config.SYSConf.ESBusyPercent = ESBusyPercent
 	}
 
 	// ES Bulk 单次批量数量

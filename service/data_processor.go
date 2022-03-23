@@ -59,13 +59,13 @@ func initDataProcessorPool() {
 
 // ES 繁忙时禁止可选写入的状态初始化
 func initESOptionalWrite() {
-	ticker := common.TWm.NewTicker(1 * time.Minute)
+	ticker := common.TWms.NewTicker(conf.UpdateESOptionalInterval)
 	defer ticker.Stop()
 
 	for range ticker.C {
-		// ES 批量写入排队数 > 10 且 > 最大排队数 * 0.9
+		// ES 批量写入排队数 > 10 且 > 最大排队数 * 0.7
 		n := esBulkTodoCount.Value()
-		m := int64(float64(conf.Config.SYSConf.ESBulkMaxWorkerSize) * conf.ESBusyPercent)
+		m := int64(float64(conf.Config.SYSConf.ESBulkMaxWorkerSize) * conf.Config.SYSConf.ESBusyPercent)
 		esOptionalWrite = n > int64(conf.ESBulkMinWorkerSize) && n > m
 	}
 }
@@ -77,8 +77,12 @@ func dataProcessor(dp *tDataProcessor) {
 
 	isPostToES := !(conf.Config.SYSConf.ESDisableWrite || esOptionalWrite && dp.dr.apiConf.ESOptionalWrite)
 	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
-	if !isPostToES && !isPostToAPI {
-		return
+	if !isPostToES {
+		// 丢弃可选写入 ES 数据项计数
+		esDataItemDiscards.Inc()
+		if !isPostToAPI {
+			return
+		}
 	}
 
 	// 兼容 {body} 或 {body}=-:-=[{body},{body}]

@@ -83,7 +83,7 @@ func sysStatus() map[string]interface{} {
 		"ForwardTunnel": conf.ForwardTunnel,
 		// 是否关闭了 ES 写入
 		"ESDisableWrite": conf.Config.SYSConf.ESDisableWrite,
-		// 可选 ES 写入状态是否开启, 开启时所有设置了该标识的接口数据将不会写入 ES
+		// 繁忙时自动开启, 开启时所有设置了该标识的接口数据将不会写入 ES
 		"ESOptionalWrite": esOptionalWrite,
 		// UDP 协议原型
 		"UDPProto": conf.Config.SYSConf.UDPProto,
@@ -164,6 +164,9 @@ func dataStats() map[string]interface{} {
 		"DataProcessorDiscards_____": dataProcessorDiscards.Value(),
 		"DataProcessorWorkerRunning": dataProcessorPool.Running(),
 		"DataProcessorWorkerFree___": dataProcessorPool.Free(),
+
+		// 设置为可选写入 ES 的接口丢弃数据项计数
+		"ESDataItemDiscards________": esDataItemDiscards.Value(),
 
 		// ES 总数据量, 排队, 待批量写入任务数, 丢弃任务数, 写入错误任务数, 繁忙状态
 		"ESDataTotal":                utils.Comma(esDataTotal.Value()),
