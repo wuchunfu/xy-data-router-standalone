@@ -28,8 +28,8 @@ var (
 )
 
 func InitCommon() {
-	// 30 秒
-	TWms, _ = timewheel.NewTimeWheel(50*time.Millisecond, 600)
+	// 180 秒
+	TWms, _ = timewheel.NewTimeWheel(100*time.Millisecond, 1800)
 	TWms.Start()
 
 	// 30 分
