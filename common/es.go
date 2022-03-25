@@ -92,6 +92,7 @@ func newES() (es *elasticsearch.Client, cfgErr error, esErr error) {
 	ESVersionClient = elasticsearch.Version
 	ESVersionMain = utils.MustInt(strings.SplitN(ESVersionServer, ".", 2)[0])
 	ESLessThan7 = ESVersionMain < 7
+	Log.Info().Str("server_version", ESVersionServer).Str("client_version", ESVersionClient).Msg("ES info")
 
 	return
 }
