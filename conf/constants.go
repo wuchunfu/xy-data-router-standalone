@@ -73,7 +73,7 @@ const (
 	ESBulkWorkerSize    = 30
 	ESBulkMaxWorkerSize = 800
 	ESBulkMinWorkerSize = 10
-	ESBusyPercent       = 0.7
+	ESBusyPercent       = 0.5
 	// UpdateESOptionalInterval 更新可选写入 ES 状态时间间隔
 	UpdateESOptionalInterval = 500 * time.Millisecond
 

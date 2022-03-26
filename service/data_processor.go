@@ -63,7 +63,7 @@ func initESOptionalWrite() {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		// ES 批量写入排队数 > 10 且 > 最大排队数 * 0.7
+		// ES 批量写入排队数 > 10 且 > 最大排队数 * 0.5
 		n := esBulkTodoCount.Value()
 		m := int64(float64(conf.Config.SYSConf.ESBulkMaxWorkerSize) * conf.Config.SYSConf.ESBusyPercent)
 		esOptionalWrite = n > int64(conf.ESBulkMinWorkerSize) && n > m
