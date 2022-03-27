@@ -81,7 +81,12 @@ func getESBulkHeader(apiConf *conf.TAPIConf, ymd string) []byte {
 		esIndex = esIndex + "_" + ymd
 	}
 
-	return utils.AddStringBytes(`{"index":{"_index":"`, esIndex, `","_type":"_doc"}}`, "\n")
+	indexType := ""
+	if common.ESLessThan7 {
+		indexType = `","_type":"_doc`
+	}
+
+	return utils.AddStringBytes(`{"index":{"_index":"`, esIndex, indexType, `"}}`, "\n")
 }
 
 // 每日更新所有接口 esBluk 索引头

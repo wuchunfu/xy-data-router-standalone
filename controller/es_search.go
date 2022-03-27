@@ -93,6 +93,10 @@ func parseESSearch(resp *esapi.Response, esSearch *tESSearch) (res []byte, count
 			Msgf("es search slow, timeout: %v", gjson.GetBytes(res, "timed_out"))
 	}
 
-	count = int(gjson.GetBytes(res, "hits.total").Int())
+	totalPath := "hits.total.value"
+	if common.ESLessThan7 {
+		totalPath = "hits.total"
+	}
+	count = int(gjson.GetBytes(res, totalPath).Int())
 	return
 }
