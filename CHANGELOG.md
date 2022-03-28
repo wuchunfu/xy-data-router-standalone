@@ -1,5 +1,13 @@
 # XY.DataRouter
 
+## v1.101.1.22010721
+
+- 搜索接口和数据写入兼容 ES 7.x 
+- 增加配置项 `es_optional_write` 可动态调整基于排队值的繁忙比率定义
+  - 繁忙时设置为 `es_optional_write` 的接口数据将不写 ES
+  - 增加运行时状态 `ESDataItemDiscards` 显示繁忙时被丢弃的数据项(UDP: 1 个数据, TCP: >=1 个数据)
+- 调整可选写入 ES 状态时间间隔, 由 `1minute` 改为 `500ms`
+
 ## v1.101.0.22010709
 
 - 调整配置项:
