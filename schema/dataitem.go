@@ -28,8 +28,8 @@ type Pool struct {
 	pool sync.Pool
 }
 
-// Get 获取空数据项
-func (p *Pool) Get() *DataItem {
+// Make 获取空数据项
+func (p *Pool) Make() *DataItem {
 	v := p.pool.Get().(*DataItem)
 	v.Body = nil
 	v.MarkReset()
@@ -37,18 +37,30 @@ func (p *Pool) Get() *DataItem {
 	return v
 }
 
-// Put 释放数据项对象, 只回收一次
-func (p *Pool) Put(d *DataItem) {
+// Release 释放数据项对象, 只回收一次
+func (p *Pool) Release(d *DataItem) bool {
 	if d.MarkSwap() == 0 {
 		d.Reset()
 		bytespool.Release(d.Body)
 		p.pool.Put(d)
+		return true
 	}
+	return false
+}
+
+// Get 获取空数据项
+func (p *Pool) Get() *DataItem {
+	return p.Make()
+}
+
+// Put 释放数据项对象, 只回收一次
+func (p *Pool) Put(d *DataItem) {
+	p.Release(d)
 }
 
 // New 新数据项, Immutable
 func New(apiname, ip string, body []byte, releaseBody ...bool) *DataItem {
-	d := defaultPool.Get()
+	d := defaultPool.Make()
 	d.APIName = utils.CopyString(apiname)
 	d.IP = utils.CopyString(ip)
 	d.Body = bytespool.New(len(body))
@@ -62,11 +74,11 @@ func New(apiname, ip string, body []byte, releaseBody ...bool) *DataItem {
 }
 
 func Make() *DataItem {
-	return defaultPool.Get()
+	return defaultPool.Make()
 }
 
-func Release(d *DataItem) {
-	defaultPool.Put(d)
+func Release(d *DataItem) bool {
+	return defaultPool.Release(d)
 }
 
 // MarkInc Mark 数值加 1
@@ -137,8 +149,8 @@ func (d *DataItem) Reset() {
 }
 
 // Release 释放自身
-func (d *DataItem) Release() {
-	defaultPool.Put(d)
+func (d *DataItem) Release() bool {
+	return defaultPool.Release(d)
 }
 
 func (d *DataItem) String() string {

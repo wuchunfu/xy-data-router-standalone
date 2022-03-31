@@ -70,11 +70,11 @@ func BenchmarkDataItem_Unmarshal_Parallel(b *testing.B) {
 // goarch: amd64
 // pkg: github.com/fufuok/xy-data-router/schema
 // cpu: Intel(R) Xeon(R) Gold 6151 CPU @ 3.00GHz
-// BenchmarkDataItem_Marshal-4                     40845681                30.71 ns/op            0 B/op          0 allocs/op
-// BenchmarkDataItem_Marshal-4                     35584504                29.36 ns/op            0 B/op          0 allocs/op
-// BenchmarkDataItem_Unmarshal-4                   16268248                70.31 ns/op           16 B/op          2 allocs/op
-// BenchmarkDataItem_Unmarshal-4                   17582056                69.78 ns/op           16 B/op          2 allocs/op
-// BenchmarkDataItem_Marshal_Parallel-4           149579329                8.014 ns/op            0 B/op          0 allocs/op
-// BenchmarkDataItem_Marshal_Parallel-4           150980236                7.934 ns/op            0 B/op          0 allocs/op
-// BenchmarkDataItem_Unmarshal_Parallel-4          28453246                41.69 ns/op           16 B/op          2 allocs/op
-// BenchmarkDataItem_Unmarshal_Parallel-4          27080328                40.97 ns/op           16 B/op          2 allocs/op
+// BenchmarkDataItem_Marshal-4                     40991911                29.34 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItem_Marshal-4                     41093400                29.39 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItem_Unmarshal-4                   17382360                69.21 ns/op           16 B/op          2 allocs/op
+// BenchmarkDataItem_Unmarshal-4                   17725569                70.28 ns/op           16 B/op          2 allocs/op
+// BenchmarkDataItem_Marshal_Parallel-4           152554408                7.997 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItem_Marshal_Parallel-4           151097313                7.862 ns/op            0 B/op          0 allocs/op
+// BenchmarkDataItem_Unmarshal_Parallel-4          35022432                33.98 ns/op           16 B/op          2 allocs/op
+// BenchmarkDataItem_Unmarshal_Parallel-4          34755963                34.48 ns/op           16 B/op          2 allocs/op
