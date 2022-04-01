@@ -4,38 +4,21 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/controller/router/es"
+	"github.com/fufuok/xy-data-router/controller/router/sys"
+	"github.com/fufuok/xy-data-router/controller/router/v1"
 	"github.com/fufuok/xy-data-router/service"
 )
 
 func setupRouter(app *fiber.App) {
 	// 动态接口
-	v1 := app.Group("/v1", middleware.WebAPILogger())
-	{
-		v1.Post("/:apiname/bulk/gzip", V1APIHandler)
-		v1.Post("/:apiname/bulk", V1APIHandler)
-		v1.Post("/:apiname/gzip", V1APIHandler)
-		v1.Post("/:apiname", V1APIHandler)
-		v1.Get("/:apiname", V1APIHandler)
-	}
-
-	// 兼容旧 ES 上报接口
-	oldAPI := []string{"/start/", "/stop/", "/tp2cn/", "/pubg_proxy/bulk/", "/tcp_proxy/bulk/"}
-	for _, u := range oldAPI {
-		app.Post(u, oldAPIHandler(nil))
-	}
-
-	// 测速数据上报 JSON 修正 (临时方案)
-	app.Post("/speed_report/", oldAPIHandler([]string{"data.node_line_type"}))
+	v1.SetupRouter(app)
 
 	// ES 相关接口
-	es := app.Group("/es", middleware.CheckESWhiteList(true))
-	{
-		// ES 通用查询
-		es.Post("/search", ESSearchHandler)
-		// ES Scroll
-		es.Post("/scroll", ESScrollHandler)
-	}
+	es.SetupRouter(app)
+
+	// 服务器状态
+	sys.SetupRouter(app)
 
 	// 健康检查
 	app.Get("/heartbeat", func(c *fiber.Ctx) error {
@@ -51,13 +34,6 @@ func setupRouter(app *fiber.App) {
 	})
 	app.Get("/server_ip", func(c *fiber.Ctx) error {
 		return c.SendString(service.ExternalIPv4)
-	})
-
-	// 服务器状态
-	app.Get("/sys/status", runningStatusHandler)
-	app.Get("/sys/status/queue", runningQueueStatusHandler)
-	app.Get("/sys/check", middleware.CheckESWhiteList(false), func(c *fiber.Ctx) error {
-		return c.SendString(c.IP() + " - " + c.Get("x-forwarded-for"))
 	})
 
 	// 记录意外: https://github.com/gofiber/fiber/issues/1388

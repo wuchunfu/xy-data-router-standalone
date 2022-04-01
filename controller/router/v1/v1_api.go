@@ -1,4 +1,4 @@
-package controller
+package v1
 
 import (
 	"strings"
@@ -15,8 +15,8 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
-// V1APIHandler 处理接口请求
-func V1APIHandler(c *fiber.Ctx) error {
+// apiHandler 处理接口请求
+func apiHandler(c *fiber.Ctx) error {
 	// not immutable by default
 	apiname := c.Params("apiname")
 
