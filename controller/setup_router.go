@@ -4,15 +4,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/controller/router/apiv1"
 	"github.com/fufuok/xy-data-router/controller/router/es"
 	"github.com/fufuok/xy-data-router/controller/router/sys"
-	"github.com/fufuok/xy-data-router/controller/router/v1"
 	"github.com/fufuok/xy-data-router/service"
 )
 
 func setupRouter(app *fiber.App) {
 	// 动态接口
-	v1.SetupRouter(app)
+	apiv1.SetupRouter(app)
 
 	// ES 相关接口
 	es.SetupRouter(app)

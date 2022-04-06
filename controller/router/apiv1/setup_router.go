@@ -1,4 +1,4 @@
-package v1
+package apiv1
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -8,7 +8,7 @@ import (
 
 func SetupRouter(app *fiber.App) {
 	// 动态接口
-	v1 := app.Group("/v1", middleware.WebAPILogger())
+	v1 := app.Group("/apiv1", middleware.WebAPILogger())
 	{
 		v1.Post("/:apiname/bulk/gzip", apiHandler)
 		v1.Post("/:apiname/bulk", apiHandler)
