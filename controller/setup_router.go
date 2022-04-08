@@ -63,4 +63,8 @@ func setupRouter(app *fiber.App) {
 
 		return c.SendStatus(fiber.StatusNotFound)
 	})
+
+	app.Use(func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusNotFound)
+	})
 }
