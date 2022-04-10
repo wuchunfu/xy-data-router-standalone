@@ -66,7 +66,7 @@ func newES() (es *elasticsearch.Client, cfgErr error, esErr error) {
 	}
 
 	// 数据转发时不涉及 ES
-	if conf.ForwardTunnel != "" {
+	if ForwardTunnel != "" {
 		return
 	}
 

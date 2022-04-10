@@ -80,7 +80,7 @@ func sysStatus() map[string]interface{} {
 		// HTTP 服务是否开启了 Keepalive
 		"EnableKeepalive": conf.Config.SYSConf.EnableKeepalive,
 		// Tun 数据转发地址, 为空时本地处理数据
-		"ForwardTunnel": conf.ForwardTunnel,
+		"ForwardHost": conf.ForwardHost,
 		// 是否关闭了 ES 写入
 		"ESDisableWrite": conf.Config.SYSConf.ESDisableWrite,
 		// 繁忙时自动开启, 开启时所有设置了该标识的接口数据将不会写入 ES

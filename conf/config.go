@@ -66,6 +66,12 @@ type tSYSConf struct {
 	RestartMain                bool       `json:"restart_main"`
 	WatcherInterval            int        `json:"watcher_interval"`
 	HeartbeatIndex             string     `json:"heartbeat_index"`
+	ESAPILogIndex              string     `json:"esapi_log_index"`
+	ProxyHeader                string     `json:"proxy_header"`
+	EnableTrustedProxyCheck    bool       `json:"enable_trusted_proxy_check"`
+	TrustedProxies             []string   `json:"trusted_proxies"`
+	WebESAPITimeoutSecond      int        `json:"web_esapi_timeout_second"`
+	WebESAPITimeout            time.Duration
 	BaseSecretValue            string
 	WebSlowRespDuration        time.Duration
 	ESSlowQueryDuration        time.Duration
@@ -303,6 +309,13 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		config.SYSConf.WebErrCodeLog = WebErrorCodeLog
 	}
 
+	// ES 查询请求代理时的超时秒数, 默认: 30s
+	if config.SYSConf.WebESAPITimeoutSecond < 1 {
+		config.SYSConf.WebESAPITimeout = WebESAPITimeout
+	} else {
+		config.SYSConf.WebESAPITimeout = time.Duration(config.SYSConf.WebESAPITimeoutSecond) * time.Second
+	}
+
 	// 以接口名为键的配置集合
 	apiConfig := make(map[string]*TAPIConf)
 	for _, cfg := range config.APIConf {
@@ -348,6 +361,11 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	// 心跳日志索引
 	if config.SYSConf.HeartbeatIndex == "" {
 		config.SYSConf.HeartbeatIndex = HeartbeatIndex
+	}
+
+	// ES 查询接口日志索引
+	if config.SYSConf.ESAPILogIndex == "" {
+		config.SYSConf.ESAPILogIndex = ESAPILogIndex
 	}
 
 	// HTTP 请求体限制, -1 表示无限

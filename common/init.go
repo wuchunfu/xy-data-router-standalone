@@ -46,6 +46,9 @@ func InitCommon() {
 	// 初始化日志环境
 	initLogger()
 
+	// 初始化代理参数
+	initProxy()
+
 	// 初始化 ES 连接
 	initES()
 }

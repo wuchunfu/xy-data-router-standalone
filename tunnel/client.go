@@ -14,13 +14,13 @@ import (
 )
 
 func initTunClient() {
-	if conf.ForwardTunnel == "" {
+	if common.ForwardTunnel == "" {
 		return
 	}
 
 	clients := newTunClients()
 	common.Log.Info().
-		Str("addr", conf.ForwardTunnel).
+		Str("addr", common.ForwardTunnel).
 		Int("client_num", conf.Config.SYSConf.TunClientNum).
 		Int("send_queue_size", arpc.DefaultHandler.SendQueueSize()).
 		Int("send_buffer_size", arpc.DefaultHandler.SendBufferSize()).
@@ -71,7 +71,7 @@ func newTunClients() (clients []*arpc.Client) {
 }
 
 func dialer() (net.Conn, error) {
-	return net.DialTimeout("tcp", conf.ForwardTunnel, conf.TunDialTimeout)
+	return net.DialTimeout("tcp", common.ForwardTunnel, conf.TunDialTimeout)
 }
 
 // 不应出现该情况, 线路不畅? 关闭连接, 强制重连

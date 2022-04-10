@@ -46,8 +46,10 @@ var (
 	// ReqUserAgent 请求名称
 	ReqUserAgent = req.Header{"User-Agent": APPName + "/" + Version}
 
-	// ForwardTunnel 上联地址, 指定后将启动客户端, 将所有数据转交到 Tunnel Server
-	ForwardTunnel = ""
+	// ForwardHost 上联服务地址, IP / 域名
+	// 启动数据客户端, 将 ES 数据转交到上联 Tunnel Server
+	// 将 ES API 的查询请求转发给上联服务接口
+	ForwardHost = ""
 
 	// FilesVer 配置文件版本信息
 	FilesVer sync.Map

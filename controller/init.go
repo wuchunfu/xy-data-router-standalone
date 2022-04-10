@@ -22,15 +22,18 @@ var fav embed.FS
 // InitWebServer 接口服务
 func InitWebServer() {
 	app := fiber.New(fiber.Config{
-		ServerHeader:          conf.APPName,
-		BodyLimit:             conf.Config.SYSConf.LimitBody,
-		JSONEncoder:           json.Marshal,
-		JSONDecoder:           json.Unmarshal,
-		DisableStartupMessage: true,
-		StrictRouting:         true,
-		DisableKeepalive:      !conf.Config.SYSConf.EnableKeepalive,
-		ReduceMemoryUsage:     conf.Config.SYSConf.ReduceMemoryUsage,
-		ErrorHandler:          errorHandler,
+		ServerHeader:            conf.APPName,
+		BodyLimit:               conf.Config.SYSConf.LimitBody,
+		ReduceMemoryUsage:       conf.Config.SYSConf.ReduceMemoryUsage,
+		ProxyHeader:             conf.Config.SYSConf.ProxyHeader,
+		EnableTrustedProxyCheck: conf.Config.SYSConf.EnableTrustedProxyCheck,
+		TrustedProxies:          conf.Config.SYSConf.TrustedProxies,
+		DisableKeepalive:        !conf.Config.SYSConf.EnableKeepalive,
+		JSONEncoder:             json.Marshal,
+		JSONDecoder:             json.Unmarshal,
+		DisableStartupMessage:   true,
+		StrictRouting:           true,
+		ErrorHandler:            errorHandler,
 		// Immutable:             true,
 	})
 
@@ -77,7 +80,7 @@ func errorHandler(c *fiber.Ctx, err error) error {
 	service.HTTPBadRequestCount.Inc()
 	if conf.Debug {
 		common.LogSampled.Error().Err(err).
-			Str("client_ip", c.IP()).Str("uri", c.OriginalURL()).
+			Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).
 			Msg(c.Method())
 	}
 

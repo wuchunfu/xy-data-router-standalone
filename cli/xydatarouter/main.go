@@ -14,7 +14,7 @@ var version bool
 
 func init() {
 	flag.StringVar(&conf.ConfigFile, "c", conf.ConfigFile, "配置文件绝对路径(可选)")
-	flag.StringVar(&conf.ForwardTunnel, "f", "", "指定上联 Tunnel 地址(可选)")
+	flag.StringVar(&conf.ForwardHost, "f", "", "指定上联服务器地址(可选) IP / 域名, 如: -f=hk.upstream.cn")
 	flag.BoolVar(&version, "v", false, "版本信息")
 	flag.Parse()
 }
