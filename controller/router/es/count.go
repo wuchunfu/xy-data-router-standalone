@@ -25,11 +25,5 @@ func countHandler(c *fiber.Ctx) error {
 	)
 	resp.totalPath = "count"
 
-	ret := parseESResponse(resp, params)
-	defer putResult(ret)
-
-	if ret.errMsg != "" {
-		return middleware.APIFailure(c, ret.errMsg)
-	}
-	return middleware.APISuccessBytes(c, ret.result, ret.count)
+	return sendResult(c, resp, params)
 }

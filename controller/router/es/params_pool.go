@@ -9,7 +9,7 @@ type tParams struct {
 	Scroll   int                    `json:"scroll"`
 	ScrollID string                 `json:"scroll_id"`
 	Body     map[string]interface{} `json:"body"`
-	ClientIP string
+	ClientIP string                 `json:"client_ip"`
 }
 
 var paramsPool = sync.Pool{

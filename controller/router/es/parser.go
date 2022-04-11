@@ -4,27 +4,46 @@ import (
 	"io"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/tidwall/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/middleware"
 )
+
+// 解析执行结果, 记录日志, 发送响应
+func sendResult(c *fiber.Ctx, resp *tResponse, params *tParams) error {
+	params.ClientIP = common.GetClientIP(c)
+	ret := parseESResponse(resp, params)
+	defer func() {
+		log(params, ret)
+		putResult(ret)
+	}()
+
+	if ret.ErrMsg != "" {
+		return middleware.APIFailure(c, ret.ErrMsg)
+	}
+	return middleware.APISuccessBytes(c, ret.result, ret.Count)
+}
 
 // 执行 ES 请求
 func parseESResponse(resp *tResponse, params *tParams) *tResult {
 	defer putResponse(resp)
 	ret := getResult()
+	ret.StatusCode = resp.response.StatusCode
 
 	if resp.err != nil {
 		common.LogSampled.Error().Err(resp.err).Msg("getting response")
-		ret.errMsg = "查询失败, 服务繁忙"
+		ret.ErrMsg = "查询失败, 服务繁忙"
+		ret.Error = resp.err.Error()
 		return ret
 	}
 
 	if resp.response.Body == nil {
-		common.LogSampled.Error().Err(resp.err).Msg("response.Body is nil")
-		ret.errMsg = "查询失败, 服务异常"
+		common.LogSampled.Error().Int("status_code", ret.StatusCode).Msg("response.Body is nil")
+		ret.ErrMsg = "查询失败, 服务异常"
 		return ret
 	}
 
@@ -40,12 +59,13 @@ func parseESResult(resp *tResponse, params *tParams, ret *tResult) *tResult {
 	res, err := io.ReadAll(resp.response.Body)
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("response.Body")
-		ret.errMsg = "查询失败, 请稍后重试"
+		ret.ErrMsg = "查询失败, 请稍后重试"
+		ret.Error = err.Error()
 		return ret
 	}
 
 	if resp.response.IsError() {
-		ret.errMsg = "查询失败, 查询语句有误"
+		ret.ErrMsg = "查询失败, 查询语句有误"
 		common.LogSampled.Warn().
 			RawJSON("body", json.MustJSON(params.Body)).
 			Int("http_code", resp.response.StatusCode).
@@ -53,15 +73,15 @@ func parseESResult(resp *tResponse, params *tParams, ret *tResult) *tResult {
 			Str("index", params.Index).
 			Str("error_type", gjson.GetBytes(res, "error.type").String()).
 			Str("error_reason", gjson.GetBytes(res, "error.reason").String()).
-			Msg(ret.errMsg)
+			Msg(ret.ErrMsg)
 		return ret
 	}
 
 	ret.result = res
 
 	// 慢查询日志
-	took := gjson.GetBytes(res, "took").Int()
-	costTime := time.Duration(took) * time.Millisecond
+	ret.Took = gjson.GetBytes(res, "took").Int()
+	costTime := time.Duration(ret.Took) * time.Millisecond
 	if costTime > conf.Config.SYSConf.ESSlowQueryDuration {
 		common.LogSampled.Warn().
 			RawJSON("body", json.MustJSON(params.Body)).
@@ -71,6 +91,6 @@ func parseESResult(resp *tResponse, params *tParams, ret *tResult) *tResult {
 			Msgf("es search slow, timeout: %v", gjson.GetBytes(res, "timed_out"))
 	}
 
-	ret.count = int(gjson.GetBytes(res, resp.totalPath).Int())
+	ret.Count = int(gjson.GetBytes(res, resp.totalPath).Int())
 	return ret
 }

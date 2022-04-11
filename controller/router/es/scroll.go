@@ -18,7 +18,6 @@ func scrollHandler(c *fiber.Ctx) error {
 	if err := c.BodyParser(params); err != nil || params.Scroll <= 0 || params.ScrollID == "" {
 		return middleware.APIFailure(c, "查询参数有误")
 	}
-	params.ClientIP = c.IP()
 
 	resp := getResponse()
 	resp.response, resp.err = common.ES.Scroll(
@@ -27,12 +26,5 @@ func scrollHandler(c *fiber.Ctx) error {
 		common.ES.Scroll.WithScrollID(params.ScrollID),
 	)
 
-	ret := parseESResponse(resp, params)
-	defer putResult(ret)
-
-	if ret.errMsg != "" {
-		return middleware.APIFailure(c, ret.errMsg)
-	}
-
-	return middleware.APISuccessBytes(c, ret.result, ret.count)
+	return sendResult(c, resp, params)
 }

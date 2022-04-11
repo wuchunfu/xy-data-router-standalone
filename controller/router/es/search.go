@@ -20,7 +20,6 @@ func searchHandler(c *fiber.Ctx) error {
 	if err := c.BodyParser(params); err != nil || params.Index == "" || params.Body == nil {
 		return middleware.APIFailure(c, "查询参数有误")
 	}
-	params.ClientIP = c.IP()
 
 	bodyBuf := bufferpool.Get()
 	defer bufferpool.Put(bodyBuf)
@@ -36,12 +35,5 @@ func searchHandler(c *fiber.Ctx) error {
 		common.ES.Search.WithBody(bodyBuf),
 	)
 
-	ret := parseESResponse(resp, params)
-	defer putResult(ret)
-
-	if ret.errMsg != "" {
-		return middleware.APIFailure(c, ret.errMsg)
-	}
-
-	return middleware.APISuccessBytes(c, ret.result, ret.count)
+	return sendResult(c, resp, params)
 }
