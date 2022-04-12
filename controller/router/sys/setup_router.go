@@ -3,6 +3,7 @@ package sys
 import (
 	"github.com/gofiber/fiber/v2"
 
+	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/middleware"
 )
 
@@ -13,7 +14,7 @@ func SetupRouter(app *fiber.App) {
 		sys.Get("/status", runningStatusHandler)
 		sys.Get("/status/queue", runningQueueStatusHandler)
 		sys.Get("/check", middleware.CheckESWhiteList(false), func(c *fiber.Ctx) error {
-			return c.SendString(c.IP() + " - " + c.Get("x-forwarded-for"))
+			return c.SendString(common.GetClientIP(c) + " - " + c.IP())
 		})
 	}
 }

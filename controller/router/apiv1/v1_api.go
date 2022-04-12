@@ -24,7 +24,7 @@ func apiHandler(c *fiber.Ctx) error {
 	apiConf, ok := conf.APIConfig[apiname]
 	if !ok || apiConf.APIName == "" {
 		common.LogSampled.Info().
-			Str("client_ip", c.IP()).Str("uri", c.OriginalURL()).Int("len", len(apiname)).
+			Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).Int("len", len(apiname)).
 			Msg("api not found")
 		return middleware.APIFailure(c, "接口配置有误")
 	}
@@ -69,7 +69,7 @@ func apiHandler(c *fiber.Ctx) error {
 	}
 
 	// 请求 IP
-	ip := utils.GetString(c.IP(), common.IPv4Zero)
+	ip := common.GetClientIP(c)
 
 	// 写入队列
 	item := schema.New(apiname, ip, body)

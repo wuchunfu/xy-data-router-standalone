@@ -43,7 +43,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		}
 
 		// 请求 IP
-		ip := utils.GetString(c.IP(), common.IPv4Zero)
+		ip := common.GetClientIP(c)
 
 		// 写入队列
 		item := schema.New(apiname, ip, body)

@@ -6,8 +6,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 
-	"github.com/fufuok/utils"
-
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 )
@@ -18,18 +16,11 @@ func IPLimiter() fiber.Handler {
 		Max:        conf.Config.SYSConf.LimitRequest,
 		Expiration: time.Duration(conf.Config.SYSConf.LimitExpiration) * time.Second,
 		KeyGenerator: func(c *fiber.Ctx) string {
-			cip := c.IP()
-			if utils.IsInternalIPv4String(cip) {
-				if fip := c.Get("x-forwarded-for"); fip != "" {
-					return fip
-				}
-			}
-
-			return cip
+			return common.GetClientIP(c)
 		},
 		LimitReached: func(c *fiber.Ctx) error {
 			common.LogSampled.Error().
-				Str("uri", c.OriginalURL()).Str("ip", c.IP()).Strs("ips", c.IPs()).
+				Str("uri", c.OriginalURL()).Str("ip", common.GetClientIP(c)).Strs("ips", c.IPs()).
 				Msg("limit reached")
 			return c.SendStatus(fiber.StatusTooManyRequests)
 		},

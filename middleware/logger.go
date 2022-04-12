@@ -22,7 +22,7 @@ func WebAPILogger() fiber.Handler {
 		if chainErr != nil {
 			common.LogSampled.Error().Err(chainErr).
 				Bytes("body", c.Body()).
-				Str("client_ip", c.IP()).Str("uri", c.OriginalURL()).
+				Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).
 				Msg(c.Method())
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
@@ -33,7 +33,7 @@ func WebAPILogger() fiber.Handler {
 			// 记录慢响应日志或错误响应日志
 			common.LogSampled.Warn().
 				Bytes("body", c.Body()).
-				Str("client_ip", c.IP()).Dur("duration", costTime).
+				Str("client_ip", common.GetClientIP(c)).Dur("duration", costTime).
 				Str("uri", c.OriginalURL()).Int("http_code", c.Response().StatusCode()).
 				Msg(c.Method())
 		}
@@ -55,7 +55,7 @@ func RecoverLogger() fiber.Handler {
 				}
 				common.LogSampled.Error().Err(err).
 					Bytes("body", c.Body()).
-					Str("client_ip", c.IP()).Str("uri", c.OriginalURL()).
+					Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).
 					Msg(c.Method())
 			}
 		}()
