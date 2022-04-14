@@ -140,6 +140,10 @@ func sendOneData(dp *tDataProcessor, js []byte, isPostToES, isPostToAPI bool) {
 // bytespool.Release(jsData)
 func appendSYSField(js []byte, ip string) []byte {
 	n := len(js)
+	if n == 0 {
+		return nil
+	}
+
 	exist := gjson.GetBytes(js, "_cip").Exists()
 	if !exist {
 		// 加系统字段 JSON 长度
