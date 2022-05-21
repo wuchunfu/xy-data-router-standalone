@@ -46,7 +46,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		ip := common.GetClientIP(c)
 
 		// 写入队列
-		item := schema.New(apiname, ip, body)
+		item := schema.NewSafe(apiname, ip, body)
 		service.PushDataToChanx(item)
 
 		// 旧接口返回值处理

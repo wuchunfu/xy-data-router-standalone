@@ -58,18 +58,30 @@ func (p *Pool) Put(d *DataItem) {
 	p.Release(d)
 }
 
-// New 新数据项, Immutable
-func New(apiname, ip string, body []byte, releaseBody ...bool) *DataItem {
+// New 新数据项, 当数据源本身不会变化且 body 不会被用到其他场景时, 以减少数据拷贝
+func New(apiname, ip string, body []byte) *DataItem {
+	d := defaultPool.Make()
+	d.APIName = apiname
+	d.IP = ip
+	d.Body = body
+	return d
+}
+
+// NewSafe 新数据项, 复制源数据
+func NewSafe(apiname, ip string, body []byte) *DataItem {
 	d := defaultPool.Make()
 	d.APIName = utils.CopyString(apiname)
 	d.IP = utils.CopyString(ip)
-	d.Body = bytespool.New(len(body))
-	copy(d.Body, body)
+	d.Body = bytespool.NewBytes(body)
+	return d
+}
 
-	if len(releaseBody) > 0 && releaseBody[0] {
-		bytespool.Release(body)
-	}
-
+// NewSafeBody 新数据项, 复制源数据的 body 项
+func NewSafeBody(apiname, ip string, body []byte) *DataItem {
+	d := defaultPool.Make()
+	d.APIName = apiname
+	d.IP = ip
+	d.Body = bytespool.NewBytes(body)
 	return d
 }
 

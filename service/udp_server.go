@@ -103,7 +103,7 @@ func udpReader(conn *net.UDPConn, withSendTo bool) {
 		}
 
 		if n >= 7 {
-			item := schema.New("", clientIP, buf[:n])
+			item := schema.NewSafeBody("", clientIP, buf[:n])
 			_ = common.Pool.Submit(func() {
 				if !saveUDPData(item) {
 					item.Release()

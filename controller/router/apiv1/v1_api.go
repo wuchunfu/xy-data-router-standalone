@@ -35,15 +35,7 @@ func apiHandler(c *fiber.Ctx) error {
 	if c.Method() == "GET" {
 		// GET 单条数据
 		body = query2JSON(c)
-		if len(body) == 0 {
-			return middleware.APIFailure(c, "数据为空")
-		}
 	} else {
-		body = c.Body()
-		if len(body) == 0 {
-			return middleware.APIFailure(c, "数据为空")
-		}
-
 		uri := utils.TrimRight(c.Path(), '/')
 		if strings.HasSuffix(uri, "/gzip") {
 			// 请求体解压缩
@@ -53,12 +45,18 @@ func apiHandler(c *fiber.Ctx) error {
 			if err != nil {
 				return middleware.APIFailure(c, "数据解压失败")
 			}
+		} else {
+			body = utils.CopyBytes(c.Body())
 		}
 
 		if strings.HasSuffix(uri, "/bulk") {
 			// 批量数据不检查必有字段
 			chkField = false
 		}
+	}
+
+	if len(body) == 0 {
+		return middleware.APIFailure(c, "数据为空")
 	}
 
 	if chkField {
@@ -68,10 +66,9 @@ func apiHandler(c *fiber.Ctx) error {
 		}
 	}
 
-	// 请求 IP
-	ip := common.GetClientIP(c)
-
 	// 写入队列
+	apiname = utils.CopyString(apiname)
+	ip := utils.CopyString(common.GetClientIP(c))
 	item := schema.New(apiname, ip, body)
 	service.PushDataToChanx(item)
 
