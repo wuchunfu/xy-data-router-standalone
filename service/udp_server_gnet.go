@@ -43,7 +43,7 @@ func (s *tUDPServerG) React(frame []byte, c gnet.Conn) (out []byte, action gnet.
 
 	if n >= 7 {
 		item := schema.NewSafeBody("", clientIP, frame)
-		_ = common.Pool.Submit(func() {
+		_ = common.GoPool.Submit(func() {
 			if !saveUDPData(item) {
 				item.Release()
 			}

@@ -36,7 +36,7 @@ func initTunClient() {
 			// 接收数据转发到通道
 			for item := range service.TunChan.Out {
 				data := item.(*schema.DataItem)
-				_ = common.Pool.Submit(func() {
+				_ = common.GoPool.Submit(func() {
 					// 不超时, 直到 ErrClientOverstock
 					if err := client.Notify(tunMethod, data, arpc.TimeZero); err != nil {
 						common.LogSampled.Warn().Err(err).Msg("Failed to write Tunnel")

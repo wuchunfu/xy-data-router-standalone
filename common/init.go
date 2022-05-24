@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/fufuok/timewheel"
-	"github.com/panjf2000/gnet/pkg/pool/goroutine"
 	"github.com/tidwall/gjson"
 )
 
@@ -22,9 +21,6 @@ var (
 	Now3399    = time.Now().Format(time.RFC3339)
 
 	IPv4Zero = "0.0.0.0"
-
-	// Pool 协程池
-	Pool = goroutine.Default()
 )
 
 func InitCommon() {
@@ -57,10 +53,6 @@ func TWStop() {
 	TWms.Stop()
 	TWs.Stop()
 	TWm.Stop()
-}
-
-func PoolRelease() {
-	Pool.Release()
 }
 
 // GetGlobalTime 统一时间

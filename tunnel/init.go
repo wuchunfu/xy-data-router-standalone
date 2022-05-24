@@ -16,7 +16,7 @@ func InitTunnel() {
 	arpc.EnablePool(true)
 	arpc.SetAsyncResponse(true)
 	arpc.SetAsyncExecutor(func(f func()) {
-		_ = common.Pool.Submit(f)
+		_ = common.GoPool.Submit(f)
 	})
 
 	go initTunServer()

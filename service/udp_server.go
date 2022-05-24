@@ -97,14 +97,14 @@ func udpReader(conn *net.UDPConn, withSendTo bool) {
 				// 返回客户端 IP
 				out = utils.S2B(clientIP)
 			}
-			_ = common.Pool.Submit(func() {
+			_ = common.GoPool.Submit(func() {
 				writeToUDP(conn, clientAddr, out)
 			})
 		}
 
 		if n >= 7 {
 			item := schema.NewSafeBody("", clientIP, buf[:n])
-			_ = common.Pool.Submit(func() {
+			_ = common.GoPool.Submit(func() {
 				if !saveUDPData(item) {
 					item.Release()
 				}

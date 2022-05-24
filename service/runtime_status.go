@@ -156,8 +156,8 @@ func dataStats() map[string]interface{} {
 		"CounterStartTime": counterStartTime,
 
 		// 公共协程池, 不阻塞
-		"CommonPoolFree":    common.Pool.Free(),
-		"CommonPoolRunning": common.Pool.Running(),
+		"CommonGoPoolFree":    common.GoPool.Free(),
+		"CommonGoPoolRunning": common.GoPool.Running(),
 
 		// 数据处理协程池, 排队, 待处理数据量, 丢弃数据量, 繁忙状态
 		"DataProcessorTodoCount____": dataProcessorTodoCount.Value(),

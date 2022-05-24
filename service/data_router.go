@@ -52,7 +52,7 @@ func dataRouter(dr *tDataRouter) {
 	for item := range dr.drChan.Out {
 		// 提交不阻塞, 有执行并发限制, 最大排队数限制
 		dp := newDataPorcessor(dr, item.(*schema.DataItem))
-		_ = common.Pool.Submit(func() {
+		_ = common.GoPool.Submit(func() {
 			dataProcessorTodoCount.Inc()
 			if err := dataProcessorPool.Invoke(dp); err != nil {
 				releaseDataProcessor(dp)

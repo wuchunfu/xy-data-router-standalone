@@ -147,7 +147,7 @@ func esWorker() {
 
 // 提交批量任务, 提交不阻塞, 有执行并发限制, 最大排队数限制
 func submitESBulk(dis *tDataItems) {
-	_ = common.Pool.Submit(func() {
+	_ = common.GoPool.Submit(func() {
 		esBulkTodoCount.Inc()
 		if err := esBulkPool.Invoke(dis); err != nil {
 			esBulkDiscards.Inc()

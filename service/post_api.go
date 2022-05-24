@@ -68,7 +68,7 @@ func postAPI(dis *tDataItems, api []string) {
 	}
 	apiBody[len(apiBody)-1] = ']'
 	dis.release()
-	_ = common.Pool.Submit(func() {
+	_ = common.GoPool.Submit(func() {
 		for _, u := range api {
 			if _, err := req.Post(u, req.BodyJSON(apiBody), conf.ReqUserAgent); err != nil {
 				common.LogSampled.Error().Err(err).Str("url", u).Msg("apiWorker")
