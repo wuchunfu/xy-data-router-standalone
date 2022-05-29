@@ -7,7 +7,7 @@ require (
 	github.com/fufuok/bytespool v1.1.1
 	github.com/fufuok/chanx v0.0.107
 	github.com/fufuok/timewheel v1.1.100
-	github.com/fufuok/utils v0.3.11
+	github.com/fufuok/utils v0.3.12
 	github.com/goccy/go-json v0.9.3
 	github.com/gofiber/fiber/v2 v2.24.0
 	github.com/imroc/req v0.3.2

@@ -36,6 +36,9 @@ func InitCommon() {
 	TWm, _ = timewheel.NewTimeWheel(time.Minute, 1440)
 	TWm.Start()
 
+	// 池相关设置
+	initPool()
+
 	// 同步时间字段
 	go syncNow()
 

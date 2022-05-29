@@ -35,7 +35,7 @@ const (
 	WebErrorCodeLog = 500
 	// BodyLimit POST 最大 500M, Request Entity Too Large
 	BodyLimit = 500 << 20
-	// ESSlowQueryDuration ES 慢查询日志时间设置, 默认: > 5秒则记录
+	// ESSlowQueryDuration ES 慢查询日志时间设置, 默认: > 5 秒则记录
 	ESSlowQueryDuration = 5 * time.Second
 	// TunClientNum1CPU Tunnel 发送数据客户端数量 / CPU
 	TunClientNum1CPU = 2
@@ -95,6 +95,9 @@ const (
 
 	// WatcherInterval 文件变化监控时间间隔(分)
 	WatcherInterval = 1
+
+	// BufferMaxCapacity 字节缓冲池最大可回收容量值限定, 默认值: 1MiB, 即大于该值的就不回收到池
+	BufferMaxCapacity = 1 << 20
 
 	// HeartbeatIndex 心跳日志索引
 	HeartbeatIndex = "monitor_heartbeat_report"
