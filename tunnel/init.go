@@ -12,7 +12,7 @@ const tunMethod = "tunnel"
 
 func InitTunnel() {
 	log.SetLogger(newLogger())
-	arpc.SetSendQueueSize(conf.Config.SYSConf.TunSendQueueSize)
+	arpc.SetSendQueueSize(conf.Config.TunConf.SendQueueSize)
 	arpc.EnablePool(true)
 	arpc.SetAsyncResponse(true)
 	arpc.SetAsyncExecutor(func(f func()) {

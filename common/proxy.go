@@ -7,7 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/internal"
 )
 
 const (
@@ -27,9 +26,9 @@ var (
 
 func initProxy() {
 	if conf.ForwardHost != "" {
-		_, port := utils.SplitHostPort(conf.Config.SYSConf.TunServerAddr)
+		_, port := utils.SplitHostPort(conf.Config.TunConf.ServerAddr)
 		ForwardTunnel = fmt.Sprintf("%s:%s", conf.ForwardHost, port)
-		_, port = utils.SplitHostPort(conf.Config.SYSConf.WebServerAddr)
+		_, port = utils.SplitHostPort(conf.Config.WebConf.ServerAddr)
 		ForwardHTTP = []string{
 			fmt.Sprintf("http://%s:%s", conf.ForwardHost, port),
 		}
@@ -45,7 +44,7 @@ func SetClientIP(c *fiber.Ctx) {
 		xip = c.IP()
 		if !utils.IsInternalIPv4String(xip) {
 			xtime := Now3399
-			xtoken := internal.HashString(xip, xtime, conf.Config.SYSConf.BaseSecretValue)
+			xtoken := utils.HashString(xip, xtime, conf.Config.SYSConf.BaseSecretValue)
 			c.Request().Header.Set(HeaderXProxyClientIP, xip)
 			c.Request().Header.Set(HeaderXProxyToken, xtoken)
 			c.Request().Header.Set(HeaderXProxyTime, xtime)
@@ -68,7 +67,7 @@ func GetClientIP(c *fiber.Ctx) string {
 	if xip != "" {
 		xtoken := c.Get(HeaderXProxyToken)
 		xtime := c.Get(HeaderXProxyTime)
-		if xtoken == internal.HashString(xip, xtime, conf.Config.SYSConf.BaseSecretValue) {
+		if xtoken == utils.HashString(xip, xtime, conf.Config.SYSConf.BaseSecretValue) {
 			c.Locals(HeaderXProxyClientIP, xip)
 			return xip
 		}

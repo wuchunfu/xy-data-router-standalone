@@ -21,7 +21,7 @@ func initTunServer() {
 
 // 新建通道(RPC)服务
 func newTunServer() error {
-	ln, err := net.Listen("tcp", conf.Config.SYSConf.TunServerAddr)
+	ln, err := net.Listen("tcp", conf.Config.TunConf.ServerAddr)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func newTunServer() error {
 	srv.Handler.SetLogTag("[Tunnel SRV" + logType + "]")
 	srv.Handler.Handle(tunMethod, onData)
 	common.Log.Info().
-		Str("addr", conf.Config.SYSConf.TunServerAddr).
+		Str("addr", conf.Config.TunConf.ServerAddr).
 		Int("send_queue_size", srv.Handler.SendQueueSize()).
 		Int("send_buffer_size", srv.Handler.SendBufferSize()).
 		Int("recv_buffer_size", srv.Handler.RecvBufferSize()).

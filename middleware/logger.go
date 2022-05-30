@@ -28,8 +28,8 @@ func WebAPILogger() fiber.Handler {
 		}
 
 		costTime := time.Since(start)
-		if costTime > conf.Config.SYSConf.WebSlowRespDuration ||
-			c.Response().StatusCode() >= conf.Config.SYSConf.WebErrCodeLog {
+		if costTime > conf.Config.WebConf.SlowResponseDuration ||
+			c.Response().StatusCode() >= conf.Config.WebConf.ErrCodeLog {
 			// 记录慢响应日志或错误响应日志
 			common.LogSampled.Warn().
 				Bytes("body", c.Body()).

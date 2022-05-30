@@ -11,8 +11,8 @@ import (
 // 初始化获取远端配置
 func startRemoteConf(ctx context.Context) {
 	// 定时获取远程主配置
-	if conf.Config.SYSConf.MainConfig.GetConfDuration > 0 {
-		go getRemoteConf(ctx, &conf.Config.SYSConf.MainConfig)
+	if conf.Config.MainConf.GetConfDuration > 0 {
+		go getRemoteConf(ctx, &conf.Config.MainConf)
 	}
 }
 

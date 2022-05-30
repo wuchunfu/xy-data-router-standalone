@@ -82,7 +82,7 @@ func parseESResult(resp *tResponse, params *tParams, ret *tResult) *tResult {
 	// 慢查询日志
 	ret.Took = gjson.GetBytes(res, "took").Int()
 	costTime := time.Duration(ret.Took) * time.Millisecond
-	if costTime > conf.Config.SYSConf.ESSlowQueryDuration {
+	if costTime > conf.Config.WebConf.ESSlowQueryDuration {
 		common.LogSampled.Warn().
 			RawJSON("body", json.MustJSON(params.Body)).
 			Str("client_ip", params.ClientIP).

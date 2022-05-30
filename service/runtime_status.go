@@ -58,14 +58,14 @@ func RunningQueueStatus() map[string]interface{} {
 
 // 系统信息
 func sysStatus() map[string]interface{} {
-	ver := conf.GetFilesVer(conf.Config.SYSConf.MainConfig.Path)
+	ver := conf.GetFilesVer(conf.Config.MainConf.Path)
 	return map[string]interface{}{
 		"APPName":      conf.APPName,
 		"Version":      conf.Version,
 		"GitCommit":    conf.GitCommit,
 		"Uptime":       time.Since(start).String(),
 		"Debug":        conf.Debug,
-		"LogLevel":     zerolog.Level(conf.Config.SYSConf.Log.Level).String(),
+		"LogLevel":     zerolog.Level(conf.Config.LogConf.Level).String(),
 		"ConfigVer":    ver.LastUpdate,
 		"ConfigMD5":    ver.MD5,
 		"GoVersion":    conf.GoVersion,
@@ -76,19 +76,19 @@ func sysStatus() map[string]interface{} {
 		"ExternalIPv4": ExternalIPv4,
 
 		// HTTP 服务是否开启了减少内存占用选项
-		"ReduceMemoryUsage": conf.Config.SYSConf.ReduceMemoryUsage,
-		// HTTP 服务是否开启了 Keepalive
-		"EnableKeepalive": conf.Config.SYSConf.EnableKeepalive,
+		"ReduceMemoryUsage": conf.Config.WebConf.ReduceMemoryUsage,
+		// HTTP 服务是否关闭了 keep-alive
+		"DisableKeepalive": conf.Config.WebConf.DisableKeepalive,
 		// Tun 数据转发地址, 为空时本地处理数据
 		"ForwardHost": conf.ForwardHost,
 		// 是否关闭了 ES 写入
-		"ESDisableWrite": conf.Config.SYSConf.ESDisableWrite,
+		"ESDisableWrite": conf.Config.DataConf.ESDisableWrite,
 		// 繁忙时自动开启, 开启时所有设置了该标识的接口数据将不会写入 ES
 		"ESOptionalWrite": esOptionalWrite,
 		// UDP 协议原型
-		"UDPProto": conf.Config.SYSConf.UDPProto,
+		"UDPProto": conf.Config.UDPConf.Proto,
 		// 是否启用了 HTTPS
-		"HTTPS": conf.Config.SYSConf.WebServerHttpsAddr != "",
+		"HTTPS": conf.Config.WebConf.ServerHttpsAddr != "",
 		// JSON 库信息
 		"JSON": json.Name,
 

@@ -66,8 +66,8 @@ func Watcher() {
 				service.InitDataRouter()
 
 				// 调节协程池
-				service.TuneDataProcessorSize(conf.Config.SYSConf.DataProcessorSize)
-				service.TuneESBulkWorkerSize(conf.Config.SYSConf.ESBulkWorkerSize)
+				service.TuneDataProcessorSize(conf.Config.DataConf.ProcessorSize)
+				service.TuneESBulkWorkerSize(conf.Config.DataConf.ESBulkWorkerSize)
 
 				common.Log.Warn().Msg(">>>>>>> reload config <<<<<<<")
 				reloadChan <- true

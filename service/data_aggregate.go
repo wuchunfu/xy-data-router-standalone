@@ -11,7 +11,7 @@ func PushDataToChanx(item *schema.DataItem) {
 	if common.ForwardTunnel != "" {
 		TunDataTotal.Inc()
 		// 设置压缩标识
-		if item.Size() >= conf.Config.SYSConf.TunCompressMinSize {
+		if item.Size() >= conf.Config.TunConf.CompressMinSize {
 			item.Flag = 1
 			TunCompressTotal.Inc()
 		}

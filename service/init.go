@@ -53,7 +53,7 @@ var (
 	// 待处理的数据项计数
 	dataProcessorTodoCount xsync.Counter
 
-	// 数据处理丢弃计数, 超过 DataProcessorMaxWorkerSize
+	// 数据处理丢弃计数, 超过 ProcessorMaxWorkerSize
 	dataProcessorDiscards xsync.Counter
 
 	// 数据丢弃计数, 繁忙时丢弃可选接口的数据, 不写 ES
@@ -144,7 +144,7 @@ func TuneESBulkWorkerSize(n int) {
 
 // 初始化无限缓冲信道
 func newChanx() *chanx.UnboundedChan {
-	return chanx.NewUnboundedChan(conf.Config.SYSConf.DataChanSize, conf.Config.SYSConf.DataChanMaxBufCap)
+	return chanx.NewUnboundedChan(conf.Config.DataConf.ChanSize, conf.Config.DataConf.ChanMaxBufCap)
 }
 
 // 新数据信道

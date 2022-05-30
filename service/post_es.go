@@ -40,12 +40,12 @@ type tESBulkResponse struct {
 // ES 批量写入协程池初始化
 func initESBulkPool() {
 	esBulkPool, _ = ants.NewPoolWithFunc(
-		conf.Config.SYSConf.ESBulkWorkerSize,
+		conf.Config.DataConf.ESBulkWorkerSize,
 		func(v interface{}) {
 			esBulk(v.(*tDataItems))
 		},
 		ants.WithExpiryDuration(10*time.Second),
-		ants.WithMaxBlockingTasks(conf.Config.SYSConf.ESBulkMaxWorkerSize),
+		ants.WithMaxBlockingTasks(conf.Config.DataConf.ESBulkMaxWorkerSize),
 		ants.WithPanicHandler(func(r interface{}) {
 			common.LogSampled.Error().Interface("recover", r).Msg("panic")
 		}),
@@ -109,7 +109,7 @@ func updateESBulkHeader() {
 
 // ES 数据入口
 func esWorker() {
-	ticker := common.TWms.NewTicker(conf.Config.SYSConf.ESPostMaxIntervalDuration)
+	ticker := common.TWms.NewTicker(conf.Config.DataConf.ESPostMaxIntervalDuration)
 	defer ticker.Stop()
 
 	dis := getDataItems()
@@ -135,7 +135,7 @@ func esWorker() {
 			dis.add(v.(*schema.DataItem))
 
 			// 达到限定数量或大小写入 ES
-			if dis.count%conf.Config.SYSConf.ESPostBatchNum == 0 || dis.size > conf.Config.SYSConf.ESPostBatchBytes {
+			if dis.count%conf.Config.DataConf.ESPostBatchNum == 0 || dis.size > conf.Config.DataConf.ESPostBatchBytes {
 				submitESBulk(dis)
 				dis = getDataItems()
 			}

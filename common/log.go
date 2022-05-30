@@ -43,8 +43,8 @@ func InitLogger() error {
 
 	// 抽样的日志记录器
 	sampler := &zerolog.BurstSampler{
-		Burst:  conf.Config.SYSConf.Log.Burst,
-		Period: conf.Config.SYSConf.Log.PeriodDur,
+		Burst:  conf.Config.LogConf.Burst,
+		Period: conf.Config.LogConf.PeriodDur,
 	}
 	LogSampled = Log.Sample(&zerolog.LevelSampler{
 		TraceSampler: sampler,
@@ -66,19 +66,19 @@ func LogConfig() error {
 	basicLog := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "0102 15:04:05"}
 
 	if !conf.Debug {
-		basicLog.NoColor = conf.Config.SYSConf.Log.NoColor
+		basicLog.NoColor = conf.Config.LogConf.NoColor
 		basicLog.Out = &lumberjack.Logger{
-			Filename:   conf.Config.SYSConf.Log.File,
-			MaxSize:    conf.Config.SYSConf.Log.MaxSize,
-			MaxAge:     conf.Config.SYSConf.Log.MaxAge,
-			MaxBackups: conf.Config.SYSConf.Log.MaxBackups,
+			Filename:   conf.Config.LogConf.File,
+			MaxSize:    conf.Config.LogConf.MaxSize,
+			MaxAge:     conf.Config.LogConf.MaxAge,
+			MaxBackups: conf.Config.LogConf.MaxBackups,
 			LocalTime:  true,
 			Compress:   true,
 		}
 	}
 
 	Log = zerolog.New(basicLog).With().Timestamp().Caller().Logger()
-	Log = Log.Level(zerolog.Level(conf.Config.SYSConf.Log.Level))
+	Log = Log.Level(zerolog.Level(conf.Config.LogConf.Level))
 
 	return nil
 }

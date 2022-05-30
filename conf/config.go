@@ -18,6 +18,12 @@ import (
 // tJSONConf 接口配置
 type tJSONConf struct {
 	SYSConf     tSYSConf   `json:"sys_conf"`
+	MainConf    TFilesConf `json:"main_conf"`
+	LogConf     tLogConf   `json:"log_conf"`
+	WebConf     tWebConf   `json:"web_conf"`
+	UDPConf     tUDPConf   `json:"udp_conf"`
+	TunConf     tTunConf   `json:"tun_conf"`
+	DataConf    tDataConf  `json:"data_conf"`
 	APIConf     []TAPIConf `json:"api_conf"`
 	ESWhiteList []string   `json:"es_white_list"`
 	ESBlackList []string   `json:"es_black_list"`
@@ -26,66 +32,13 @@ type tJSONConf struct {
 
 // tSYSConf 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
 type tSYSConf struct {
-	Debug                      bool       `json:"debug"`
-	Log                        tLogConf   `json:"log"`
-	PProfAddr                  string     `json:"pprof_addr"`
-	WebServerAddr              string     `json:"web_server_addr"`
-	WebServerHttpsAddr         string     `json:"web_server_https_addr"`
-	TunServerAddr              string     `json:"tun_server_addr"`
-	TunClientNum1CPU           int        `json:"tun_client_num_1_cpu"`
-	TunSendQueueSize           int        `json:"tun_send_queue_size"`
-	TunCompressMinSize         uint64     `json:"tun_compress_min_size"`
-	EnableKeepalive            bool       `json:"enable_keepalive"`
-	ReduceMemoryUsage          bool       `json:"reduce_memory_usage"`
-	LimitBody                  int        `json:"limit_body"`
-	LimitExpiration            int        `json:"limit_expiration"`
-	LimitRequest               int        `json:"limit_request"`
-	WebSlowResponse            int        `json:"web_slow_response"`
-	WebErrCodeLog              int        `json:"web_errcode_log"`
-	UDPServerRAddr             string     `json:"udp_server_raddr"`
-	UDPServerRWAddr            string     `json:"udp_server_rwaddr"`
-	UDPGoReadNum1CPU           int        `json:"udp_go_read_num_1cpu"`
-	UDPProto                   string     `json:"udp_proto"`
-	ESAddress                  []string   `json:"es_address"`
-	ESPostBatchNum             int        `json:"es_post_batch_num"`
-	ESPostBatchBytes           int        `json:"es_post_batch_mb"`
-	ESPostMaxInterval          int        `json:"es_post_max_interval"`
-	ESRetryOnStatus            []int      `json:"es_retry_on_status"`
-	ESMaxRetries               int        `json:"es_max_retries"`
-	ESDisableRetry             bool       `json:"es_disable_retry"`
-	ESDisableWrite             bool       `json:"es_disable_write"`
-	ESSlowQuery                int        `json:"es_slow_query"`
-	ESBulkWorkerSize           int        `json:"es_bulk_worker_size"`
-	ESBulkMaxWorkerSize        int        `json:"es_bulk_max_worker_size"`
-	ESBusyPercent              float64    `json:"es_busy_percent"`
-	DataChanSize               int        `json:"data_chan_size"`
-	DataChanMaxBufCap          int        `json:"data_chan_max_buf_cap"`
-	DataProcessorSize          int        `json:"data_processor_size"`
-	DataProcessorMaxWorkerSize int        `json:"data_processor_max_worker_size"`
-	MainConfig                 TFilesConf `json:"main_config"`
-	RestartMain                bool       `json:"restart_main"`
-	WatcherInterval            int        `json:"watcher_interval"`
-	HeartbeatIndex             string     `json:"heartbeat_index"`
-	ESAPILogIndex              string     `json:"esapi_log_index"`
-	ProxyHeader                string     `json:"proxy_header"`
-	EnableTrustedProxyCheck    bool       `json:"enable_trusted_proxy_check"`
-	TrustedProxies             []string   `json:"trusted_proxies"`
-	WebESAPITimeoutSecond      int        `json:"web_esapi_timeout_second"`
-	WebESAPITimeout            time.Duration
-	BaseSecretValue            string
-	WebSlowRespDuration        time.Duration
-	ESSlowQueryDuration        time.Duration
-	ESPostMaxIntervalDuration  time.Duration
-	UDPGoReadNum               int
-	TunClientNum               int
-	WebCertFile                string
-	WebKeyFile                 string
-}
-
-type tStateConf struct {
-	CheckESBulkResult bool
-	CheckESBulkErrors bool
-	RecordESBulkBody  bool
+	Debug           bool   `json:"debug"`
+	PProfAddr       string `json:"pprof_addr"`
+	RestartMain     bool   `json:"restart_main"`
+	WatcherInterval int    `json:"watcher_interval"`
+	HeartbeatIndex  string `json:"heartbeat_index"`
+	ESAPILogIndex   string `json:"esapi_log_index"`
+	BaseSecretValue string
 }
 
 type tLogConf struct {
@@ -99,6 +52,70 @@ type tLogConf struct {
 	MaxAge      int    `json:"max_age"`
 	ESBulkLevel int    `json:"es_bulk_level"`
 	PeriodDur   time.Duration
+}
+
+type tWebConf struct {
+	ServerAddr              string   `json:"server_addr"`
+	ServerHttpsAddr         string   `json:"server_https_addr"`
+	DisableKeepalive        bool     `json:"disable_keepalive"`
+	ReduceMemoryUsage       bool     `json:"reduce_memory_usage"`
+	LimitBody               int      `json:"limit_body"`
+	LimitExpiration         int      `json:"limit_expiration"`
+	LimitRequest            int      `json:"limit_request"`
+	SlowResponse            int      `json:"slow_response"`
+	ErrCodeLog              int      `json:"errcode_log"`
+	ProxyHeader             string   `json:"proxy_header"`
+	EnableTrustedProxyCheck bool     `json:"enable_trusted_proxy_check"`
+	TrustedProxies          []string `json:"trusted_proxies"`
+	ESAPITimeoutSecond      int      `json:"esapi_timeout_second"`
+	ESSlowQuery             int      `json:"es_slow_query"`
+	ESSlowQueryDuration     time.Duration
+	SlowResponseDuration    time.Duration
+	ESAPITimeout            time.Duration
+	CertFile                string
+	KeyFile                 string
+}
+
+type tUDPConf struct {
+	ServerRAddr   string `json:"server_raddr"`
+	ServerRWAddr  string `json:"server_rwaddr"`
+	GoReadNum1CPU int    `json:"go_read_num_1cpu"`
+	Proto         string `json:"proto"`
+	GoReadNum     int
+}
+
+type tTunConf struct {
+	ServerAddr      string `json:"server_addr"`
+	ClientNum1CPU   int    `json:"client_num_1_cpu"`
+	SendQueueSize   int    `json:"send_queue_size"`
+	CompressMinSize uint64 `json:"compress_min_size"`
+	ClientNum       int
+}
+
+type tDataConf struct {
+	ESAddress                 []string `json:"es_address"`
+	ESDisableWrite            bool     `json:"es_disable_write"`
+	ESPostBatchNum            int      `json:"es_post_batch_num"`
+	ESPostBatchMB             int      `json:"es_post_batch_mb"`
+	ESPostMaxInterval         int      `json:"es_post_max_interval"`
+	ESRetryOnStatus           []int    `json:"es_retry_on_status"`
+	ESMaxRetries              int      `json:"es_max_retries"`
+	ESDisableRetry            bool     `json:"es_disable_retry"`
+	ESBulkWorkerSize          int      `json:"es_bulk_worker_size"`
+	ESBulkMaxWorkerSize       int      `json:"es_bulk_max_worker_size"`
+	ESBusyPercent             float64  `json:"es_busy_percent"`
+	ChanSize                  int      `json:"chan_size"`
+	ChanMaxBufCap             int      `json:"chan_max_buf_cap"`
+	ProcessorSize             int      `json:"processor_size"`
+	ProcessorMaxWorkerSize    int      `json:"processor_max_worker_size"`
+	ESPostBatchBytes          int
+	ESPostMaxIntervalDuration time.Duration
+}
+
+type tStateConf struct {
+	CheckESBulkResult bool
+	CheckESBulkErrors bool
+	RecordESBulkBody  bool
 }
 
 type TAPIConf struct {
@@ -118,7 +135,7 @@ type TPostAPIConf struct {
 }
 
 type TFilesConf struct {
-	Path            string `json:"path"`
+	Path            string `json:"-"`
 	Method          string `json:"method"`
 	SecretName      string `json:"secret_name"`
 	API             string `json:"api"`
@@ -188,132 +205,132 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	}
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off
-	if config.SYSConf.Log.Level > 7 || config.SYSConf.Log.Level < -1 {
-		config.SYSConf.Log.Level = LogLevel
+	if config.LogConf.Level > 7 || config.LogConf.Level < -1 {
+		config.LogConf.Level = LogLevel
 	}
 
 	// ES 批量写入错误日志
-	if config.SYSConf.Log.ESBulkLevel > 7 || config.SYSConf.Log.ESBulkLevel < -1 {
-		config.SYSConf.Log.ESBulkLevel = LogLevel
+	if config.LogConf.ESBulkLevel > 7 || config.LogConf.ESBulkLevel < -1 {
+		config.LogConf.ESBulkLevel = LogLevel
 	}
 
 	// 抽样日志设置 (x 秒 n 条)
-	if config.SYSConf.Log.Burst < 0 || config.SYSConf.Log.Period < 0 {
-		config.SYSConf.Log.PeriodDur = LogSamplePeriodDur
-		config.SYSConf.Log.Burst = LogSampleBurst
+	if config.LogConf.Burst < 0 || config.LogConf.Period < 0 {
+		config.LogConf.PeriodDur = LogSamplePeriodDur
+		config.LogConf.Burst = LogSampleBurst
 	} else {
-		config.SYSConf.Log.PeriodDur = time.Duration(config.SYSConf.Log.Period) * time.Second
+		config.LogConf.PeriodDur = time.Duration(config.LogConf.Period) * time.Second
 	}
 
 	// 日志文件
-	if config.SYSConf.Log.File == "" {
-		config.SYSConf.Log.File = LogFile
+	if config.LogConf.File == "" {
+		config.LogConf.File = LogFile
 	}
 
 	// 日志大小和保存设置
-	if config.SYSConf.Log.MaxSize < 1 {
-		config.SYSConf.Log.MaxSize = LogFileMaxSize
+	if config.LogConf.MaxSize < 1 {
+		config.LogConf.MaxSize = LogFileMaxSize
 	}
-	if config.SYSConf.Log.MaxBackups < 1 {
-		config.SYSConf.Log.MaxBackups = LogFileMaxBackups
+	if config.LogConf.MaxBackups < 1 {
+		config.LogConf.MaxBackups = LogFileMaxBackups
 	}
-	if config.SYSConf.Log.MaxAge < 1 {
-		config.SYSConf.Log.MaxAge = LogFileMaxAge
+	if config.LogConf.MaxAge < 1 {
+		config.LogConf.MaxAge = LogFileMaxAge
 	}
 
 	// 单个 CPU 的 UDP 并发读取协程数, 默认为 2
-	if config.SYSConf.UDPGoReadNum1CPU < 1 {
-		config.SYSConf.UDPGoReadNum1CPU = UDPGoReadNum1CPU
+	if config.UDPConf.GoReadNum1CPU < 1 {
+		config.UDPConf.GoReadNum1CPU = UDPGoReadNum1CPU
 	}
-	config.SYSConf.UDPGoReadNum = utils.MinInt(config.SYSConf.UDPGoReadNum1CPU*runtime.NumCPU(), UDPGoReadNumMax)
+	config.UDPConf.GoReadNum = utils.MinInt(config.UDPConf.GoReadNum1CPU*runtime.NumCPU(), UDPGoReadNumMax)
 
 	// UDP 协议原型
-	if config.SYSConf.UDPProto != "gnet" {
-		config.SYSConf.UDPProto = "default"
+	if config.UDPConf.Proto != "gnet" {
+		config.UDPConf.Proto = "default"
 	}
 
 	// 数据分发通道缓存大小
-	if config.SYSConf.DataChanSize < 1 {
-		config.SYSConf.DataChanSize = DataChanSize
+	if config.DataConf.ChanSize < 1 {
+		config.DataConf.ChanSize = DataChanSize
 	}
 
 	// 数据分发通道最大缓存数限制, 0 为无限
-	if config.SYSConf.DataChanMaxBufCap < 0 {
-		config.SYSConf.DataChanMaxBufCap = DataChanMaxBufCap
+	if config.DataConf.ChanMaxBufCap < 0 {
+		config.DataConf.ChanMaxBufCap = DataChanMaxBufCap
 	}
 
 	// 优先使用配置中的绑定参数(HTTP)
-	if config.SYSConf.WebServerAddr == "" {
-		config.SYSConf.WebServerAddr = WebServerAddr
+	if config.WebConf.ServerAddr == "" {
+		config.WebConf.ServerAddr = WebServerAddr
 	}
 
 	// 证书文件存在时开启 HTTPS
-	config.SYSConf.WebCertFile = os.Getenv(WebCertFile)
-	config.SYSConf.WebKeyFile = os.Getenv(WebKeyFile)
-	if utils.IsFile(config.SYSConf.WebCertFile) && utils.IsFile(config.SYSConf.WebKeyFile) {
+	config.WebConf.CertFile = os.Getenv(WebCertFileEnv)
+	config.WebConf.KeyFile = os.Getenv(WebKeyFileEnv)
+	if utils.IsFile(config.WebConf.CertFile) && utils.IsFile(config.WebConf.KeyFile) {
 		// 优先使用配置中的绑定参数(HTTPS)
-		if config.SYSConf.WebServerHttpsAddr == "" {
-			config.SYSConf.WebServerHttpsAddr = WebServerHttpsAddr
+		if config.WebConf.ServerHttpsAddr == "" {
+			config.WebConf.ServerHttpsAddr = WebServerHttpsAddr
 		}
 	} else {
-		config.SYSConf.WebServerHttpsAddr = ""
+		config.WebConf.ServerHttpsAddr = ""
 	}
 
 	// 优先使用配置中的绑定参数(Tunnel)
-	if config.SYSConf.TunServerAddr == "" {
-		config.SYSConf.TunServerAddr = TunServerAddr
+	if config.TunConf.ServerAddr == "" {
+		config.TunConf.ServerAddr = TunServerAddr
 	}
 
 	// 优先使用配置中的绑定参数(UDP带应答)
-	if config.SYSConf.UDPServerRWAddr == "" {
-		config.SYSConf.UDPServerRWAddr = UDPServerRWAddr
+	if config.UDPConf.ServerRWAddr == "" {
+		config.UDPConf.ServerRWAddr = UDPServerRWAddr
 	}
 
 	// 优先使用配置中的绑定参数(UDP不带应答)
-	if config.SYSConf.UDPServerRAddr == "" {
-		config.SYSConf.UDPServerRAddr = UDPServerRAddr
+	if config.UDPConf.ServerRAddr == "" {
+		config.UDPConf.ServerRAddr = UDPServerRAddr
 	}
 
 	// Tunnel 发送队列容量
-	if config.SYSConf.TunSendQueueSize < TunSendQueueSize {
-		config.SYSConf.TunSendQueueSize = TunSendQueueSize
+	if config.TunConf.SendQueueSize < TunSendQueueSize {
+		config.TunConf.SendQueueSize = TunSendQueueSize
 	}
 
 	// Tunnel 压缩传输数据最小字节数
-	if config.SYSConf.TunCompressMinSize < TunCompressMinSize {
-		config.SYSConf.TunCompressMinSize = TunCompressMinSize
+	if config.TunConf.CompressMinSize < TunCompressMinSize {
+		config.TunConf.CompressMinSize = TunCompressMinSize
 	}
 
 	// Tunnel 单个 CPU 的发送客户端数, 默认为 2
-	if config.SYSConf.TunClientNum1CPU < 1 {
-		config.SYSConf.TunClientNum1CPU = TunClientNum1CPU
+	if config.TunConf.ClientNum1CPU < 1 {
+		config.TunConf.ClientNum1CPU = TunClientNum1CPU
 	}
-	config.SYSConf.TunClientNum = utils.MinInt(config.SYSConf.TunClientNum1CPU*runtime.NumCPU(), TunClientNumMax)
+	config.TunConf.ClientNum = utils.MinInt(config.TunConf.ClientNum1CPU*runtime.NumCPU(), TunClientNumMax)
 
 	// ES 慢查询日志时间设置
-	if config.SYSConf.ESSlowQuery < 1 {
-		config.SYSConf.ESSlowQueryDuration = ESSlowQueryDuration
+	if config.WebConf.ESSlowQuery < 1 {
+		config.WebConf.ESSlowQueryDuration = ESSlowQueryDuration
 	} else {
-		config.SYSConf.ESSlowQueryDuration = time.Duration(config.SYSConf.ESSlowQuery) * time.Second
+		config.WebConf.ESSlowQueryDuration = time.Duration(config.WebConf.ESSlowQuery) * time.Second
 	}
 
 	// Web 慢响应日志时间设置
-	if config.SYSConf.WebSlowResponse < 1 {
-		config.SYSConf.WebSlowRespDuration = WebSlowRespDuration
+	if config.WebConf.SlowResponse < 1 {
+		config.WebConf.SlowResponseDuration = WebSlowResponseDuration
 	} else {
-		config.SYSConf.WebSlowRespDuration = time.Duration(config.SYSConf.WebSlowResponse) * time.Second
+		config.WebConf.SlowResponseDuration = time.Duration(config.WebConf.SlowResponse) * time.Second
 	}
 
 	// HTTP 响应码日志设置, 默认 >= 500
-	if config.SYSConf.WebErrCodeLog < 1 {
-		config.SYSConf.WebErrCodeLog = WebErrorCodeLog
+	if config.WebConf.ErrCodeLog < 1 {
+		config.WebConf.ErrCodeLog = WebErrorCodeLog
 	}
 
 	// ES 查询请求代理时的超时秒数, 默认: 30s
-	if config.SYSConf.WebESAPITimeoutSecond < 1 {
-		config.SYSConf.WebESAPITimeout = WebESAPITimeout
+	if config.WebConf.ESAPITimeoutSecond < 1 {
+		config.WebConf.ESAPITimeout = WebESAPITimeout
 	} else {
-		config.SYSConf.WebESAPITimeout = time.Duration(config.SYSConf.WebESAPITimeoutSecond) * time.Second
+		config.WebConf.ESAPITimeout = time.Duration(config.WebConf.ESAPITimeoutSecond) * time.Second
 	}
 
 	// 以接口名为键的配置集合
@@ -340,18 +357,18 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	}
 
 	// 每次获取远程主配置的时间间隔, < 30 秒则禁用该功能
-	if config.SYSConf.MainConfig.Interval > 29 {
+	if config.MainConf.Interval > 29 {
 		// 远程获取主配置 API, 解密 SecretName
-		if config.SYSConf.MainConfig.SecretName != "" {
-			config.SYSConf.MainConfig.SecretValue = utils.GetenvDecrypt(config.SYSConf.MainConfig.SecretName,
+		if config.MainConf.SecretName != "" {
+			config.MainConf.SecretValue = utils.GetenvDecrypt(config.MainConf.SecretName,
 				config.SYSConf.BaseSecretValue)
-			if config.SYSConf.MainConfig.SecretValue == "" {
-				return nil, nil, nil, nil, fmt.Errorf("%s cannot be empty", config.SYSConf.MainConfig.SecretName)
+			if config.MainConf.SecretValue == "" {
+				return nil, nil, nil, nil, fmt.Errorf("%s cannot be empty", config.MainConf.SecretName)
 			}
 		}
-		config.SYSConf.MainConfig.GetConfDuration = time.Duration(config.SYSConf.MainConfig.Interval) * time.Second
+		config.MainConf.GetConfDuration = time.Duration(config.MainConf.Interval) * time.Second
 	}
-	config.SYSConf.MainConfig.Path = ConfigFile
+	config.MainConf.Path = ConfigFile
 
 	// 文件变化监控时间间隔
 	if config.SYSConf.WatcherInterval < 1 {
@@ -369,56 +386,59 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	}
 
 	// HTTP 请求体限制, -1 表示无限
-	if config.SYSConf.LimitBody == 0 {
-		config.SYSConf.LimitBody = BodyLimit
+	if config.WebConf.LimitBody == 0 {
+		config.WebConf.LimitBody = BodyLimit
 	}
 
 	// 数据处理并发协程数限制
-	if config.SYSConf.DataProcessorSize < 10 {
-		config.SYSConf.DataProcessorSize = DataProcessorSize
+	if config.DataConf.ProcessorSize < 10 {
+		config.DataConf.ProcessorSize = DataProcessorSize
 	}
-	if config.SYSConf.DataProcessorMaxWorkerSize < 10000 {
-		config.SYSConf.DataProcessorMaxWorkerSize = DataProcessorMaxWorkerSize
+	if config.DataConf.ProcessorMaxWorkerSize < 10000 {
+		config.DataConf.ProcessorMaxWorkerSize = DataProcessorMaxWorkerSize
 	}
 
 	// ES Bulk 写入并发协程限制
-	if config.SYSConf.ESBulkWorkerSize < 1 {
-		config.SYSConf.ESBulkWorkerSize = ESBulkWorkerSize
+	if config.DataConf.ESBulkWorkerSize < 1 {
+		config.DataConf.ESBulkWorkerSize = ESBulkWorkerSize
 	}
-	if config.SYSConf.ESBulkMaxWorkerSize < ESBulkMinWorkerSize {
-		config.SYSConf.ESBulkMaxWorkerSize = ESBulkMaxWorkerSize
+	if config.DataConf.ESBulkMaxWorkerSize < ESBulkMinWorkerSize {
+		config.DataConf.ESBulkMaxWorkerSize = ESBulkMaxWorkerSize
 	}
 
 	// ES 基于排队数的繁忙比率定义
-	if config.SYSConf.ESBusyPercent < 0.01 || config.SYSConf.ESBusyPercent > 1 {
-		config.SYSConf.ESBusyPercent = ESBusyPercent
+	if config.DataConf.ESBusyPercent < 0.01 || config.DataConf.ESBusyPercent > 1 {
+		config.DataConf.ESBusyPercent = ESBusyPercent
 	}
 
 	// ES Bulk 单次批量数量
-	if config.SYSConf.ESPostBatchNum < 100 {
-		config.SYSConf.ESPostBatchNum = ESPostBatchNum
+	if config.DataConf.ESPostBatchNum < 100 {
+		config.DataConf.ESPostBatchNum = ESPostBatchNum
 	}
 
 	// ES Bulk 单次批量大小
-	if config.SYSConf.ESPostBatchBytes < 1 {
-		config.SYSConf.ESPostBatchBytes = ESPostBatchBytes
+	if config.DataConf.ESPostBatchMB < 1 {
+		config.DataConf.ESPostBatchBytes = ESPostBatchBytes
 	} else {
 		// 配置文件单位是 MB
-		config.SYSConf.ESPostBatchBytes = config.SYSConf.ESPostBatchBytes << 20
+		config.DataConf.ESPostBatchBytes = config.DataConf.ESPostBatchMB << 20
 	}
 
 	// ES Bulk 单次批量最大时间间隔
-	if config.SYSConf.ESPostMaxInterval < 100 {
-		config.SYSConf.ESPostMaxIntervalDuration = ESPostMaxInterval
+	if config.DataConf.ESPostMaxInterval < 100 {
+		config.DataConf.ESPostMaxIntervalDuration = ESPostMaxInterval
 	} else {
-		config.SYSConf.ESPostMaxIntervalDuration = time.Duration(config.SYSConf.ESPostMaxInterval) * time.Millisecond
+		config.DataConf.ESPostMaxIntervalDuration = time.Duration(config.DataConf.ESPostMaxInterval) * time.Millisecond
 	}
 
 	// 更新状态类配置
-	config.StateConf.CheckESBulkResult = config.SYSConf.Log.Level <= int(zerolog.WarnLevel)
-	config.StateConf.CheckESBulkErrors = config.SYSConf.Log.ESBulkLevel <= int(zerolog.WarnLevel)
-	config.StateConf.RecordESBulkBody = config.SYSConf.Log.ESBulkLevel <= int(zerolog.InfoLevel)
+	config.StateConf.CheckESBulkResult = config.LogConf.Level <= int(zerolog.WarnLevel)
+	config.StateConf.CheckESBulkErrors = config.LogConf.ESBulkLevel <= int(zerolog.WarnLevel)
+	config.StateConf.RecordESBulkBody = config.LogConf.ESBulkLevel <= int(zerolog.InfoLevel)
 
+	if config.SYSConf.Debug {
+		fmt.Printf("\n\n%s\n\n", json.MustJSONIndent(config))
+	}
 	return config, apiConfig, whiteList, blackList, nil
 }
 

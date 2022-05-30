@@ -22,15 +22,15 @@ const (
 	WebServerAddr = ":6600"
 	// WebServerHttpsAddr HTTPS 接口端口
 	WebServerHttpsAddr = ":6699"
-	// WebCertFile 默认证书路径环境变量
-	WebCertFile = "DR_WEB_CERT_FILE"
-	WebKeyFile  = "DR_WEB_KEY_FILE"
+	// WebCertFileEnv 默认证书路径环境变量
+	WebCertFileEnv = "DR_WEB_CERT_FILE"
+	WebKeyFileEnv  = "DR_WEB_KEY_FILE"
 	// TunServerAddr Tunnel 绑定端口
 	TunServerAddr = ":6633"
 	// WebESAPITimeout ES 查询请求代理时的超时秒数
 	WebESAPITimeout = 30 * time.Second
-	// WebSlowRespDuration Web 慢响应日志时间设置, 默认: > 1秒则记录
-	WebSlowRespDuration = time.Second
+	// WebSlowResponseDuration Web 慢响应日志时间设置, 默认: > 1秒则记录
+	WebSlowResponseDuration = time.Second
 	// WebErrorCodeLog HTTP 响应码日志记录, 默认: 500, 即大于等于 500 的状态码记录日志
 	WebErrorCodeLog = 500
 	// BodyLimit POST 最大 500M, Request Entity Too Large

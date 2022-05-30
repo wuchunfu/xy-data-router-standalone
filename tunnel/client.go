@@ -21,7 +21,7 @@ func initTunClient() {
 	clients := newTunClients()
 	common.Log.Info().
 		Str("addr", common.ForwardTunnel).
-		Int("client_num", conf.Config.SYSConf.TunClientNum).
+		Int("client_num", conf.Config.TunConf.ClientNum).
 		Int("send_queue_size", arpc.DefaultHandler.SendQueueSize()).
 		Int("send_buffer_size", arpc.DefaultHandler.SendBufferSize()).
 		Int("recv_buffer_size", arpc.DefaultHandler.RecvBufferSize()).
@@ -52,7 +52,7 @@ func initTunClient() {
 
 // 支持创建多个 client, 每 client 支持多协程并发处理数据
 func newTunClients() (clients []*arpc.Client) {
-	for i := 0; i < conf.Config.SYSConf.TunClientNum; i++ {
+	for i := 0; i < conf.Config.TunConf.ClientNum; i++ {
 		handler := arpc.DefaultHandler.Clone()
 		handler.SetLogTag(fmt.Sprintf("[Tunnel CLI-%d%s]", i, logType))
 

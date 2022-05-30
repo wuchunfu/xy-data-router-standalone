@@ -15,7 +15,7 @@ func SetupRouter(app *fiber.App) {
 	if len(common.ForwardHTTP) > 0 {
 		app.Use("/es/", proxy.Balancer(proxy.Config{
 			Servers: common.ForwardHTTP,
-			Timeout: conf.Config.SYSConf.WebESAPITimeout,
+			Timeout: conf.Config.WebConf.ESAPITimeout,
 			ModifyRequest: func(c *fiber.Ctx) error {
 				common.SetClientIP(c)
 				return nil
@@ -27,7 +27,7 @@ func SetupRouter(app *fiber.App) {
 		}))
 		return
 	}
-	// TODO: WebESAPITimeout
+	// TODO: ESAPITimeout
 	es := app.Group("/es", middleware.CheckESWhiteList(true))
 	{
 		// ES 查询总数

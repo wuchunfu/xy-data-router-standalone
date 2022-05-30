@@ -19,35 +19,35 @@ var (
 func initUDPServer() {
 	exitUDPChan := make(chan error)
 
-	switch conf.Config.SYSConf.UDPProto {
+	switch conf.Config.UDPConf.Proto {
 	case "gnet":
 		go func() {
-			if err := udpServerG(conf.Config.SYSConf.UDPServerRWAddr, true); err != nil {
+			if err := udpServerG(conf.Config.UDPConf.ServerRWAddr, true); err != nil {
 				exitUDPChan <- err
 			}
 		}()
 		go func() {
-			if err := udpServerG(conf.Config.SYSConf.UDPServerRAddr, false); err != nil {
+			if err := udpServerG(conf.Config.UDPConf.ServerRAddr, false); err != nil {
 				exitUDPChan <- err
 			}
 		}()
 	default:
 		go func() {
-			if err := udpServer(conf.Config.SYSConf.UDPServerRWAddr, true); err != nil {
+			if err := udpServer(conf.Config.UDPConf.ServerRWAddr, true); err != nil {
 				exitUDPChan <- err
 			}
 		}()
 		go func() {
-			if err := udpServer(conf.Config.SYSConf.UDPServerRAddr, false); err != nil {
+			if err := udpServer(conf.Config.UDPConf.ServerRAddr, false); err != nil {
 				exitUDPChan <- err
 			}
 		}()
 	}
 
 	common.Log.Info().
-		Str("raddr", conf.Config.SYSConf.UDPServerRAddr).
-		Str("rwaddr", conf.Config.SYSConf.UDPServerRWAddr).
-		Str("proto", conf.Config.SYSConf.UDPProto).
+		Str("raddr", conf.Config.UDPConf.ServerRAddr).
+		Str("rwaddr", conf.Config.UDPConf.ServerRWAddr).
+		Str("proto", conf.Config.UDPConf.Proto).
 		Msg("Listening and serving UDP")
 
 	err := <-exitUDPChan
@@ -73,7 +73,7 @@ func udpServer(addr string, withSendTo bool) error {
 	// _ = conn.SetWriteBuffer(1024 * 1024 * 20)
 
 	// UDP 接口并发读取数据协程
-	for i := 0; i < conf.Config.SYSConf.UDPGoReadNum; i++ {
+	for i := 0; i < conf.Config.UDPConf.GoReadNum; i++ {
 		go udpReader(conn, withSendTo)
 	}
 

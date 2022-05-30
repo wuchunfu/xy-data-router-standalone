@@ -45,12 +45,12 @@ func releaseDataProcessor(dp *tDataProcessor) {
 // 数据处理协程池初始化
 func initDataProcessorPool() {
 	dataProcessorPool, _ = ants.NewPoolWithFunc(
-		conf.Config.SYSConf.DataProcessorSize,
+		conf.Config.DataConf.ProcessorSize,
 		func(i interface{}) {
 			dataProcessor(i.(*tDataProcessor))
 		},
 		ants.WithExpiryDuration(10*time.Second),
-		ants.WithMaxBlockingTasks(conf.Config.SYSConf.DataProcessorMaxWorkerSize),
+		ants.WithMaxBlockingTasks(conf.Config.DataConf.ProcessorMaxWorkerSize),
 		ants.WithPanicHandler(func(r interface{}) {
 			common.LogSampled.Error().Interface("recover", r).Msg("panic")
 		}),
@@ -65,7 +65,7 @@ func initESOptionalWrite() {
 	for range ticker.C {
 		// ES 批量写入排队数 > 10 且 > 最大排队数 * 0.5
 		n := esBulkTodoCount.Value()
-		m := int64(float64(conf.Config.SYSConf.ESBulkMaxWorkerSize) * conf.Config.SYSConf.ESBusyPercent)
+		m := int64(float64(conf.Config.DataConf.ESBulkMaxWorkerSize) * conf.Config.DataConf.ESBusyPercent)
 		esOptionalWrite = n > int64(conf.ESBulkMinWorkerSize) && n > m
 	}
 }
@@ -75,7 +75,7 @@ func initESOptionalWrite() {
 func dataProcessor(dp *tDataProcessor) {
 	defer releaseDataProcessor(dp)
 
-	isPostToES := !(conf.Config.SYSConf.ESDisableWrite || esOptionalWrite && dp.dr.apiConf.ESOptionalWrite)
+	isPostToES := !(conf.Config.DataConf.ESDisableWrite || esOptionalWrite && dp.dr.apiConf.ESOptionalWrite)
 	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
 	if !isPostToES {
 		// 丢弃可选写入 ES 数据项计数

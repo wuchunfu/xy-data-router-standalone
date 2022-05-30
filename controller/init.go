@@ -23,12 +23,12 @@ var fav embed.FS
 func InitWebServer() {
 	app := fiber.New(fiber.Config{
 		ServerHeader:            conf.APPName,
-		BodyLimit:               conf.Config.SYSConf.LimitBody,
-		ReduceMemoryUsage:       conf.Config.SYSConf.ReduceMemoryUsage,
-		ProxyHeader:             conf.Config.SYSConf.ProxyHeader,
-		EnableTrustedProxyCheck: conf.Config.SYSConf.EnableTrustedProxyCheck,
-		TrustedProxies:          conf.Config.SYSConf.TrustedProxies,
-		DisableKeepalive:        !conf.Config.SYSConf.EnableKeepalive,
+		BodyLimit:               conf.Config.WebConf.LimitBody,
+		ReduceMemoryUsage:       conf.Config.WebConf.ReduceMemoryUsage,
+		ProxyHeader:             conf.Config.WebConf.ProxyHeader,
+		EnableTrustedProxyCheck: conf.Config.WebConf.EnableTrustedProxyCheck,
+		TrustedProxies:          conf.Config.WebConf.TrustedProxies,
+		DisableKeepalive:        conf.Config.WebConf.DisableKeepalive,
 		JSONEncoder:             json.Marshal,
 		JSONDecoder:             json.Unmarshal,
 		DisableStartupMessage:   true,
@@ -38,7 +38,7 @@ func InitWebServer() {
 	})
 
 	// 限流 (有一定的 CPU 占用)
-	if conf.Config.SYSConf.LimitExpiration > 0 && conf.Config.SYSConf.LimitRequest > 0 {
+	if conf.Config.WebConf.LimitExpiration > 0 && conf.Config.WebConf.LimitRequest > 0 {
 		app.Use(middleware.IPLimiter())
 	}
 
@@ -54,18 +54,18 @@ func InitWebServer() {
 	)
 	setupRouter(app)
 
-	if conf.Config.SYSConf.WebServerHttpsAddr != "" {
+	if conf.Config.WebConf.ServerHttpsAddr != "" {
 		go func() {
-			common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerHttpsAddr).Msg("Listening and serving HTTPS")
-			if err := app.ListenTLS(conf.Config.SYSConf.WebServerHttpsAddr,
-				conf.Config.SYSConf.WebCertFile, conf.Config.SYSConf.WebKeyFile); err != nil {
+			common.Log.Info().Str("addr", conf.Config.WebConf.ServerHttpsAddr).Msg("Listening and serving HTTPS")
+			if err := app.ListenTLS(conf.Config.WebConf.ServerHttpsAddr,
+				conf.Config.WebConf.CertFile, conf.Config.WebConf.KeyFile); err != nil {
 				log.Fatalln("Failed to start HTTPS Server:", err, "\nbye.")
 			}
 		}()
 	}
 
-	common.Log.Info().Str("addr", conf.Config.SYSConf.WebServerAddr).Msg("Listening and serving HTTP")
-	if err := app.Listen(conf.Config.SYSConf.WebServerAddr); err != nil {
+	common.Log.Info().Str("addr", conf.Config.WebConf.ServerAddr).Msg("Listening and serving HTTP")
+	if err := app.Listen(conf.Config.WebConf.ServerAddr); err != nil {
 		log.Fatalln("Failed to start HTTP Server:", err, "\nbye.")
 	}
 }

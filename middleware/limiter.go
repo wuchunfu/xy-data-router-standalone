@@ -13,8 +13,8 @@ import (
 // IPLimiter 基于请求 IP 限流
 func IPLimiter() fiber.Handler {
 	return limiter.New(limiter.Config{
-		Max:        conf.Config.SYSConf.LimitRequest,
-		Expiration: time.Duration(conf.Config.SYSConf.LimitExpiration) * time.Second,
+		Max:        conf.Config.WebConf.LimitRequest,
+		Expiration: time.Duration(conf.Config.WebConf.LimitExpiration) * time.Second,
 		KeyGenerator: func(c *fiber.Ctx) string {
 			return common.GetClientIP(c)
 		},
