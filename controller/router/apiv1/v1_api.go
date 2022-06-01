@@ -3,6 +3,7 @@ package apiv1
 import (
 	"strings"
 
+	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/tidwall/sjson"
@@ -46,7 +47,7 @@ func apiHandler(c *fiber.Ctx) error {
 				return middleware.APIFailure(c, "数据解压失败")
 			}
 		} else {
-			body = utils.CopyBytes(c.Body())
+			body = bytespool.NewBytes(c.Body())
 		}
 
 		if strings.HasSuffix(uri, "/bulk") {
