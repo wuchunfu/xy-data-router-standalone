@@ -4,6 +4,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/fufuok/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/tidwall/gjson"
 
@@ -65,15 +66,17 @@ func parseESResult(resp *tResponse, params *tParams, ret *tResult) *tResult {
 	}
 
 	if resp.response.IsError() {
-		ret.ErrMsg = "查询失败, 查询语句有误"
+		reason := gjson.GetBytes(res, "error.reason").String()
+		msg := "查询失败, 查询语句有误"
+		ret.ErrMsg = utils.AddString(msg, ": ", reason)
 		common.LogSampled.Warn().
 			RawJSON("body", json.MustJSON(params.Body)).
 			Int("http_code", resp.response.StatusCode).
 			Str("client_ip", params.ClientIP).
 			Str("index", params.Index).
 			Str("error_type", gjson.GetBytes(res, "error.type").String()).
-			Str("error_reason", gjson.GetBytes(res, "error.reason").String()).
-			Msg(ret.ErrMsg)
+			Str("error_reason", reason).
+			Msg(msg)
 		return ret
 	}
 
