@@ -7,7 +7,7 @@ import (
 	"github.com/fufuok/xy-data-router/internal/json"
 )
 
-var apiSuccessNil = json.MustJSON(common.APISuccessNil())
+var apiSuccessNil = json.MustJSON(common.APISuccessNilData())
 
 // APIException 通用异常处理
 func APIException(c *fiber.Ctx, code int, msg string) error {
@@ -30,7 +30,7 @@ func APISuccess(c *fiber.Ctx, data interface{}, count int) error {
 // APISuccessBytes 返回成功, JSON 字节数据, 状态码: 200
 func APISuccessBytes(c *fiber.Ctx, data []byte, count int) error {
 	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
-	return c.Send(common.APISuccessBytes(data, count))
+	return c.Send(common.APISuccessBytesData(data, count))
 }
 
 // APISuccessNil 返回成功, 无数据, 状态码: 200
