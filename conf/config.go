@@ -37,7 +37,6 @@ type tSYSConf struct {
 	RestartMain     bool   `json:"restart_main"`
 	WatcherInterval int    `json:"watcher_interval"`
 	HeartbeatIndex  string `json:"heartbeat_index"`
-	ESAPILogIndex   string `json:"esapi_log_index"`
 	BaseSecretValue string
 }
 
@@ -69,6 +68,7 @@ type tWebConf struct {
 	TrustedProxies          []string `json:"trusted_proxies"`
 	ESAPITimeoutSecond      int      `json:"esapi_timeout_second"`
 	ESSlowQuery             int      `json:"es_slow_query"`
+	ESAPILogIndex           string   `json:"esapi_log_index"`
 	ESSlowQueryDuration     time.Duration
 	SlowResponseDuration    time.Duration
 	ESAPITimeout            time.Duration
@@ -381,8 +381,8 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	}
 
 	// ES 查询接口日志索引
-	if config.SYSConf.ESAPILogIndex == "" {
-		config.SYSConf.ESAPILogIndex = ESAPILogIndex
+	if config.WebConf.ESAPILogIndex == "" {
+		config.WebConf.ESAPILogIndex = ESAPILogIndex
 	}
 
 	// HTTP 请求体限制, -1 表示无限
