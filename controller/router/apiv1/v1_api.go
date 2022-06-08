@@ -42,9 +42,9 @@ func apiHandler(c *fiber.Ctx) error {
 			// 请求体解压缩
 			var err error
 			uri = uri[:len(uri)-5]
-			body, err = gzip.Unzip(body)
+			body, err = gzip.Unzip(c.Body())
 			if err != nil {
-				return middleware.APIFailure(c, "数据解压失败")
+				return middleware.APIFailure(c, "数据解压失败: "+err.Error())
 			}
 		} else {
 			body = bytespool.NewBytes(c.Body())
