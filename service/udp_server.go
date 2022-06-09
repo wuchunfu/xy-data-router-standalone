@@ -91,7 +91,7 @@ func udpReader(conn *net.UDPConn, withSendTo bool) {
 
 		clientIP := clientAddr.IP.String()
 
-		if withSendTo || n < 7 {
+		if withSendTo || n < jsonMinLen {
 			out := outBytes
 			if n == 2 {
 				// 返回客户端 IP
@@ -102,7 +102,7 @@ func udpReader(conn *net.UDPConn, withSendTo bool) {
 			})
 		}
 
-		if n >= 7 {
+		if n >= jsonMinLen {
 			item := schema.NewSafeBody("", clientIP, buf[:n])
 			_ = common.GoPool.Submit(func() {
 				if !saveUDPData(item) {

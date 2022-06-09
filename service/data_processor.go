@@ -87,7 +87,7 @@ func dataProcessor(dp *tDataProcessor) {
 
 	// 兼容 {body} 或 {body}=-:-=[{body},{body}]
 	for _, js := range bytes.Split(pretty.Ugly(dp.data.Body), esBodySep) {
-		if len(js) == 0 {
+		if len(js) < jsonMinLen {
 			continue
 		}
 
@@ -114,6 +114,9 @@ func dataProcessor(dp *tDataProcessor) {
 
 func sendOneData(dp *tDataProcessor, js []byte, isPostToES, isPostToAPI bool) {
 	jsData := appendSYSField(js, dp.data.IP)
+	if jsData == nil {
+		return
+	}
 	if isPostToES {
 		esData := bytespool.Make(dp.dr.apiConf.ESBulkHeaderLength + len(jsData) + 1)
 		esData = append(esData, dp.dr.apiConf.ESBulkHeader...)
@@ -134,13 +137,13 @@ func sendOneData(dp *tDataProcessor, js []byte, isPostToES, isPostToAPI bool) {
 	}
 }
 
-// 附加系统字段: 入参 JS 数据必须为 {JSON字典}, Immutable
-// 返回值使用完成后可以回收:
+// 附加系统字段, 已存在 _cip 字段时不重复附加, Immutable
+// 返回值使用完成后可以回收, 如:
 // jsData := appendSYSField([]byte(`{"f":"f"}`, "1.1.1.1")
 // bytespool.Release(jsData)
 func appendSYSField(js []byte, ip string) []byte {
 	n := len(js)
-	if n == 0 {
+	if n < jsonMinLen {
 		return nil
 	}
 

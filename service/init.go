@@ -10,29 +10,8 @@ import (
 	"github.com/fufuok/xy-data-router/schema"
 )
 
-// 数据分发
-type tDataRouter struct {
-	// 数据接收信道
-	drChan *chanx.UnboundedChan
-
-	// 接口配置
-	apiConf *conf.TAPIConf
-
-	// 数据分发信道索引
-	drOut *tDataRouterOut
-}
-
-// 数据分发信道
-type tDataRouterOut struct {
-	esChan  *chanx.UnboundedChan
-	apiChan *chanx.UnboundedChan
-}
-
-// 数据处理
-type tDataProcessor struct {
-	dr   *tDataRouter
-	data *schema.DataItem
-}
+// JS 数据必须为 JSON 字典, 数据至少包含 1 个键值对, 即最小长为 7, 如: {"L":7}
+const jsonMinLen = 7
 
 var (
 	// ES 数据分隔符
@@ -95,6 +74,30 @@ var (
 	// ES 写入协程池
 	esBulkPool *ants.PoolWithFunc
 )
+
+// 数据分发
+type tDataRouter struct {
+	// 数据接收信道
+	drChan *chanx.UnboundedChan
+
+	// 接口配置
+	apiConf *conf.TAPIConf
+
+	// 数据分发信道索引
+	drOut *tDataRouterOut
+}
+
+// 数据分发信道
+type tDataRouterOut struct {
+	esChan  *chanx.UnboundedChan
+	apiChan *chanx.UnboundedChan
+}
+
+// 数据处理
+type tDataProcessor struct {
+	dr   *tDataRouter
+	data *schema.DataItem
+}
 
 func InitService() {
 	// 初始化 ES 数据信道

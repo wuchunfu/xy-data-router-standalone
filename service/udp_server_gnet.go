@@ -33,7 +33,7 @@ func (s *tUDPServerG) React(frame []byte, c gnet.Conn) (out []byte, action gnet.
 	clientIP := ip.String()
 
 	n := len(frame)
-	if s.withSendTo || n < 7 {
+	if s.withSendTo || n < jsonMinLen {
 		out = outBytes
 		if n == 2 {
 			// 返回客户端 IP
@@ -41,7 +41,7 @@ func (s *tUDPServerG) React(frame []byte, c gnet.Conn) (out []byte, action gnet.
 		}
 	}
 
-	if n >= 7 {
+	if n >= jsonMinLen {
 		item := schema.NewSafeBody("", clientIP, frame)
 		_ = common.GoPool.Submit(func() {
 			if !saveUDPData(item) {
