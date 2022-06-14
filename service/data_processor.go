@@ -86,7 +86,8 @@ func dataProcessor(dp *tDataProcessor) {
 	}
 
 	// 兼容 {body} 或 {body}=-:-=[{body},{body}]
-	for _, js := range bytes.Split(pretty.Ugly(dp.data.Body), esBodySep) {
+	dp.data.Body = pretty.UglyInPlace(dp.data.Body)
+	for _, js := range bytes.Split(dp.data.Body, esBodySep) {
 		if len(js) < jsonMinLen {
 			continue
 		}
