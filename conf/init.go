@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/fufuok/utils"
-	"github.com/imroc/req"
 )
 
 var (
@@ -44,7 +43,7 @@ var (
 	ESBlackListConfig map[*net.IPNet]struct{}
 
 	// ReqUserAgent 请求名称
-	ReqUserAgent = req.Header{"User-Agent": APPName + "/" + Version}
+	ReqUserAgent = APPName + "/" + Version
 
 	// ForwardHost 上联服务地址, IP / 域名
 	// 启动数据客户端, 将 ES 数据转交到上联 Tunnel Server

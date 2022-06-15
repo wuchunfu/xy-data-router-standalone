@@ -35,8 +35,7 @@
   "web_conf": {
     "server_addr": ":6600",
     "server_https_addr": ":6699",
-    "__DisableKeepalive": "压测时要设置为 false, 实际使用场景短连接 (true) 更合适",
-    "disable_keepalive": true,
+    "disable_keepalive": false,
     "__ReduceMemoryUsage": "减少内存占用(可能增加CPU占用), 默认关闭",
     "reduce_memory_usage": true,
     "__LimitBody": "HTTP 请求体限制, -1 表示无限, 0 表示使用默认值: 500MiB",
@@ -110,7 +109,9 @@
     "__ProcessorSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",
     "processor_size": 3000,
     "__ProcessorMaxWorkerSize": "数据处理最大排队大小, 达到该值会丢弃, 最低: 10000, 默认 100000 个数据",
-    "processor_max_worker_size": 100000
+    "processor_max_worker_size": 100000,
+    "__APIClientTimeout": "数据分发到其他接口时请求超时时间(秒), 默认: 30",
+    "api_client_timeout": 30
   },
   "api_conf": [
     {

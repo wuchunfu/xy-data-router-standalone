@@ -108,8 +108,10 @@ type tDataConf struct {
 	ChanMaxBufCap             int      `json:"chan_max_buf_cap"`
 	ProcessorSize             int      `json:"processor_size"`
 	ProcessorMaxWorkerSize    int      `json:"processor_max_worker_size"`
+	APIClientTimeout          int      `json:"api_client_timeout"`
 	ESPostBatchBytes          int
 	ESPostMaxIntervalDuration time.Duration
+	APIClientTimeoutDuration  time.Duration
 }
 
 type tStateConf struct {
@@ -429,6 +431,13 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		config.DataConf.ESPostMaxIntervalDuration = ESPostMaxInterval
 	} else {
 		config.DataConf.ESPostMaxIntervalDuration = time.Duration(config.DataConf.ESPostMaxInterval) * time.Millisecond
+	}
+
+	// 数据分发到其他接口时请求默认超时时间
+	if config.DataConf.APIClientTimeout < 1 {
+		config.DataConf.APIClientTimeoutDuration = APIClientTimeoutDuration
+	} else {
+		config.DataConf.APIClientTimeoutDuration = time.Duration(config.DataConf.APIClientTimeout) * time.Second
 	}
 
 	// 更新状态类配置

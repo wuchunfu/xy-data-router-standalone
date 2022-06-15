@@ -62,6 +62,9 @@ func Watcher() {
 				// 日志配置更新
 				_ = common.InitLogger()
 
+				// 客户端请求配置更新
+				common.InitReq()
+
 				// 同步数据分发器配置
 				service.InitDataRouter()
 

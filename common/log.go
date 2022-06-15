@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/imroc/req"
 	"github.com/rs/zerolog"
 	"gopkg.in/natefinch/lumberjack.v2"
 
@@ -53,8 +52,6 @@ func InitLogger() error {
 		WarnSampler:  sampler,
 		ErrorSampler: sampler,
 	})
-
-	req.Debug = conf.Debug
 
 	return nil
 }

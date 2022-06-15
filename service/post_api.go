@@ -1,13 +1,13 @@
 package service
 
 import (
+	"sync"
 	"time"
 
 	"github.com/fufuok/bytespool"
-	"github.com/imroc/req"
+	"github.com/imroc/req/v3"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/schema"
 )
 
@@ -59,6 +59,10 @@ func apiWorker(dr *tDataRouter) {
 
 // 推送数据到 API
 func postAPI(dis *tDataItems, api []string) {
+	defer dis.release()
+	if len(api) == 0 {
+		return
+	}
 	// [json,json]
 	apiBody := bytespool.Make(dis.size + dis.count + 1)
 	apiBody = append(apiBody, '[')
@@ -67,12 +71,20 @@ func postAPI(dis *tDataItems, api []string) {
 		apiBody = append(apiBody, ',')
 	}
 	apiBody[len(apiBody)-1] = ']'
-	dis.release()
+	// 分发数据到接口 POST JSON
 	_ = common.GoPool.Submit(func() {
+		defer bytespool.Release(apiBody)
+		var wg sync.WaitGroup
 		for _, u := range api {
-			if _, err := req.Post(u, req.BodyJSON(apiBody), conf.ReqUserAgent); err != nil {
-				common.LogSampled.Error().Err(err).Str("url", u).Msg("apiWorker")
-			}
+			wg.Add(1)
+			apiUrl := u
+			_ = common.GoPool.Submit(func() {
+				defer wg.Done()
+				if _, err := req.SetBodyJsonBytes(apiBody).Post(apiUrl); err != nil {
+					common.LogSampled.Error().Err(err).Str("url", apiUrl).Msg("apiWorker")
+				}
+			})
 		}
+		wg.Wait()
 	})
 }
