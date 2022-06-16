@@ -49,6 +49,12 @@ func APISuccessData(data interface{}, count int) *TAPIData {
 	}
 }
 
+// APISuccessBytesData API 请求成功返回值(JSON Bytes)
+func APISuccessBytesData(data []byte, count int) []byte {
+	n := utils.S2B(strconv.Itoa(count))
+	return utils.JoinBytes(okA, data, okB, n, okC)
+}
+
 // APISuccessNilData API 请求成功返回, 无数据
 func APISuccessNilData() *TAPIData {
 	return &TAPIData{
@@ -59,10 +65,4 @@ func APISuccessNilData() *TAPIData {
 		Data:  nil,
 		Count: 0,
 	}
-}
-
-// APISuccessBytesData API 请求成功返回值(JSON Bytes)
-func APISuccessBytesData(data []byte, count int) []byte {
-	n := utils.S2B(strconv.Itoa(count))
-	return utils.JoinBytes(okA, data, okB, n, okC)
 }

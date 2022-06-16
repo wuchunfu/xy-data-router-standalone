@@ -34,7 +34,6 @@ func InitWebServer() {
 		DisableStartupMessage:   true,
 		StrictRouting:           true,
 		ErrorHandler:            errorHandler,
-		// Immutable:             true,
 	})
 
 	// 限流 (有一定的 CPU 占用)
