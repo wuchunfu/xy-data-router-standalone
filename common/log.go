@@ -17,6 +17,11 @@ var (
 	LogSampled zerolog.Logger
 )
 
+// 注意: 受抽样日志影响, 日志可能不会被全部输出
+type reqLogger struct {
+	log zerolog.Logger
+}
+
 func initLogger() {
 	if err := InitLogger(); err != nil {
 		log.Fatalln("Failed to initialize logger:", err, "\nbye.")
@@ -78,4 +83,28 @@ func LogConfig() error {
 	Log = Log.Level(zerolog.Level(conf.Config.LogConf.Level))
 
 	return nil
+}
+
+// Req 日志
+func newReqLogger() *reqLogger {
+	if reqDebug {
+		return &reqLogger{
+			log: Log,
+		}
+	}
+	return &reqLogger{
+		log: LogSampled,
+	}
+}
+
+func (l *reqLogger) Debugf(format string, v ...interface{}) {
+	l.log.Debug().Msgf(format, v...)
+}
+
+func (l *reqLogger) Warnf(format string, v ...interface{}) {
+	l.log.Warn().Msgf(format, v...)
+}
+
+func (l *reqLogger) Errorf(format string, v ...interface{}) {
+	l.log.Error().Msgf(format, v...)
 }

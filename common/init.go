@@ -45,8 +45,8 @@ func InitCommon() {
 	// 初始化日志环境
 	initLogger()
 
-	// 初始化客户端连接配置
-	InitReq()
+	// 初始化 HTTP 客户端连接配置
+	initReq()
 
 	// 初始化代理参数
 	initProxy()
