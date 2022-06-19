@@ -1,18 +1,34 @@
 package tunnel
 
 import (
+	"github.com/lesismal/arpc/log"
 	"github.com/rs/zerolog"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 )
 
-var logType = " LogSampled"
+var (
+	logType   = " LogSampled"
+	arpcDebug bool
+)
 
 // zerolog of arpc
 // 注意: 受抽样日志影响, 日志可能不会被全部输出
 type logger struct {
 	log zerolog.Logger
+}
+
+func initLogger() {
+	log.SetLogger(newLogger())
+}
+
+func InitLogger() {
+	if arpcDebug == conf.Debug {
+		return
+	}
+	arpcDebug = conf.Debug
+	log.SetLogger(newLogger())
 }
 
 func newLogger() *logger {

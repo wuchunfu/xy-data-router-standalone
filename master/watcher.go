@@ -9,6 +9,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/tunnel"
 )
 
 // Watcher 监听程序二进制变化(重启)和配置文件(热加载)
@@ -62,7 +63,10 @@ func Watcher() {
 				// 日志配置更新
 				_ = common.InitLogger()
 
-				// 客户端请求配置更新
+				// 更新 Tunnel 日志配置
+				tunnel.InitLogger()
+
+				// 更新 HTTP 客户端请求配置
 				common.InitReq()
 
 				// 同步数据分发器配置
