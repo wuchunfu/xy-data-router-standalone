@@ -447,6 +447,8 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 
 	if config.SYSConf.Debug {
 		fmt.Printf("\n\n%s\n\n", json.MustJSONIndent(config))
+		fmt.Printf("\nWhitelist:\n%s\n\n", whiteList)
+		fmt.Printf("\nBlackList:\n%s\n\n", blackList)
 	}
 	return config, apiConfig, whiteList, blackList, nil
 }
