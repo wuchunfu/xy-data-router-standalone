@@ -64,6 +64,7 @@ func sysStatus() map[string]interface{} {
 		"Version":      conf.Version,
 		"GitCommit":    conf.GitCommit,
 		"Uptime":       time.Since(start).String(),
+		"StartTime":    start,
 		"Debug":        conf.Debug,
 		"LogLevel":     zerolog.Level(conf.Config.LogConf.Level).String(),
 		"ConfigVer":    ver.LastUpdate,

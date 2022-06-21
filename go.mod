@@ -7,14 +7,13 @@ require (
 	github.com/fufuok/bytespool v1.1.1
 	github.com/fufuok/chanx v0.0.107
 	github.com/fufuok/timewheel v1.1.100
-	github.com/fufuok/utils v0.3.15
+	github.com/fufuok/utils v0.4.0
 	github.com/goccy/go-json v0.9.4
 	github.com/gofiber/fiber/v2 v2.27.0
-	github.com/imroc/req v0.3.2
 	github.com/imroc/req/v3 v3.7.6
-	github.com/klauspost/compress v1.14.3
+	github.com/klauspost/compress v1.14.4
 	github.com/lesismal/arpc v1.2.5
-	github.com/panjf2000/ants/v2 v2.4.7
+	github.com/panjf2000/ants/v2 v2.4.8
 	github.com/panjf2000/gnet v1.6.4
 	github.com/rs/zerolog v1.26.1
 	github.com/tidwall/gjson v1.14.0
@@ -36,6 +35,6 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
+	golang.org/x/sys v0.0.0-20220222200937-f2425489ef4c // indirect
 	golang.org/x/text v0.3.7 // indirect
 )

@@ -8,11 +8,11 @@ import (
 )
 
 func runningStatusHandler(c *fiber.Ctx) error {
-	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
 	return c.Send(json.MustJSONIndent(service.RunningStatus()))
 }
 
 func runningQueueStatusHandler(c *fiber.Ctx) error {
-	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
 	return c.Send(json.MustJSONIndent(service.RunningQueueStatus()))
 }

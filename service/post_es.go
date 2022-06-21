@@ -103,7 +103,7 @@ func updateESBulkHeader() {
 		})
 		// 等待明天 0 点再执行
 		now = common.GetGlobalTime()
-		time.Sleep(utils.Get0Tomorrow(now).Sub(now))
+		time.Sleep(utils.BeginOfTomorrow(now).Sub(now))
 	}
 }
 

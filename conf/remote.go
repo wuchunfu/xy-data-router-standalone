@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
-	"github.com/imroc/req"
+	"github.com/imroc/req/v3"
 	"github.com/tidwall/gjson"
 )
 
@@ -17,12 +17,12 @@ func (c *TFilesConf) GetMonitorSource() error {
 	token := utils.MD5Hex(timestamp + c.SecretValue)
 
 	// 请求数据源
-	resp, err := req.Get(c.API+token+"&time="+timestamp, ReqUserAgent)
+	resp, err := req.Get(c.API + token + "&time=" + timestamp)
 	if err != nil {
 		return err
 	}
 
-	res := resp.String()
+	res := utils.B2S(resp.Bytes())
 	if gjson.Get(res, "ok").Bool() {
 		// 获取所有配置项数据 ["item1 ip txt", "item2 ip txt"]
 		body := ""
