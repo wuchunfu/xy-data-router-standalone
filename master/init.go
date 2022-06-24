@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/controller"
 	"github.com/fufuok/xy-data-router/service"
 	"github.com/fufuok/xy-data-router/tunnel"
+	"github.com/fufuok/xy-data-router/web"
 )
 
 var (
@@ -57,7 +57,7 @@ func initMaster() {
 	go tunnel.InitTunnel()
 
 	// 启动 Web 服务
-	go controller.InitWebServer()
+	go web.InitWebServer()
 
 	// 统计和性能工具
 	go startPProf()

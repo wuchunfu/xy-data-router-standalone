@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/web/middleware"
 )
 
 // SetupRouter 服务器状态

@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/web/response"
 )
 
 // ES 统计数量接口
@@ -15,7 +15,7 @@ func countHandler(c *fiber.Ctx) error {
 	defer putParams(params)
 
 	if err := c.BodyParser(params); err != nil || params.Index == "" {
-		return middleware.APIFailure(c, "查询参数有误")
+		return response.APIFailure(c, "查询参数有误")
 	}
 
 	resp := getResponse()

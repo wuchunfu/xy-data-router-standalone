@@ -1,4 +1,4 @@
-package controller
+package web
 
 import (
 	"embed"
@@ -12,8 +12,8 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
-	"github.com/fufuok/xy-data-router/middleware"
 	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/web/middleware"
 )
 
 //go:embed assets/favicon.ico

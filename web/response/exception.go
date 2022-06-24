@@ -1,20 +1,19 @@
-package middleware
+package response
 
 import (
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/internal/json"
 )
 
-var apiSuccessNil = json.MustJSON(common.APISuccessNilData())
+var apiSuccessNil = json.MustJSON(APISuccessNilData())
 
 // APIException 通用异常处理
 func APIException(c *fiber.Ctx, code int, msg string) error {
 	if msg == "" {
 		msg = "错误的请求"
 	}
-	return c.Status(code).JSON(common.APIFailureData(msg))
+	return c.Status(code).JSON(APIFailureData(msg))
 }
 
 // APIFailure 返回失败, 状态码: 200
@@ -24,13 +23,13 @@ func APIFailure(c *fiber.Ctx, msg string) error {
 
 // APISuccess 返回成功, 状态码: 200
 func APISuccess(c *fiber.Ctx, data interface{}, count int) error {
-	return c.JSON(common.APISuccessData(data, count))
+	return c.JSON(APISuccessData(data, count))
 }
 
 // APISuccessBytes 返回成功, JSON 字节数据, 状态码: 200
 func APISuccessBytes(c *fiber.Ctx, data []byte, count int) error {
 	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
-	return c.Send(common.APISuccessBytesData(data, count))
+	return c.Send(APISuccessBytesData(data, count))
 }
 
 // APISuccessNil 返回成功, 无数据, 状态码: 200

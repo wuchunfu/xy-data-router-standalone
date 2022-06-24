@@ -6,7 +6,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/web/middleware"
 )
 
 // SetupRouter ES 相关接口

@@ -6,6 +6,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/web/response"
 )
 
 // CheckESBlackList ES 数据上报接口黑名单检查
@@ -21,9 +22,9 @@ func CheckESBlackList(asAPI bool) fiber.Handler {
 					Str("method", c.Method()).Str("uri", c.OriginalURL()).
 					Msg(msg)
 				if asAPI {
-					return APIFailure(c, msg)
+					return response.APIFailure(c, msg)
 				} else {
-					return TxtMsg(c, msg)
+					return response.TxtMsg(c, msg)
 				}
 			}
 		}

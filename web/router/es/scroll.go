@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/web/response"
 )
 
 // ES Scroll 接口
@@ -16,7 +16,7 @@ func scrollHandler(c *fiber.Ctx) error {
 	defer putParams(params)
 
 	if err := c.BodyParser(params); err != nil || params.Scroll <= 0 || params.ScrollID == "" {
-		return middleware.APIFailure(c, "查询参数有误")
+		return response.APIFailure(c, "查询参数有误")
 	}
 
 	resp := getResponse()

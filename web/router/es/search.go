@@ -9,7 +9,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/internal/json"
-	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/web/response"
 )
 
 // ES 通用查询接口
@@ -18,7 +18,7 @@ func searchHandler(c *fiber.Ctx) error {
 	defer putParams(params)
 
 	if err := c.BodyParser(params); err != nil || params.Index == "" || params.Body == nil {
-		return middleware.APIFailure(c, "查询参数有误")
+		return response.APIFailure(c, "查询参数有误")
 	}
 
 	bodyBuf := bufferpool.Get()

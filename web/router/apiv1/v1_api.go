@@ -11,9 +11,9 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/gzip"
-	"github.com/fufuok/xy-data-router/middleware"
 	"github.com/fufuok/xy-data-router/schema"
 	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/web/response"
 )
 
 // apiHandler 处理接口请求
@@ -27,7 +27,7 @@ func apiHandler(c *fiber.Ctx) error {
 		common.LogSampled.Info().
 			Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).Int("len", len(apiname)).
 			Msg("api not found")
-		return middleware.APIFailure(c, "接口配置有误")
+		return response.APIFailure(c, "接口配置有误")
 	}
 
 	// 按场景获取数据
@@ -44,7 +44,7 @@ func apiHandler(c *fiber.Ctx) error {
 			uri = uri[:len(uri)-5]
 			body, err = gzip.Unzip(c.Body())
 			if err != nil {
-				return middleware.APIFailure(c, "数据解压失败: "+err.Error())
+				return response.APIFailure(c, "数据解压失败: "+err.Error())
 			}
 		} else {
 			body = bytespool.NewBytes(c.Body())
@@ -57,13 +57,13 @@ func apiHandler(c *fiber.Ctx) error {
 	}
 
 	if len(body) == 0 {
-		return middleware.APIFailure(c, "数据为空")
+		return response.APIFailure(c, "数据为空")
 	}
 
 	if chkField {
 		// 检查必有字段, POST 非标准 JSON 时(多条数据), 不一定准确
 		if !common.CheckRequiredField(body, apiConf.RequiredField) {
-			return middleware.APIFailure(c, utils.AddString("必填字段: ", strings.Join(apiConf.RequiredField, ",")))
+			return response.APIFailure(c, utils.AddString("必填字段: ", strings.Join(apiConf.RequiredField, ",")))
 		}
 	}
 
@@ -73,7 +73,7 @@ func apiHandler(c *fiber.Ctx) error {
 	item := schema.New(apiname, ip, body)
 	service.PushDataToChanx(item)
 
-	return middleware.APISuccessNil(c)
+	return response.APISuccessNil(c)
 }
 
 // 获取所有 GET 请求参数

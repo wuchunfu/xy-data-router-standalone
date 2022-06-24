@@ -11,7 +11,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
-	"github.com/fufuok/xy-data-router/middleware"
+	"github.com/fufuok/xy-data-router/web/response"
 )
 
 // 解析执行结果, 记录日志, 发送响应
@@ -24,9 +24,9 @@ func sendResult(c *fiber.Ctx, resp *tResponse, params *tParams) error {
 	}()
 
 	if ret.ErrMsg != "" {
-		return middleware.APIFailure(c, ret.ErrMsg)
+		return response.APIFailure(c, ret.ErrMsg)
 	}
-	return middleware.APISuccessBytes(c, ret.result, ret.Count)
+	return response.APISuccessBytes(c, ret.result, ret.Count)
 }
 
 // 执行 ES 请求

@@ -1,13 +1,13 @@
-package controller
+package web
 
 import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/controller/router/apiv1"
-	"github.com/fufuok/xy-data-router/controller/router/es"
-	"github.com/fufuok/xy-data-router/controller/router/sys"
 	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/web/router/apiv1"
+	"github.com/fufuok/xy-data-router/web/router/es"
+	"github.com/fufuok/xy-data-router/web/router/sys"
 )
 
 func setupRouter(app *fiber.App) {
