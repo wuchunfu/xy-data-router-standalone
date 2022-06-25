@@ -32,12 +32,13 @@ type tJSONConf struct {
 
 // tSYSConf 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
 type tSYSConf struct {
-	Debug           bool   `json:"debug"`
-	PProfAddr       string `json:"pprof_addr"`
-	RestartMain     bool   `json:"restart_main"`
-	WatcherInterval int    `json:"watcher_interval"`
-	HeartbeatIndex  string `json:"heartbeat_index"`
-	BaseSecretValue string
+	Debug                   bool   `json:"debug"`
+	PProfAddr               string `json:"pprof_addr"`
+	RestartMain             bool   `json:"restart_main"`
+	WatcherInterval         int    `json:"watcher_interval"`
+	HeartbeatIndex          string `json:"heartbeat_index"`
+	WatcherIntervalDuration time.Duration
+	BaseSecretValue         string
 }
 
 type tLogConf struct {
@@ -374,7 +375,9 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 
 	// 文件变化监控时间间隔
 	if config.SYSConf.WatcherInterval < 1 {
-		config.SYSConf.WatcherInterval = WatcherInterval
+		config.SYSConf.WatcherIntervalDuration = WatcherIntervalDuration
+	} else {
+		config.SYSConf.WatcherIntervalDuration = time.Duration(config.SYSConf.WatcherInterval) * time.Minute
 	}
 
 	// 心跳日志索引

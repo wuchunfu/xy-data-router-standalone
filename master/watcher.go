@@ -2,7 +2,6 @@ package master
 
 import (
 	"log"
-	"time"
 
 	"github.com/fufuok/utils"
 
@@ -27,7 +26,7 @@ func Watcher() {
 		Msg("Watching")
 
 	go func() {
-		ticker := common.TWm.NewTicker(time.Duration(conf.Config.SYSConf.WatcherInterval) * time.Minute)
+		ticker := common.TWm.NewTicker(conf.Config.SYSConf.WatcherIntervalDuration)
 		defer ticker.Stop()
 
 		for range ticker.C {
@@ -75,6 +74,9 @@ func Watcher() {
 				// 调节协程池
 				service.TuneDataProcessorSize(conf.Config.DataConf.ProcessorSize)
 				service.TuneESBulkWorkerSize(conf.Config.DataConf.ESBulkWorkerSize)
+
+				// 更新配置文件监控周期
+				ticker.Reset(conf.Config.SYSConf.WatcherIntervalDuration)
 
 				common.Log.Warn().Msg(">>>>>>> reload config <<<<<<<")
 				reloadChan <- true

@@ -93,8 +93,8 @@ const (
 	// BaseSecretSalt 用于解密基础密钥值的密钥 (编译在程序中)
 	BaseSecretSalt = "Fufu@dr.777"
 
-	// WatcherInterval 文件变化监控时间间隔(分)
-	WatcherInterval = 1
+	// WatcherIntervalDuration 文件变化监控时间间隔(分)
+	WatcherIntervalDuration = 1 * time.Minute
 
 	// BufferMaxCapacity 字节缓冲池最大可回收容量值限定, 默认值: 1MiB, 即大于该值的就不回收到池
 	BufferMaxCapacity = 1 << 20
