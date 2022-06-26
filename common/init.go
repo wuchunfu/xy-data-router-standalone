@@ -55,7 +55,12 @@ func InitCommon() {
 	initES()
 }
 
-func TWStop() {
+func Stop() {
+	twStop()
+	poolRelease()
+}
+
+func twStop() {
 	TWms.Stop()
 	TWs.Stop()
 	TWm.Stop()

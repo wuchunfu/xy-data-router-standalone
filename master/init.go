@@ -65,7 +65,6 @@ func initMaster() {
 
 // Stop 程序退出时清理
 func Stop() {
-	common.TWStop()
-	common.PoolRelease()
-	service.PoolRelease()
+	common.Stop()
+	service.Stop()
 }

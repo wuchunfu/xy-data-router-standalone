@@ -18,6 +18,6 @@ func initPool() {
 	bytespool.InitDefaultPools(2, conf.BufferMaxCapacity)
 }
 
-func PoolRelease() {
+func poolRelease() {
 	GoPool.Release()
 }

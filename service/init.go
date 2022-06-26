@@ -130,7 +130,11 @@ func InitService() {
 	go initRuntime()
 }
 
-func PoolRelease() {
+func Stop() {
+	poolRelease()
+}
+
+func poolRelease() {
 	dataProcessorPool.Release()
 	esBulkPool.Release()
 }
