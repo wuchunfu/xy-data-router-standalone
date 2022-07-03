@@ -36,14 +36,14 @@ func InitCommon() {
 	TWm, _ = timewheel.NewTimeWheel(time.Minute, 1440)
 	TWm.Start()
 
-	// 池相关设置
-	initPool()
-
 	// 同步时间字段
 	go syncNow()
 
 	// 初始化日志环境
 	initLogger()
+
+	// 池相关设置
+	initPool()
 
 	// 初始化 HTTP 客户端连接配置
 	initReq()

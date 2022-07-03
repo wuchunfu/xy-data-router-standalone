@@ -17,8 +17,8 @@ var (
 	LogSampled zerolog.Logger
 )
 
-// 注意: 受抽样日志影响, 日志可能不会被全部输出
-type reqLogger struct {
+// Logger 注意: 受抽样日志影响, 日志可能不会被全部输出
+type Logger struct {
 	log zerolog.Logger
 }
 
@@ -85,26 +85,30 @@ func LogConfig() error {
 	return nil
 }
 
-// Req 日志
-func newReqLogger() *reqLogger {
-	if reqDebug {
-		return &reqLogger{
+// NewLogger 类库日志实现: Req / Ants
+func NewLogger() *Logger {
+	if conf.Debug {
+		return &Logger{
 			log: Log,
 		}
 	}
-	return &reqLogger{
+	return &Logger{
 		log: LogSampled,
 	}
 }
 
-func (l *reqLogger) Debugf(format string, v ...interface{}) {
+func (l *Logger) Debugf(format string, v ...interface{}) {
 	l.log.Debug().Msgf(format, v...)
 }
 
-func (l *reqLogger) Warnf(format string, v ...interface{}) {
+func (l *Logger) Warnf(format string, v ...interface{}) {
 	l.log.Warn().Msgf(format, v...)
 }
 
-func (l *reqLogger) Errorf(format string, v ...interface{}) {
+func (l *Logger) Printf(format string, v ...interface{}) {
+	l.log.Warn().Msgf(format, v...)
+}
+
+func (l *Logger) Errorf(format string, v ...interface{}) {
 	l.log.Error().Msgf(format, v...)
 }

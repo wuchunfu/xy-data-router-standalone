@@ -29,9 +29,9 @@ func InitReq() {
 		return
 	}
 	reqDebug = conf.Debug
-	req.SetLogger(newReqLogger())
-	ReqUpload.SetLogger(newReqLogger())
-	ReqDownload.SetLogger(newReqLogger())
+	req.SetLogger(NewLogger())
+	ReqUpload.SetLogger(NewLogger())
+	ReqDownload.SetLogger(NewLogger())
 	if reqDebug {
 		req.EnableDumpAll().EnableDebugLog().EnableTraceAll()
 		ReqUpload.EnableDumpAllWithoutRequestBody().EnableDebugLog().EnableTraceAll()
@@ -47,15 +47,15 @@ func newReq() {
 	req.SetUserAgent(conf.ReqUserAgent).
 		SetJsonMarshal(json.Marshal).
 		SetJsonUnmarshal(json.Unmarshal).
-		SetLogger(newReqLogger())
+		SetLogger(NewLogger())
 	ReqUpload = req.C().
 		SetUserAgent(conf.ReqUserAgent).
 		SetJsonMarshal(json.Marshal).
 		SetJsonUnmarshal(json.Unmarshal).
-		SetLogger(newReqLogger())
+		SetLogger(NewLogger())
 	ReqDownload = req.C().
 		SetUserAgent(conf.ReqUserAgent).
 		SetJsonMarshal(json.Marshal).
 		SetJsonUnmarshal(json.Unmarshal).
-		SetLogger(newReqLogger())
+		SetLogger(NewLogger())
 }
