@@ -53,6 +53,11 @@ func apiWorker(dr *tDataRouter) {
 				return
 			}
 			dis.add(v.(*schema.DataItem))
+			// 达到限定数量或大小时推送数据
+			if dis.count%dr.apiConf.PostAPI.PostBatchNum == 0 || dis.size > dr.apiConf.PostAPI.PostBatchBytes {
+				postAPI(dis, dr.apiConf.PostAPI.API)
+				dis = getDataItems()
+			}
 		}
 	}
 }

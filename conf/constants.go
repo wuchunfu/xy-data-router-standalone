@@ -79,6 +79,10 @@ const (
 	// UpdateESOptionalInterval 更新可选写入 ES 状态时间间隔
 	UpdateESOptionalInterval = 500 * time.Millisecond
 
+	// APIPostBatchNum 分发数据到 API 单次最大条数或最大字节数
+	APIPostBatchNum   = 1500
+	APIPostBatchBytes = 2 << 20
+
 	// DataChanSize 无限缓冲信道默认初始化缓冲大小
 	DataChanSize = 50
 	// DataChanMaxBufCap 无限缓冲信道最大缓冲数量, 0 为无限, 超过限制(DataChanSize + DataChanMaxBufCap)丢弃数据
