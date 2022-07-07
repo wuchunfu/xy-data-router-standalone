@@ -7,12 +7,12 @@ import (
 	"github.com/fufuok/xy-data-router/service"
 )
 
-func runningStatusHandler(c *fiber.Ctx) error {
+func runtimeStatsHandler(c *fiber.Ctx) error {
 	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
-	return c.Send(json.MustJSONIndent(service.RunningStatus()))
+	return c.Send(json.MustJSONIndent(service.RuntimeStats()))
 }
 
-func runningQueueStatusHandler(c *fiber.Ctx) error {
+func runtimeQueueStatsHandler(c *fiber.Ctx) error {
 	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
-	return c.Send(json.MustJSONIndent(service.RunningQueueStatus()))
+	return c.Send(json.MustJSONIndent(service.RuntimeQueueStats()))
 }

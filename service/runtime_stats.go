@@ -42,22 +42,22 @@ func initRuntime() {
 	}()
 }
 
-// RunningStatus 运行状态
-func RunningStatus() map[string]interface{} {
+// RuntimeStats 运行状态统计
+func RuntimeStats() map[string]interface{} {
 	return map[string]interface{}{
 		"DATA": dataStats(),
-		"SYS":  sysStatus(),
+		"SYS":  sysStats(),
 		"MEM":  memStats(),
 	}
 }
 
-// RunningQueueStatus 队列状态
-func RunningQueueStatus() map[string]interface{} {
+// RuntimeQueueStats 队列状态
+func RuntimeQueueStats() map[string]interface{} {
 	return chanStats()
 }
 
 // 系统信息
-func sysStatus() map[string]interface{} {
+func sysStats() map[string]interface{} {
 	ver := conf.GetFilesVer(conf.Config.MainConf.Path)
 	return map[string]interface{}{
 		"APPName":      conf.APPName,
@@ -211,6 +211,5 @@ func chanStats() map[string]interface{} {
 		}
 		return true
 	})
-
 	return stats
 }
