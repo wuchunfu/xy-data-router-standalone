@@ -9,8 +9,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/schema"
-	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/service/schema"
 )
 
 func initTunClient() {
@@ -34,16 +33,16 @@ func initTunClient() {
 		go func() {
 			defer client.Stop()
 			// 接收数据转发到通道
-			for item := range service.TunChan.Out {
+			for item := range tunChan.Out {
 				data := item.(*schema.DataItem)
 				_ = common.GoPool.Submit(func() {
 					// 不超时, 直到 ErrClientOverstock
 					if err := client.Notify(tunMethod, data, arpc.TimeZero); err != nil {
 						common.LogSampled.Warn().Err(err).Msg("Failed to write Tunnel")
-						service.TunSendErrors.Inc()
+						TunSendErrors.Inc()
 						return
 					}
-					service.TunSendCount.Inc()
+					TunSendCount.Inc()
 				})
 			}
 		}()

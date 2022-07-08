@@ -40,8 +40,8 @@ func initES() {
 	ES = es
 }
 
-// InitES 重新初始化 ES 连接, 成功则更新连接
-func InitES() error {
+// 重新初始化 ES 连接, 成功则更新连接
+func loadES() error {
 	es, cfgErr, esErr := newES()
 	if cfgErr != nil || esErr != nil {
 		return fmt.Errorf("%s%s", cfgErr, esErr)

@@ -8,8 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/schema"
-	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/service/schema"
 )
 
 // 数据通道(RPC)服务初始化
@@ -54,12 +53,12 @@ func onData(c *arpc.Context) {
 			Err(err).Str("apiname", item.APIName).Str("client_ip", item.IP).
 			Str("remote_addr", c.Client.Conn.RemoteAddr().String()).
 			Msg("TunRecvBad")
-		service.TunRecvBadCount.Inc()
+		TunRecvBadCount.Inc()
 		item.Release()
 		return
 	}
 
 	// 写入队列
-	service.TunRecvCount.Inc()
-	service.PushDataToChanx(item)
+	TunRecvCount.Inc()
+	schema.PushDataToChanx(item)
 }

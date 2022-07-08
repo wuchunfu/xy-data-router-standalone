@@ -5,42 +5,15 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
-	"github.com/fufuok/utils/myip"
 	"github.com/rs/zerolog"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/service/datarouter"
+	"github.com/fufuok/xy-data-router/service/schema"
+	"github.com/fufuok/xy-data-router/service/tunnel"
 )
-
-type tDataRouterStats struct {
-	DataRouterQueue tChanLen
-	APIQueue        tChanLen
-}
-
-type tChanLen struct {
-	AllLen   int
-	BufLen   int
-	Discards uint64
-}
-
-var (
-	// 系统启动时间
-	start = time.Now()
-
-	// InternalIPv4 服务器 IP
-	InternalIPv4 string
-	ExternalIPv4 string
-)
-
-func initRuntime() {
-	go func() {
-		InternalIPv4 = myip.InternalIPv4()
-	}()
-	go func() {
-		ExternalIPv4 = myip.ExternalIPAny(10)
-	}()
-}
 
 // RuntimeStats 运行状态统计
 func RuntimeStats() map[string]interface{} {
@@ -51,11 +24,6 @@ func RuntimeStats() map[string]interface{} {
 	}
 }
 
-// RuntimeQueueStats 队列状态
-func RuntimeQueueStats() map[string]interface{} {
-	return chanStats()
-}
-
 // 系统信息
 func sysStats() map[string]interface{} {
 	ver := conf.GetFilesVer(conf.Config.MainConf.Path)
@@ -63,8 +31,8 @@ func sysStats() map[string]interface{} {
 		"APPName":      conf.APPName,
 		"Version":      conf.Version,
 		"GitCommit":    conf.GitCommit,
-		"Uptime":       time.Since(start).String(),
-		"StartTime":    start,
+		"Uptime":       time.Since(common.Start).String(),
+		"StartTime":    common.Start,
 		"Debug":        conf.Debug,
 		"LogLevel":     zerolog.Level(conf.Config.LogConf.Level).String(),
 		"ConfigVer":    ver.LastUpdate,
@@ -73,8 +41,8 @@ func sysStats() map[string]interface{} {
 		"NumCpus":      runtime.NumCPU(),
 		"NumGoroutine": runtime.NumGoroutine(),
 		"NumCgoCall":   utils.Comma(runtime.NumCgoCall()),
-		"InternalIPv4": InternalIPv4,
-		"ExternalIPv4": ExternalIPv4,
+		"InternalIPv4": common.InternalIPv4,
+		"ExternalIPv4": common.ExternalIPv4,
 
 		// HTTP 服务是否开启了减少内存占用选项
 		"ReduceMemoryUsage": conf.Config.WebConf.ReduceMemoryUsage,
@@ -85,7 +53,7 @@ func sysStats() map[string]interface{} {
 		// 是否关闭了 ES 写入
 		"ESDisableWrite": conf.Config.DataConf.ESDisableWrite,
 		// 繁忙时自动开启, 开启时所有设置了该标识的接口数据将不会写入 ES
-		"ESOptionalWrite": esOptionalWrite,
+		"ESOptionalWrite": datarouter.ESOptionalWrite,
 		// UDP 协议原型
 		"UDPProto": conf.Config.UDPConf.Proto,
 		// 是否启用了 HTTPS
@@ -139,77 +107,56 @@ func memStats() map[string]interface{} {
 
 // 数据处理信息
 func dataStats() map[string]interface{} {
-	tunSendErrors := TunSendErrors.Value()
-	tunSendCount := TunSendCount.Value()
-	tunTotal := TunDataTotal.Value()
+	tunSendErrors := tunnel.TunSendErrors.Value()
+	tunSendCount := tunnel.TunSendCount.Value()
+	tunTotal := tunnel.TunDataTotal.Value()
 
 	return map[string]interface{}{
 		// 数据传输到 ES 处理通道繁忙状态
-		"ESDataQueueAll":             esChan.Len(),
-		"ESDataQueueBuf":             esChan.BufLen(),
-		"ESDataQueueDiscards_______": esChan.Discards(),
+		"ESDataQueueAll":             datarouter.ESChan.Len(),
+		"ESDataQueueBuf":             datarouter.ESChan.BufLen(),
+		"ESDataQueueDiscards_______": datarouter.ESChan.Discards(),
 
 		// 数据传输通道繁忙状态
-		"TunnelQueueAll":             TunChan.Len(),
-		"TunnelQueueBuf":             TunChan.BufLen(),
-		"TunnelQueueDiscards_______": TunChan.Discards(),
-
-		"CounterStartTime": counterStartTime,
+		"TunnelQueueAll":             schema.ItemTunChan.Len(),
+		"TunnelQueueBuf":             schema.ItemTunChan.BufLen(),
+		"TunnelQueueDiscards_______": schema.ItemTunChan.Discards(),
+		"DataRouterQueueAll":         schema.ItemDrChan.Len(),
+		"DataRouterQueueBuf":         schema.ItemDrChan.BufLen(),
+		"DataRouterQueueDiscards___": schema.ItemDrChan.Discards(),
 
 		// 公共协程池, 不阻塞
 		"CommonGoPoolFree":    common.GoPool.Free(),
 		"CommonGoPoolRunning": common.GoPool.Running(),
 
 		// 数据处理协程池, 排队, 待处理数据量, 丢弃数据量, 繁忙状态
-		"DataProcessorTodoCount____": dataProcessorTodoCount.Value(),
-		"DataProcessorDiscards_____": dataProcessorDiscards.Value(),
-		"DataProcessorWorkerRunning": dataProcessorPool.Running(),
-		"DataProcessorWorkerFree___": dataProcessorPool.Free(),
+		"DataProcessorTodoCount____": datarouter.DataProcessorTodoCount.Value(),
+		"DataProcessorDiscards_____": datarouter.DataProcessorDiscards.Value(),
+		"DataProcessorWorkerRunning": datarouter.DataProcessorPool.Running(),
+		"DataProcessorWorkerFree___": datarouter.DataProcessorPool.Free(),
 
 		// 设置为可选写入 ES 的接口丢弃数据项计数
-		"ESDataItemDiscards________": esDataItemDiscards.Value(),
+		"ESDataItemDiscards________": datarouter.ESDataItemDiscards.Value(),
 
 		// ES 总数据量, 排队, 待批量写入任务数, 丢弃任务数, 写入错误任务数, 繁忙状态
-		"ESDataTotal":                utils.Comma(esDataTotal.Value()),
-		"ESBulkTodoCount___________": esBulkTodoCount.Value(),
-		"ESBulkCount":                utils.Comma(esBulkCount.Value()),
-		"ESBulkDiscards____________": esBulkDiscards.Value(),
-		"ESBulkErrors______________": esBulkErrors.Value(),
-		"ESBulkWorkerRunning":        esBulkPool.Running(),
-		"ESBulkWorkerFree__________": esBulkPool.Free(),
+		"ESDataTotal":                utils.Comma(datarouter.ESDataTotal.Value()),
+		"ESBulkTodoCount___________": datarouter.ESBulkTodoCount.Value(),
+		"ESBulkCount":                utils.Comma(datarouter.ESBulkCount.Value()),
+		"ESBulkDiscards____________": datarouter.ESBulkDiscards.Value(),
+		"ESBulkErrors______________": datarouter.ESBulkErrors.Value(),
+		"ESBulkWorkerRunning":        datarouter.ESBulkPool.Running(),
+		"ESBulkWorkerFree__________": datarouter.ESBulkPool.Free(),
 
 		// HTTP 请求数, 非法/错误请求数, UDP 请求数, Tunnel 收发数据数
-		"HTTPRequestCount":           utils.Comma(HTTPRequestCount.Value()),
-		"HTTPBadRequestCount":        utils.Comma(HTTPBadRequestCount.Value()),
-		"UDPRequestCount":            utils.Comma(udpRequestCount.Value()),
-		"TunnelRecvCount":            utils.Comma(TunRecvCount.Value()),
-		"TunnelRecvBadCount________": TunRecvBadCount.Value(),
-		"TunnelCompressTotal":        utils.Comma(TunCompressTotal.Value()),
+		"HTTPRequestCount":           utils.Comma(common.HTTPRequestCount.Value()),
+		"HTTPBadRequestCount":        utils.Comma(common.HTTPBadRequestCount.Value()),
+		"UDPRequestCount":            utils.Comma(datarouter.UDPRequestCount.Value()),
+		"TunnelRecvCount":            utils.Comma(tunnel.TunRecvCount.Value()),
+		"TunnelRecvBadCount________": tunnel.TunRecvBadCount.Value(),
+		"TunnelCompressTotal":        utils.Comma(tunnel.TunCompressTotal.Value()),
 		"TunnelDataTotal":            utils.Comma(tunTotal),
 		"TunnelSendCount":            utils.Comma(tunSendCount),
 		"TunnelSendErrors__________": tunSendErrors,
 		"TunnelTodoSendCount_______": tunTotal - tunSendCount - tunSendErrors,
 	}
-}
-
-// 数据队列信息
-func chanStats() map[string]interface{} {
-	stats := map[string]interface{}{}
-	dataRouters.Range(func(key string, value interface{}) bool {
-		dr := value.(*tDataRouter)
-		stats[key] = tDataRouterStats{
-			DataRouterQueue: tChanLen{
-				AllLen:   dr.drChan.Len(),
-				BufLen:   dr.drChan.BufLen(),
-				Discards: dr.drChan.Discards(),
-			},
-			APIQueue: tChanLen{
-				AllLen:   dr.drOut.apiChan.Len(),
-				BufLen:   dr.drOut.apiChan.BufLen(),
-				Discards: dr.drOut.apiChan.Discards(),
-			},
-		}
-		return true
-	})
-	return stats
 }

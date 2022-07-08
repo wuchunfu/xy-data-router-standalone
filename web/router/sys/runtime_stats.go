@@ -11,8 +11,3 @@ func runtimeStatsHandler(c *fiber.Ctx) error {
 	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
 	return c.Send(json.MustJSONIndent(service.RuntimeStats()))
 }
-
-func runtimeQueueStatsHandler(c *fiber.Ctx) error {
-	c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSONCharsetUTF8)
-	return c.Send(json.MustJSONIndent(service.RuntimeQueueStats()))
-}

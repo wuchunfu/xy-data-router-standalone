@@ -26,7 +26,7 @@ func main() {
 		return
 	}
 
-	conf.InitConfig()
+	conf.InitMain()
 
 	if !conf.Debug {
 		xdaemon.NewDaemon(conf.LogDaemon).Run()

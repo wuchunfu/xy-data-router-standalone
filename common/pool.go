@@ -30,7 +30,7 @@ func initPool() {
 		antsPoolSize,
 		ants.WithExpiryDuration(expiryDuration),
 		ants.WithNonblocking(true),
-		ants.WithLogger(NewLogger()),
+		ants.WithLogger(NewAppLogger()),
 	)
 }
 

@@ -12,16 +12,27 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
-	"github.com/fufuok/xy-data-router/service"
 	"github.com/fufuok/xy-data-router/web/middleware"
 )
 
 //go:embed assets/favicon.ico
 var fav embed.FS
 
-// InitWebServer 接口服务
-func InitWebServer() {
-	app := fiber.New(fiber.Config{
+var app *fiber.App
+
+// InitMain 程序启动时初始化
+func InitMain() {
+	go initWeb()
+}
+
+// InitRuntime 重新加载或初始化运行时配置
+func InitRuntime() {}
+
+func Stop() {}
+
+// 初始化 Web 服务
+func initWeb() {
+	app = fiber.New(fiber.Config{
 		ServerHeader:            conf.APPName,
 		BodyLimit:               conf.Config.WebConf.LimitBody,
 		ReduceMemoryUsage:       conf.Config.WebConf.ReduceMemoryUsage,
@@ -76,7 +87,7 @@ func errorHandler(c *fiber.Ctx, err error) error {
 		code = e.Code
 	}
 
-	service.HTTPBadRequestCount.Inc()
+	common.HTTPBadRequestCount.Inc()
 	if conf.Debug {
 		common.LogSampled.Error().Err(err).
 			Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).

@@ -12,7 +12,6 @@ func SetupRouter(app *fiber.App) {
 	sys := app.Group("/sys")
 	{
 		sys.Get("/stats", runtimeStatsHandler)
-		sys.Get("/stats/queue", runtimeQueueStatsHandler)
 		sys.Get("/check", middleware.CheckESWhiteList(false), func(c *fiber.Ctx) error {
 			return c.SendString(common.GetClientIP(c) + " - " + c.IP())
 		})

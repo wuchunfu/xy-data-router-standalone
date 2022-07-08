@@ -6,7 +6,7 @@ import (
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
 
-	"github.com/fufuok/xy-data-router/schema"
+	"github.com/fufuok/xy-data-router/service/schema"
 )
 
 func TestCodec(t *testing.T) {

@@ -8,7 +8,6 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/service"
-	"github.com/fufuok/xy-data-router/tunnel"
 	"github.com/fufuok/xy-data-router/web"
 )
 
@@ -48,16 +47,13 @@ func Start() {
 
 func initMaster() {
 	// 优先初始化公共变量
-	common.InitCommon()
+	common.InitMain()
 
-	// 启动数据服务
-	service.InitService()
-
-	// 启动 Tunnel 服务
-	go tunnel.InitTunnel()
+	// 启动数据处理服务
+	service.InitMain()
 
 	// 启动 Web 服务
-	go web.InitWebServer()
+	web.InitMain()
 
 	// 统计和性能工具
 	go startPProf()
@@ -65,6 +61,7 @@ func initMaster() {
 
 // Stop 程序退出时清理
 func Stop() {
-	common.Stop()
+	web.Stop()
 	service.Stop()
+	common.Stop()
 }

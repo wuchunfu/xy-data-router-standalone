@@ -23,7 +23,7 @@ func initLogger() {
 	log.SetLogger(newLogger())
 }
 
-func InitLogger() {
+func loadLogger() {
 	if arpcDebug == conf.Debug {
 		return
 	}

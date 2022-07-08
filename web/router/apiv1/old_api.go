@@ -3,15 +3,13 @@ package apiv1
 import (
 	"strings"
 
+	"github.com/fufuok/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/tidwall/sjson"
 
-	"github.com/fufuok/utils"
-
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/schema"
-	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/service/schema"
 )
 
 // 兼容旧接口
@@ -47,7 +45,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 
 		// 写入队列
 		item := schema.NewSafe(apiname, ip, body)
-		service.PushDataToChanx(item)
+		schema.PushDataToChanx(item)
 
 		// 旧接口返回值处理
 		return c.SendString("1")

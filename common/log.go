@@ -1,7 +1,6 @@
 package common
 
 import (
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -23,10 +22,7 @@ type Logger struct {
 }
 
 func initLogger() {
-	if err := InitLogger(); err != nil {
-		log.Fatalln("Failed to initialize logger:", err, "\nbye.")
-	}
-
+	loadLogger()
 	// 路径脱敏, 日志格式规范, 避免与自定义字段名冲突: {"E":"is Err(error)","error":"is Str(error)"}
 	zerolog.TimestampFieldName = "T"
 	zerolog.LevelFieldName = "L"
@@ -40,11 +36,8 @@ func initLogger() {
 	}
 }
 
-func InitLogger() error {
-	if err := LogConfig(); err != nil {
-		return err
-	}
-
+func loadLogger() {
+	newLogger()
 	// 抽样的日志记录器
 	sampler := &zerolog.BurstSampler{
 		Burst:  conf.Config.LogConf.Burst,
@@ -57,14 +50,12 @@ func InitLogger() error {
 		WarnSampler:  sampler,
 		ErrorSampler: sampler,
 	})
-
-	return nil
 }
 
-// LogConfig 日志配置
+// 日志配置
 // 1. 开发环境时, 日志高亮输出到控制台
 // 2. 生产环境时, 日志输出到文件(可选关闭高亮, 保存最近 10 个 30 天内的日志)
-func LogConfig() error {
+func newLogger() {
 	basicLog := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "0102 15:04:05"}
 
 	if !conf.Debug {
@@ -78,15 +69,12 @@ func LogConfig() error {
 			Compress:   true,
 		}
 	}
-
 	Log = zerolog.New(basicLog).With().Timestamp().Caller().Logger()
 	Log = Log.Level(zerolog.Level(conf.Config.LogConf.Level))
-
-	return nil
 }
 
-// NewLogger 类库日志实现: Req / Ants
-func NewLogger() *Logger {
+// NewAppLogger 类库日志实现: Req / Ants
+func NewAppLogger() *Logger {
 	if conf.Debug {
 		return &Logger{
 			log: Log,

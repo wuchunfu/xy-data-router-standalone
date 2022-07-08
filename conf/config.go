@@ -2,7 +2,6 @@ package conf
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"runtime"
@@ -167,13 +166,6 @@ func GetFilesVer(k interface{}) (ver *TFilesVer) {
 	ver = new(TFilesVer)
 	FilesVer.Store(k, ver)
 	return
-}
-
-// InitConfig 初始化配置
-func InitConfig() {
-	if err := LoadConf(); err != nil {
-		log.Fatalln("Failed to initialize config:", err, "\nbye.")
-	}
 }
 
 // LoadConf 加载配置

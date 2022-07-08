@@ -6,7 +6,7 @@ import (
 	"github.com/fufuok/bytespool"
 
 	"github.com/fufuok/xy-data-router/internal/zstd"
-	"github.com/fufuok/xy-data-router/schema"
+	"github.com/fufuok/xy-data-router/service/schema"
 )
 
 const (

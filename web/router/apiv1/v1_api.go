@@ -11,8 +11,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/gzip"
-	"github.com/fufuok/xy-data-router/schema"
-	"github.com/fufuok/xy-data-router/service"
+	"github.com/fufuok/xy-data-router/service/schema"
 	"github.com/fufuok/xy-data-router/web/response"
 )
 
@@ -71,7 +70,7 @@ func apiHandler(c *fiber.Ctx) error {
 	apiname = utils.CopyString(apiname)
 	ip := utils.CopyString(common.GetClientIP(c))
 	item := schema.New(apiname, ip, body)
-	service.PushDataToChanx(item)
+	schema.PushDataToChanx(item)
 
 	return response.APISuccessNil(c)
 }

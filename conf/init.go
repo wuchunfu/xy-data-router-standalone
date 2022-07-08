@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"log"
 	"net"
 	"path/filepath"
 	"sync"
@@ -9,10 +10,7 @@ import (
 )
 
 var (
-	Debug     bool
-	Version   = "v0.0.0"
-	GoVersion = ""
-	GitCommit = ""
+	Debug bool
 
 	// RootPath 运行绝对路径
 	RootPath = utils.ExecutableDir(true)
@@ -53,3 +51,10 @@ var (
 	// FilesVer 配置文件版本信息
 	FilesVer sync.Map
 )
+
+// InitMain 程序启动时初始化配置
+func InitMain() {
+	if err := LoadConf(); err != nil {
+		log.Fatalln("Failed to initialize config:", err, "\nbye.")
+	}
+}

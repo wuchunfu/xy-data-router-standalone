@@ -20,18 +20,18 @@ var (
 
 func initReq() {
 	newReq()
-	InitReq()
+	loadReq()
 }
 
-func InitReq() {
+func loadReq() {
 	req.SetTimeout(conf.Config.DataConf.APIClientTimeoutDuration)
 	if reqDebug == conf.Debug {
 		return
 	}
 	reqDebug = conf.Debug
-	req.SetLogger(NewLogger())
-	ReqUpload.SetLogger(NewLogger())
-	ReqDownload.SetLogger(NewLogger())
+	req.SetLogger(NewAppLogger())
+	ReqUpload.SetLogger(NewAppLogger())
+	ReqDownload.SetLogger(NewAppLogger())
 	if reqDebug {
 		req.EnableDumpAll().EnableDebugLog().EnableTraceAll()
 		ReqUpload.EnableDumpAllWithoutRequestBody().EnableDebugLog().EnableTraceAll()
@@ -47,15 +47,15 @@ func newReq() {
 	req.SetUserAgent(conf.ReqUserAgent).
 		SetJsonMarshal(json.Marshal).
 		SetJsonUnmarshal(json.Unmarshal).
-		SetLogger(NewLogger())
+		SetLogger(NewAppLogger())
 	ReqUpload = req.C().
 		SetUserAgent(conf.ReqUserAgent).
 		SetJsonMarshal(json.Marshal).
 		SetJsonUnmarshal(json.Unmarshal).
-		SetLogger(NewLogger())
+		SetLogger(NewAppLogger())
 	ReqDownload = req.C().
 		SetUserAgent(conf.ReqUserAgent).
 		SetJsonMarshal(json.Marshal).
 		SetJsonUnmarshal(json.Unmarshal).
-		SetLogger(NewLogger())
+		SetLogger(NewAppLogger())
 }

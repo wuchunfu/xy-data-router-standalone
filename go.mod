@@ -3,15 +3,15 @@ module github.com/fufuok/xy-data-router
 go 1.17
 
 require (
-	github.com/elastic/go-elasticsearch/v7 v7.17.0
+	github.com/elastic/go-elasticsearch/v7 v7.17.1
 	github.com/fufuok/bytespool v1.1.1
 	github.com/fufuok/chanx v0.0.107
 	github.com/fufuok/timewheel v1.1.100
 	github.com/fufuok/utils v0.4.0
-	github.com/goccy/go-json v0.9.4
-	github.com/gofiber/fiber/v2 v2.27.0
-	github.com/imroc/req/v3 v3.7.6
-	github.com/klauspost/compress v1.14.4
+	github.com/goccy/go-json v0.9.5
+	github.com/gofiber/fiber/v2 v2.28.0
+	github.com/imroc/req/v3 v3.8.2
+	github.com/klauspost/compress v1.15.0
 	github.com/lesismal/arpc v1.2.5
 	github.com/panjf2000/ants/v2 v2.4.8
 	github.com/panjf2000/gnet v1.6.4
@@ -32,9 +32,9 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/multierr v1.7.0 // indirect
+	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/sys v0.0.0-20220222200937-f2425489ef4c // indirect
+	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
+	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )

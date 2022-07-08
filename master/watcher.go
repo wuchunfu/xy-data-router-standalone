@@ -8,7 +8,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/service"
-	"github.com/fufuok/xy-data-router/tunnel"
+	"github.com/fufuok/xy-data-router/web"
 )
 
 // Watcher 监听程序二进制变化(重启)和配置文件(热加载)
@@ -54,26 +54,9 @@ func Watcher() {
 					continue
 				}
 
-				// 重新连接 ES
-				if err := common.InitES(); err != nil {
-					common.Log.Error().Err(err).Msg("Failed to update elasticsearch connection")
-				}
-
-				// 日志配置更新
-				_ = common.InitLogger()
-
-				// 更新 Tunnel 日志配置
-				tunnel.InitLogger()
-
-				// 更新 HTTP 客户端请求配置
-				common.InitReq()
-
-				// 同步数据分发器配置
-				service.InitDataRouter()
-
-				// 调节协程池
-				service.TuneDataProcessorSize(conf.Config.DataConf.ProcessorSize)
-				service.TuneESBulkWorkerSize(conf.Config.DataConf.ESBulkWorkerSize)
+				common.InitRuntime()
+				service.InitRuntime()
+				web.InitRuntime()
 
 				// 更新配置文件监控周期
 				ticker.Reset(conf.Config.SYSConf.WatcherIntervalDuration)

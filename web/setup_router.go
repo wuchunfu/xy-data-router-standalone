@@ -4,7 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/service"
 	"github.com/fufuok/xy-data-router/web/router/apiv1"
 	"github.com/fufuok/xy-data-router/web/router/es"
 	"github.com/fufuok/xy-data-router/web/router/sys"
@@ -33,7 +32,7 @@ func setupRouter(app *fiber.App) {
 		return c.SendString(c.IP())
 	})
 	app.Get("/server_ip", func(c *fiber.Ctx) error {
-		return c.SendString(service.ExternalIPv4)
+		return c.SendString(common.ExternalIPv4)
 	})
 
 	// 记录意外: https://github.com/gofiber/fiber/issues/1388
