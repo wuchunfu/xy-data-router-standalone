@@ -5,7 +5,11 @@
     "restart_main": false,
     "watcher_interval": 1,
     "heartbeat_index": "",
-    "esapi_log_index": ""
+    "esapi_log_index": "",
+    "__ReqTimeout": "作为客户端发起请求默认超时时间(秒), 如数据分发到其他接口, 默认: 30",
+    "req_timeout": 30,
+    "__ReqMaxRetries": "作为客户端发起请求失败时(比如网络错误)重试次数, 默认: 0",
+    "req_max_retries": 1
   },
   "main_conf": {
     "__MainConf": "远端配置接口, 获取的配置内容将替换掉该文件",
@@ -109,9 +113,7 @@
     "__ProcessorSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",
     "processor_size": 3000,
     "__ProcessorMaxWorkerSize": "数据处理最大排队大小, 达到该值会丢弃, 最低: 10000, 默认 100000 个数据",
-    "processor_max_worker_size": 100000,
-    "__APIClientTimeout": "数据分发到其他接口时请求超时时间(秒), 默认: 30",
-    "api_client_timeout": 30
+    "processor_max_worker_size": 100000
   },
   "api_conf": [
     {

@@ -108,6 +108,6 @@ const (
 	// ESAPILogIndex ES 查询接口日志索引
 	ESAPILogIndex = "esapi_log"
 
-	// APIClientTimeoutDuration 数据分发到其他接口时请求默认超时时间(秒)
-	APIClientTimeoutDuration = 30 * time.Second
+	// ReqTimeoutDuration 作为客户端发起请求默认超时时间(秒), 数据分发到其他接口时请求默认超时时间
+	ReqTimeoutDuration = 30 * time.Second
 )

@@ -36,6 +36,9 @@ type tSYSConf struct {
 	RestartMain             bool   `json:"restart_main"`
 	WatcherInterval         int    `json:"watcher_interval"`
 	HeartbeatIndex          string `json:"heartbeat_index"`
+	ReqTimeout              int    `json:"req_timeout"`
+	ReqMaxRetries           int    `json:"req_max_retries"`
+	ReqTimeoutDuration      time.Duration
 	WatcherIntervalDuration time.Duration
 	BaseSecretValue         string
 }
@@ -108,10 +111,8 @@ type tDataConf struct {
 	ChanMaxBufCap             int      `json:"chan_max_buf_cap"`
 	ProcessorSize             int      `json:"processor_size"`
 	ProcessorMaxWorkerSize    int      `json:"processor_max_worker_size"`
-	APIClientTimeout          int      `json:"api_client_timeout"`
 	ESPostBatchBytes          int
 	ESPostMaxIntervalDuration time.Duration
-	APIClientTimeoutDuration  time.Duration
 }
 
 type tStateConf struct {
@@ -442,11 +443,11 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		config.DataConf.ESPostMaxIntervalDuration = time.Duration(config.DataConf.ESPostMaxInterval) * time.Millisecond
 	}
 
-	// 数据分发到其他接口时请求默认超时时间
-	if config.DataConf.APIClientTimeout < 1 {
-		config.DataConf.APIClientTimeoutDuration = APIClientTimeoutDuration
+	// 作为客户端发起请求默认超时时间, 数据分发
+	if config.SYSConf.ReqTimeout < 1 {
+		config.SYSConf.ReqTimeoutDuration = ReqTimeoutDuration
 	} else {
-		config.DataConf.APIClientTimeoutDuration = time.Duration(config.DataConf.APIClientTimeout) * time.Second
+		config.SYSConf.ReqTimeoutDuration = time.Duration(config.SYSConf.ReqTimeout) * time.Second
 	}
 
 	// 更新状态类配置

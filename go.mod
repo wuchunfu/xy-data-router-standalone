@@ -10,16 +10,16 @@ require (
 	github.com/fufuok/utils v0.4.0
 	github.com/goccy/go-json v0.9.5
 	github.com/gofiber/fiber/v2 v2.28.0
-	github.com/imroc/req/v3 v3.8.2
+	github.com/imroc/req/v3 v3.9.1
 	github.com/klauspost/compress v1.15.0
-	github.com/lesismal/arpc v1.2.5
+	github.com/lesismal/arpc v1.2.6
 	github.com/panjf2000/ants/v2 v2.4.8
 	github.com/panjf2000/gnet v1.6.4
 	github.com/rs/zerolog v1.26.1
 	github.com/tidwall/gjson v1.14.0
 	github.com/tidwall/pretty v1.2.0
 	github.com/tidwall/sjson v1.2.4
-	github.com/valyala/fasthttp v1.33.0
+	github.com/valyala/fasthttp v1.34.0
 	github.com/valyala/gozstd v1.16.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
@@ -35,6 +35,6 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
+	golang.org/x/sys v0.0.0-20220307203707-22a9840ba4d7 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )

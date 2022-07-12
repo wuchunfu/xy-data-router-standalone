@@ -24,7 +24,8 @@ func initReq() {
 }
 
 func loadReq() {
-	req.SetTimeout(conf.Config.DataConf.APIClientTimeoutDuration)
+	req.SetTimeout(conf.Config.SYSConf.ReqTimeoutDuration).
+		SetCommonRetryCount(conf.Config.SYSConf.ReqMaxRetries)
 	if reqDebug == conf.Debug {
 		return
 	}
