@@ -133,11 +133,11 @@ type TAPIConf struct {
 }
 
 type TPostAPIConf struct {
-	API            []string `json:"api"`
-	Interval       int      `json:"interval"`
-	PostBatchNum   int      `json:"post_batch_num"`
-	PostBatchMB    int      `json:"post_batch_mb"`
-	PostBatchBytes int
+	API        []string `json:"api"`
+	Interval   int      `json:"interval"`
+	BatchNum   int      `json:"batch_num"`
+	BatchMB    int      `json:"batch_mb"`
+	BatchBytes int
 }
 
 type TFilesConf struct {
@@ -340,17 +340,24 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		if apiname == "" {
 			continue
 		}
-		// 单次汇聚最大数量
-		if apiConf.PostAPI.PostBatchNum < 1 {
-			apiConf.PostAPI.PostBatchNum = APIPostBatchNum
-		}
-		// 单次汇聚最大字节大小
-		if apiConf.PostAPI.PostBatchMB < 1 {
-			apiConf.PostAPI.PostBatchBytes = APIPostBatchBytes
+
+		if len(apiConf.PostAPI.API) > 0 && apiConf.PostAPI.Interval > 0 {
+			// 单次汇聚最大数量
+			if apiConf.PostAPI.BatchNum < 1 {
+				apiConf.PostAPI.BatchNum = APIPostBatchNum
+			}
+			// 单次汇聚最大字节大小
+			if apiConf.PostAPI.BatchMB < 1 {
+				apiConf.PostAPI.BatchBytes = APIPostBatchBytes
+			} else {
+				// 配置文件单位是 MB
+				apiConf.PostAPI.BatchBytes = apiConf.PostAPI.BatchMB << 20
+			}
 		} else {
-			// 配置文件单位是 MB
-			apiConf.PostAPI.PostBatchBytes = config.DataConf.ESPostBatchMB << 20
+			// 禁用该 API 数据分发功能
+			apiConf.PostAPI.Interval = 0
 		}
+
 		apiConfig[apiname] = &apiConf
 	}
 
