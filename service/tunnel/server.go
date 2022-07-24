@@ -53,12 +53,12 @@ func onData(c *arpc.Context) {
 			Err(err).Str("apiname", item.APIName).Str("client_ip", item.IP).
 			Str("remote_addr", c.Client.Conn.RemoteAddr().String()).
 			Msg("TunRecvBad")
-		TunRecvBadCount.Inc()
+		RecvBadCount.Inc()
 		item.Release()
 		return
 	}
 
 	// 写入队列
-	TunRecvCount.Inc()
+	RecvCount.Inc()
 	schema.PushDataToChanx(item)
 }

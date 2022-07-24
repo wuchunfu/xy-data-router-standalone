@@ -39,10 +39,10 @@ func initTunClient() {
 					// 不超时, 直到 ErrClientOverstock
 					if err := client.Notify(tunMethod, data, arpc.TimeZero); err != nil {
 						common.LogSampled.Warn().Err(err).Msg("Failed to write Tunnel")
-						TunSendErrors.Inc()
+						SendErrors.Inc()
 						return
 					}
-					TunSendCount.Inc()
+					SendCount.Inc()
 				})
 			}
 		}()

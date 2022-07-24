@@ -20,6 +20,9 @@ var (
 	// 以接口名为键的数据通道
 	dataRouters = xsync.NewMap()
 
+	// ItemTotal 收到的数据项计数
+	ItemTotal xsync.Counter
+
 	// ESChan ES 数据接收信道
 	ESChan *chanx.UnboundedChan
 
@@ -149,12 +152,13 @@ func newDataRouter(apiConf *conf.TAPIConf) *tDataRouter {
 // 数据入口
 func dataEntry() {
 	for item := range schema.ItemDrChan.Out {
+		ItemTotal.Inc()
 		item := item.(*schema.DataItem)
 		dr, ok := dataRouters.Load(item.APIName)
 		if !ok {
 			common.LogSampled.Error().Str("apiname", item.APIName).Int("len", len(item.APIName)).Msg("nonexistence")
 			item.Release()
-			return
+			continue
 		}
 		dr.(*tDataRouter).drChan.In <- item
 	}

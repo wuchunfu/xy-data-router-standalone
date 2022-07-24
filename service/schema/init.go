@@ -2,6 +2,7 @@ package schema
 
 import (
 	"github.com/fufuok/chanx"
+	"github.com/fufuok/utils/xsync"
 
 	"github.com/fufuok/xy-data-router/common"
 )
@@ -9,6 +10,7 @@ import (
 var (
 	ItemDrChan  *chanx.UnboundedChan
 	ItemTunChan *chanx.UnboundedChan
+	ItemTotal   xsync.Counter
 )
 
 // InitMain 程序启动时初始化配置
@@ -24,6 +26,7 @@ func Stop() {}
 
 // PushDataToChanx 接收数据推入队列
 func PushDataToChanx(item *DataItem) {
+	ItemTotal.Inc()
 	if common.ForwardTunnel != "" {
 		ItemTunChan.In <- item
 		return

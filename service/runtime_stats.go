@@ -107,10 +107,9 @@ func memStats() map[string]interface{} {
 
 // 数据处理信息
 func dataStats() map[string]interface{} {
-	tunSendErrors := tunnel.TunSendErrors.Value()
-	tunSendCount := tunnel.TunSendCount.Value()
-	tunTotal := tunnel.TunDataTotal.Value()
-
+	tunSendErrors := tunnel.SendErrors.Value()
+	tunSendCount := tunnel.SendCount.Value()
+	tunTotal := tunnel.ItemTotal.Value()
 	return map[string]interface{}{
 		// 数据传输到 ES 处理通道繁忙状态
 		"ESDataQueueAll":             datarouter.ESChan.Len(),
@@ -124,6 +123,11 @@ func dataStats() map[string]interface{} {
 		"DataRouterQueueAll":         schema.ItemDrChan.Len(),
 		"DataRouterQueueBuf":         schema.ItemDrChan.BufLen(),
 		"DataRouterQueueDiscards___": schema.ItemDrChan.Discards(),
+
+		// 数据项统计
+		"AllItemTotal":        utils.Comma(schema.ItemTotal.Value()),
+		"DataRouterItemTotal": utils.Comma(datarouter.ItemTotal.Value()),
+		"TunnelItemTotal":     utils.Comma(tunTotal),
 
 		// 公共协程池, 不阻塞
 		"CommonGoPoolFree":    common.GoPool.Free(),
@@ -151,10 +155,9 @@ func dataStats() map[string]interface{} {
 		"HTTPRequestCount":           utils.Comma(common.HTTPRequestCount.Value()),
 		"HTTPBadRequestCount":        utils.Comma(common.HTTPBadRequestCount.Value()),
 		"UDPRequestCount":            utils.Comma(datarouter.UDPRequestCount.Value()),
-		"TunnelRecvCount":            utils.Comma(tunnel.TunRecvCount.Value()),
-		"TunnelRecvBadCount________": tunnel.TunRecvBadCount.Value(),
-		"TunnelCompressTotal":        utils.Comma(tunnel.TunCompressTotal.Value()),
-		"TunnelDataTotal":            utils.Comma(tunTotal),
+		"TunnelRecvCount":            utils.Comma(tunnel.RecvCount.Value()),
+		"TunnelRecvBadCount________": tunnel.RecvBadCount.Value(),
+		"TunnelCompressTotal":        utils.Comma(tunnel.CompressTotal.Value()),
 		"TunnelSendCount":            utils.Comma(tunSendCount),
 		"TunnelSendErrors__________": tunSendErrors,
 		"TunnelTodoSendCount_______": tunTotal - tunSendCount - tunSendErrors,
