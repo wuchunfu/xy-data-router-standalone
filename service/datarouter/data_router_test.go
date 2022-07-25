@@ -44,7 +44,6 @@ func BenchmarkDataRouterLoad(b *testing.B) {
 		apiConf.ESBulkHeader = []byte(`{"index":{"_index":"` + apiname + `","_type":"_doc"}}`)
 		dr := &tDataRouter{
 			apiConf: apiConf,
-			drOut:   &tDataRouterOut{},
 		}
 		dataRouters.Store(apiname, dr)
 

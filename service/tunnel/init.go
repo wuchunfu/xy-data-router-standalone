@@ -62,4 +62,5 @@ func dataEntry() {
 		}
 		tunChan.In <- item
 	}
+	common.Log.Error().Msg("Exception: Tunnel entry worker exited")
 }

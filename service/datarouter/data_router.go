@@ -63,7 +63,7 @@ func dataRouter(dr *tDataRouter) {
 	}
 
 	// 准备退出
-	time.Sleep(time.Second)
-	close(dr.drOut.apiChan.In)
+	time.Sleep(2 * time.Second)
+	close(dr.apiChan.In)
 	common.Log.Warn().Str("apiname", dr.apiConf.APIName).Msg("DataRouter worker exited")
 }

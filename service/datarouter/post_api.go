@@ -43,7 +43,7 @@ func apiWorker(dr *tDataRouter) {
 				postAPI(dis, dr.apiConf.PostAPI.API)
 				dis = getDataItems()
 			}
-		case v, ok := <-dr.drOut.apiChan.Out:
+		case v, ok := <-dr.apiChan.Out:
 			if !ok {
 				// 消费所有数据
 				if dis.count > 0 {

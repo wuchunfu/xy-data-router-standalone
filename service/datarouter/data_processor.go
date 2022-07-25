@@ -126,13 +126,13 @@ func sendOneData(dp *tDataProcessor, js []byte, isPostToES, isPostToAPI bool) {
 		// 需要在 ES 使用后回收 DataItem
 		item := schema.Make()
 		item.Body = esData
-		dp.dr.drOut.esChan.In <- item
+		ESChan.In <- item
 	}
 	if isPostToAPI {
 		// 需要在 API 使用后回收 DataItem
 		item := schema.Make()
 		item.Body = jsData
-		dp.dr.drOut.apiChan.In <- item
+		dp.dr.apiChan.In <- item
 	} else {
 		bytespool.Release(jsData)
 	}

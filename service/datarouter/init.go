@@ -65,17 +65,11 @@ type tDataRouter struct {
 	// 数据接收信道
 	drChan *chanx.UnboundedChan
 
+	// 接口数据分发信道
+	apiChan *chanx.UnboundedChan
+
 	// 接口配置
 	apiConf *conf.TAPIConf
-
-	// 数据分发信道索引
-	drOut *tDataRouterOut
-}
-
-// 数据分发信道
-type tDataRouterOut struct {
-	esChan  *chanx.UnboundedChan
-	apiChan *chanx.UnboundedChan
 }
 
 // 数据处理
@@ -141,11 +135,8 @@ func tuneESBulkWorkerSize(n int) {
 func newDataRouter(apiConf *conf.TAPIConf) *tDataRouter {
 	return &tDataRouter{
 		drChan:  common.NewChanx(),
+		apiChan: common.NewChanx(),
 		apiConf: apiConf,
-		drOut: &tDataRouterOut{
-			esChan:  ESChan,
-			apiChan: common.NewChanx(),
-		},
 	}
 }
 
@@ -162,4 +153,5 @@ func dataEntry() {
 		}
 		dr.(*tDataRouter).drChan.In <- item
 	}
+	common.Log.Error().Msg("Exception: DataRouter entry worker exited")
 }
