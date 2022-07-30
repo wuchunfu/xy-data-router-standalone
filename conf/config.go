@@ -35,7 +35,6 @@ type tSYSConf struct {
 	PProfAddr               string `json:"pprof_addr"`
 	RestartMain             bool   `json:"restart_main"`
 	WatcherInterval         int    `json:"watcher_interval"`
-	HeartbeatIndex          string `json:"heartbeat_index"`
 	ReqTimeout              int    `json:"req_timeout"`
 	ReqMaxRetries           int    `json:"req_max_retries"`
 	ReqTimeoutDuration      time.Duration
@@ -53,6 +52,7 @@ type tLogConf struct {
 	MaxBackups  int    `json:"max_backups"`
 	MaxAge      int    `json:"max_age"`
 	ESBulkLevel int    `json:"es_bulk_level"`
+	ESIndex     string `json:"es_index"`
 	PeriodDur   time.Duration
 }
 
@@ -71,7 +71,6 @@ type tWebConf struct {
 	TrustedProxies          []string `json:"trusted_proxies"`
 	ESAPITimeoutSecond      int      `json:"esapi_timeout_second"`
 	ESSlowQuery             int      `json:"es_slow_query"`
-	ESAPILogIndex           string   `json:"esapi_log_index"`
 	ESSlowQueryDuration     time.Duration
 	SlowResponseDuration    time.Duration
 	ESAPITimeout            time.Duration
@@ -394,14 +393,9 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		config.SYSConf.WatcherIntervalDuration = time.Duration(config.SYSConf.WatcherInterval) * time.Minute
 	}
 
-	// 心跳日志索引
-	if config.SYSConf.HeartbeatIndex == "" {
-		config.SYSConf.HeartbeatIndex = HeartbeatIndex
-	}
-
 	// ES 查询接口日志索引
-	if config.WebConf.ESAPILogIndex == "" {
-		config.WebConf.ESAPILogIndex = ESAPILogIndex
+	if config.LogConf.ESIndex == "" {
+		config.LogConf.ESIndex = LogESIndex
 	}
 
 	// HTTP 请求体限制, -1 表示无限

@@ -29,7 +29,7 @@ func log(params *tParams, ret *tResult) {
 	data := buf.Bytes()
 	data, _ = sjson.SetBytes(data, "body", gjson.GetBytes(data, "body").String())
 
-	item := schema.New(conf.Config.WebConf.ESAPILogIndex, common.ExternalIPv4, data)
+	item := schema.New(conf.Config.LogConf.ESIndex, common.ExternalIPv4, data)
 	schema.PushDataToChanx(item)
 	if conf.Debug {
 		common.Log.Debug().RawJSON("query", buf.Bytes()).Msg("es query")

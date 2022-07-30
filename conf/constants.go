@@ -17,6 +17,8 @@ const (
 	LogFileMaxSize    = 100
 	LogFileMaxBackups = 10
 	LogFileMaxAge     = 30
+	// LogESIndex 日志存放的 ES 索引
+	LogESIndex = "app_log"
 
 	// WebServerAddr HTTP 接口端口
 	WebServerAddr = ":6600"
@@ -102,11 +104,6 @@ const (
 
 	// BufferMaxCapacity 字节缓冲池最大可回收容量值限定, 默认值: 1MiB, 即大于该值的就不回收到池
 	BufferMaxCapacity = 1 << 20
-
-	// HeartbeatIndex 心跳日志索引
-	HeartbeatIndex = "monitor_heartbeat_report"
-	// ESAPILogIndex ES 查询接口日志索引
-	ESAPILogIndex = "esapi_log"
 
 	// ReqTimeoutDuration 作为客户端发起请求默认超时时间(秒), 数据分发到其他接口时请求默认超时时间
 	ReqTimeoutDuration = 30 * time.Second

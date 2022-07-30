@@ -16,13 +16,13 @@ func initHeartbeat() {
 	defer ticker.Stop()
 	for range ticker.C {
 		js := jsongen.NewMap()
-		js.PutString("type", conf.APPName)
+		js.PutString("app", conf.APPName)
 		js.PutString("version", conf.Version)
 		js.PutString("internal_ipv4", common.InternalIPv4)
 		js.PutString("external_ipv4", common.ExternalIPv4)
 		js.PutString("time", time.Now().Format(time.RFC3339))
 		data := js.Serialize(nil)
-		item := schema.New(conf.Config.SYSConf.HeartbeatIndex, common.ExternalIPv4, data)
+		item := schema.New(conf.Config.LogConf.ESIndex, common.ExternalIPv4, data)
 		schema.PushDataToChanx(item)
 	}
 }

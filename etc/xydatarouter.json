@@ -4,8 +4,6 @@
     "pprof_addr": ":8888",
     "restart_main": false,
     "watcher_interval": 1,
-    "heartbeat_index": "",
-    "esapi_log_index": "",
     "__ReqTimeout": "作为客户端发起请求默认超时时间(秒), 如数据分发到其他接口, 默认: 30",
     "req_timeout": 30,
     "__ReqMaxRetries": "作为客户端发起请求失败时(比如网络错误)重试次数, 默认: 0",
@@ -34,7 +32,9 @@
     "max_backups": 10,
     "max_age": 30,
     "__ESBulkLevel": "依赖于 Level <= Warn, 设置 Warn 解析 ES Bulk 批量结果, 抽样错误; Info 记录详细内容",
-    "es_bulk_level": 2
+    "es_bulk_level": 2,
+    "es_index": "app_log"
+
   },
   "web_conf": {
     "server_addr": ":6600",
