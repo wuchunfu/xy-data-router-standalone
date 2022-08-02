@@ -17,12 +17,12 @@ var (
 // id: 1, ok: 1, code: 0 成功; id: 0, ok: 0, code: 1 失败
 // 成功时 msg 必定为空
 type TAPIData struct {
-	ID    int         `json:"id"`
-	OK    int         `json:"ok"`
-	Code  int         `json:"code"`
-	Msg   string      `json:"msg"`
-	Data  interface{} `json:"data"`
-	Count int         `json:"count"`
+	ID    int    `json:"id"`
+	OK    int    `json:"ok"`
+	Code  int    `json:"code"`
+	Msg   string `json:"msg"`
+	Data  any    `json:"data"`
+	Count int    `json:"count"`
 }
 
 // APIFailureData API 请求失败返回值
@@ -38,7 +38,7 @@ func APIFailureData(msg string) *TAPIData {
 }
 
 // APISuccessData API 请求成功返回值
-func APISuccessData(data interface{}, count int) *TAPIData {
+func APISuccessData(data any, count int) *TAPIData {
 	return &TAPIData{
 		ID:    1,
 		OK:    1,

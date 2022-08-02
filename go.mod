@@ -1,17 +1,17 @@
 module github.com/fufuok/xy-data-router
 
-go 1.17
+go 1.18
 
 require (
 	github.com/elastic/go-elasticsearch/v7 v7.17.1
 	github.com/fufuok/bytespool v1.1.1
-	github.com/fufuok/chanx v0.0.107
+	github.com/fufuok/chanx v1.0.0
 	github.com/fufuok/timewheel v1.1.100
-	github.com/fufuok/utils v0.4.1
+	github.com/fufuok/utils v0.4.2
 	github.com/goccy/go-json v0.9.5
 	github.com/gofiber/fiber/v2 v2.29.0
-	github.com/imroc/req/v3 v3.9.3
-	github.com/klauspost/compress v1.15.0
+	github.com/imroc/req/v3 v3.9.4
+	github.com/klauspost/compress v1.15.1
 	github.com/lesismal/arpc v1.2.6
 	github.com/panjf2000/ants/v2 v2.4.8
 	github.com/panjf2000/gnet v1.6.4
@@ -35,6 +35,6 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/sys v0.0.0-20220319134239-a9b59b0215f8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )

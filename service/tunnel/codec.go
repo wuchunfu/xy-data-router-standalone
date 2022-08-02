@@ -21,7 +21,7 @@ var codecError = errors.New("invalid schema.DataItem")
 type genCodec struct{}
 
 // Marshal wraps schema.DataItem.Marshal
-func (j *genCodec) Marshal(v interface{}) ([]byte, error) {
+func (j *genCodec) Marshal(v any) ([]byte, error) {
 	d, ok := v.(*schema.DataItem)
 	if !ok {
 		return nil, codecError
@@ -49,7 +49,7 @@ func (j *genCodec) Marshal(v interface{}) ([]byte, error) {
 }
 
 // Unmarshal wraps schema.DataItem.Unmarshal
-func (j *genCodec) Unmarshal(data []byte, v interface{}) (err error) {
+func (j *genCodec) Unmarshal(data []byte, v any) (err error) {
 	d, ok := v.(*schema.DataItem)
 	if !ok {
 		return codecError

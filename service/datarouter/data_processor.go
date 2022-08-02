@@ -22,7 +22,7 @@ var (
 
 	// 数据处理池
 	dpPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return new(tDataProcessor)
 		},
 	}
@@ -46,12 +46,12 @@ func releaseDataProcessor(dp *tDataProcessor) {
 func initDataProcessorPool() {
 	DataProcessorPool, _ = ants.NewPoolWithFunc(
 		conf.Config.DataConf.ProcessorSize,
-		func(i interface{}) {
+		func(i any) {
 			dataProcessor(i.(*tDataProcessor))
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.DataConf.ProcessorMaxWorkerSize),
-		ants.WithPanicHandler(func(r interface{}) {
+		ants.WithPanicHandler(func(r any) {
 			common.LogSampled.Error().Interface("recover", r).Msg("panic")
 		}),
 	)

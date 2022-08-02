@@ -48,18 +48,18 @@ func (l *logger) SetLogger(logger zerolog.Logger) {
 	l.log = logger
 }
 
-func (l *logger) Debug(format string, v ...interface{}) {
+func (l *logger) Debug(format string, v ...any) {
 	l.log.Debug().Msgf(format, v...)
 }
 
-func (l *logger) Info(format string, v ...interface{}) {
+func (l *logger) Info(format string, v ...any) {
 	l.log.Info().Msgf(format, v...)
 }
 
-func (l *logger) Warn(format string, v ...interface{}) {
+func (l *logger) Warn(format string, v ...any) {
 	l.log.Warn().Msgf(format, v...)
 }
 
-func (l *logger) Error(format string, v ...interface{}) {
+func (l *logger) Error(format string, v ...any) {
 	l.log.Error().Msgf(format, v...)
 }

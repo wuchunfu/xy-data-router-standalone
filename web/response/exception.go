@@ -22,7 +22,7 @@ func APIFailure(c *fiber.Ctx, msg string) error {
 }
 
 // APISuccess 返回成功, 状态码: 200
-func APISuccess(c *fiber.Ctx, data interface{}, count int) error {
+func APISuccess(c *fiber.Ctx, data any, count int) error {
 	return c.JSON(APISuccessData(data, count))
 }
 

@@ -5,13 +5,12 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/service/schema"
 )
 
 // initDataRouter 根据接口配置初始化数据分发处理器
 func initDataRouter() {
 	// 关闭配置中已取消的接口
-	dataRouters.Range(func(key string, value interface{}) bool {
+	dataRouters.Range(func(key string, value any) bool {
 		if _, ok := conf.APIConfig[key]; !ok {
 			dataRouters.Delete(key)
 			close(value.(*tDataRouter).drChan.In)
@@ -51,7 +50,7 @@ func dataRouter(dr *tDataRouter) {
 	// 接收数据
 	for item := range dr.drChan.Out {
 		// 提交不阻塞, 有执行并发限制, 最大排队数限制
-		dp := newDataPorcessor(dr, item.(*schema.DataItem))
+		dp := newDataPorcessor(dr, item)
 		_ = common.GoPool.Submit(func() {
 			DataProcessorTodoCount.Inc()
 			if err := DataProcessorPool.Invoke(dp); err != nil {

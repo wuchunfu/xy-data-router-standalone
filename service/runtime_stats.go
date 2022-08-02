@@ -16,8 +16,8 @@ import (
 )
 
 // RuntimeStats 运行状态统计
-func RuntimeStats() map[string]interface{} {
-	return map[string]interface{}{
+func RuntimeStats() map[string]any {
+	return map[string]any{
 		"DATA": dataStats(),
 		"SYS":  sysStats(),
 		"MEM":  memStats(),
@@ -25,9 +25,9 @@ func RuntimeStats() map[string]interface{} {
 }
 
 // 系统信息
-func sysStats() map[string]interface{} {
+func sysStats() map[string]any {
 	ver := conf.GetFilesVer(conf.Config.MainConf.Path)
-	return map[string]interface{}{
+	return map[string]any{
 		"APPName":      conf.APPName,
 		"Version":      conf.Version,
 		"GitCommit":    conf.GitCommit,
@@ -68,10 +68,10 @@ func sysStats() map[string]interface{} {
 }
 
 // 内存信息
-func memStats() map[string]interface{} {
+func memStats() map[string]any {
 	var ms runtime.MemStats
 	runtime.ReadMemStats(&ms)
-	return map[string]interface{}{
+	return map[string]any{
 		// 程序启动后累计申请的字节数
 		"TotalAlloc":  ms.TotalAlloc,
 		"TotalAlloc_": utils.HumanBytes(ms.TotalAlloc),
@@ -106,11 +106,11 @@ func memStats() map[string]interface{} {
 }
 
 // 数据处理信息
-func dataStats() map[string]interface{} {
+func dataStats() map[string]any {
 	tunSendErrors := tunnel.SendErrors.Value()
 	tunSendCount := tunnel.SendCount.Value()
 	tunTotal := tunnel.ItemTotal.Value()
-	return map[string]interface{}{
+	return map[string]any{
 		// 数据传输到 ES 处理通道繁忙状态
 		"ESDataQueueAll":             datarouter.ESChan.Len(),
 		"ESDataQueueBuf":             datarouter.ESChan.BufLen(),

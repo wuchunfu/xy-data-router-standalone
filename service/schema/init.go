@@ -8,15 +8,15 @@ import (
 )
 
 var (
-	ItemDrChan  *chanx.UnboundedChan
-	ItemTunChan *chanx.UnboundedChan
+	ItemDrChan  *chanx.UnboundedChan[*DataItem]
+	ItemTunChan *chanx.UnboundedChan[*DataItem]
 	ItemTotal   xsync.Counter
 )
 
 // InitMain 程序启动时初始化配置
 func InitMain() {
-	ItemDrChan = common.NewChanx()
-	ItemTunChan = common.NewChanx()
+	ItemDrChan = common.NewChanx[*DataItem]()
+	ItemTunChan = common.NewChanx[*DataItem]()
 }
 
 // InitRuntime 重新加载或初始化运行时配置

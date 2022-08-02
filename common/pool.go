@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/fufuok/bytespool"
+	"github.com/fufuok/chanx"
 	"github.com/fufuok/utils/pools/bufferpool"
 	"github.com/panjf2000/ants/v2"
 
@@ -36,4 +37,9 @@ func initPool() {
 
 func poolRelease() {
 	GoPool.Release()
+}
+
+// NewChanx 初始化无限缓冲信道
+func NewChanx[T any]() *chanx.UnboundedChan[T] {
+	return chanx.NewUnboundedChan[T](conf.Config.DataConf.ChanSize, conf.Config.DataConf.ChanMaxBufCap)
 }

@@ -3,13 +3,10 @@ package common
 import (
 	"time"
 
-	"github.com/fufuok/chanx"
 	"github.com/fufuok/timewheel"
 	"github.com/fufuok/utils/myip"
 	"github.com/fufuok/utils/xsync"
 	"github.com/tidwall/gjson"
-
-	"github.com/fufuok/xy-data-router/conf"
 )
 
 var (
@@ -118,11 +115,6 @@ func CheckRequiredField(body []byte, fields []string) bool {
 		}
 	}
 	return true
-}
-
-// NewChanx 初始化无限缓冲信道
-func NewChanx() *chanx.UnboundedChan {
-	return chanx.NewUnboundedChan(conf.Config.DataConf.ChanSize, conf.Config.DataConf.ChanMaxBufCap)
 }
 
 // 周期性更新全局时间字段

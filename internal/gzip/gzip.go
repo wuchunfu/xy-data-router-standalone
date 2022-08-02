@@ -11,12 +11,12 @@ import (
 var (
 	writerPool = newGzipWriterPool()
 	readerPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return new(gzip.Reader)
 		},
 	}
 	bufferPool = sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return bytes.NewBuffer(nil)
 		},
 	}
@@ -90,7 +90,7 @@ func newGzipWriterPool() (pools []*sync.Pool) {
 	for i := 0; i < 12; i++ {
 		level := i - 2
 		pools = append(pools, &sync.Pool{
-			New: func() interface{} {
+			New: func() any {
 				zw, _ := gzip.NewWriterLevel(nil, level)
 				return zw
 			},

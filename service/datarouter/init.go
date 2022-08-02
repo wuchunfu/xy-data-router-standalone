@@ -24,7 +24,7 @@ var (
 	ItemTotal xsync.Counter
 
 	// ESChan ES 数据接收信道
-	ESChan *chanx.UnboundedChan
+	ESChan *chanx.UnboundedChan[*schema.DataItem]
 
 	// DataProcessorTodoCount 待处理的数据项计数
 	DataProcessorTodoCount xsync.Counter
@@ -63,10 +63,10 @@ var (
 // 数据分发
 type tDataRouter struct {
 	// 数据接收信道
-	drChan *chanx.UnboundedChan
+	drChan *chanx.UnboundedChan[*schema.DataItem]
 
 	// 接口数据分发信道
-	apiChan *chanx.UnboundedChan
+	apiChan *chanx.UnboundedChan[*schema.DataItem]
 
 	// 接口配置
 	apiConf *conf.TAPIConf
@@ -81,7 +81,7 @@ type tDataProcessor struct {
 // InitMain 程序启动时初始化
 func InitMain() {
 	// 初始化 ES 数据信道
-	ESChan = common.NewChanx()
+	ESChan = common.NewChanx[*schema.DataItem]()
 
 	// 初始化数据分发器
 	initDataRouter()
@@ -134,8 +134,8 @@ func tuneESBulkWorkerSize(n int) {
 // 新数据信道
 func newDataRouter(apiConf *conf.TAPIConf) *tDataRouter {
 	return &tDataRouter{
-		drChan:  common.NewChanx(),
-		apiChan: common.NewChanx(),
+		drChan:  common.NewChanx[*schema.DataItem](),
+		apiChan: common.NewChanx[*schema.DataItem](),
 		apiConf: apiConf,
 	}
 }
@@ -143,8 +143,8 @@ func newDataRouter(apiConf *conf.TAPIConf) *tDataRouter {
 // 数据入口
 func dataEntry() {
 	for item := range schema.ItemDrChan.Out {
+		item := item
 		ItemTotal.Inc()
-		item := item.(*schema.DataItem)
 		dr, ok := dataRouters.Load(item.APIName)
 		if !ok {
 			common.LogSampled.Error().Str("apiname", item.APIName).Int("len", len(item.APIName)).Msg("nonexistence")

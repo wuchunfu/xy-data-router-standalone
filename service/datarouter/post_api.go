@@ -8,7 +8,6 @@ import (
 	"github.com/imroc/req/v3"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/service/schema"
 )
 
 func apiWorker(dr *tDataRouter) {
@@ -43,7 +42,7 @@ func apiWorker(dr *tDataRouter) {
 				postAPI(dis, dr.apiConf.PostAPI.API)
 				dis = getDataItems()
 			}
-		case v, ok := <-dr.apiChan.Out:
+		case item, ok := <-dr.apiChan.Out:
 			if !ok {
 				// 消费所有数据
 				if dis.count > 0 {
@@ -52,7 +51,9 @@ func apiWorker(dr *tDataRouter) {
 				common.Log.Warn().Str("apiname", dr.apiConf.APIName).Msg("apiWorker exited")
 				return
 			}
-			dis.add(v.(*schema.DataItem))
+
+			dis.add(item)
+
 			// 达到限定数量或大小时推送数据
 			if dis.count%dr.apiConf.PostAPI.BatchNum == 0 || dis.size > dr.apiConf.PostAPI.BatchBytes {
 				postAPI(dis, dr.apiConf.PostAPI.API)

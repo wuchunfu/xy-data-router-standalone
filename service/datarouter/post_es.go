@@ -14,7 +14,6 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
-	"github.com/fufuok/xy-data-router/service/schema"
 )
 
 // ES 批量写入响应
@@ -41,12 +40,12 @@ type tESBulkResponse struct {
 func initESBulkPool() {
 	ESBulkPool, _ = ants.NewPoolWithFunc(
 		conf.Config.DataConf.ESBulkWorkerSize,
-		func(v interface{}) {
+		func(v any) {
 			esBulk(v.(*tDataItems))
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.DataConf.ESBulkMaxWorkerSize),
-		ants.WithPanicHandler(func(r interface{}) {
+		ants.WithPanicHandler(func(r any) {
 			common.LogSampled.Error().Interface("recover", r).Msg("panic")
 		}),
 	)
@@ -95,7 +94,7 @@ func updateESBulkHeader() {
 	for {
 		now := common.GTimeNow()
 		ymd := now.Format("060102")
-		dataRouters.Range(func(_ string, value interface{}) bool {
+		dataRouters.Range(func(_ string, value any) bool {
 			dr := value.(*tDataRouter)
 			dr.apiConf.ESBulkHeader = getESBulkHeader(dr.apiConf, ymd)
 			dr.apiConf.ESBulkHeaderLength = len(dr.apiConf.ESBulkHeader)
@@ -122,7 +121,7 @@ func esWorker() {
 			}
 			submitESBulk(dis)
 			dis = getDataItems()
-		case v, ok := <-ESChan.Out:
+		case item, ok := <-ESChan.Out:
 			if !ok {
 				// 消费所有数据
 				if dis.count > 0 {
@@ -132,7 +131,7 @@ func esWorker() {
 				return
 			}
 
-			dis.add(v.(*schema.DataItem))
+			dis.add(item)
 
 			// 达到限定数量或大小写入 ES
 			if dis.count%conf.Config.DataConf.ESPostBatchNum == 0 || dis.size > conf.Config.DataConf.ESPostBatchBytes {

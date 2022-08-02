@@ -14,7 +14,7 @@ const tunMethod = "tunnel"
 
 var (
 	// Tun 数据信道
-	tunChan *chanx.UnboundedChan
+	tunChan *chanx.UnboundedChan[*schema.DataItem]
 
 	// ItemTotal Tunnel 服务端接收和客户端发送计数
 	ItemTotal     xsync.Counter
@@ -28,7 +28,7 @@ var (
 // InitMain 程序启动时初始化
 func InitMain() {
 	// 初始化 Tun 数据信道
-	tunChan = common.NewChanx()
+	tunChan = common.NewChanx[*schema.DataItem]()
 
 	initLogger()
 	arpc.SetSendQueueSize(conf.Config.TunConf.SendQueueSize)
@@ -53,8 +53,8 @@ func Stop() {}
 // 数据入口
 func dataEntry() {
 	for item := range schema.ItemTunChan.Out {
+		item := item
 		ItemTotal.Inc()
-		item := item.(*schema.DataItem)
 		// 设置压缩标识
 		if item.Size() >= conf.Config.TunConf.CompressMinSize {
 			item.Flag = 1

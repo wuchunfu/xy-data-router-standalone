@@ -16,7 +16,7 @@ const (
 
 var defaultPool = &Pool{
 	pool: sync.Pool{
-		New: func() interface{} {
+		New: func() any {
 			return new(DataItem)
 		},
 	},
