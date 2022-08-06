@@ -125,6 +125,7 @@ type TAPIConf struct {
 	ESOptionalWrite    bool         `json:"es_optional_write"`
 	ESIndex            string       `json:"es_index"`
 	ESIndexSplit       string       `json:"es_index_split"`
+	ESPipeline         string       `json:"es_pipeline"`
 	RequiredField      []string     `json:"required_field"`
 	PostAPI            TPostAPIConf `json:"post_api"`
 	ESBulkHeader       []byte
@@ -340,6 +341,7 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 			continue
 		}
 
+		apiConf.ESPipeline = strings.TrimSpace(apiConf.ESPipeline)
 		if len(apiConf.PostAPI.API) > 0 && apiConf.PostAPI.Interval > 0 {
 			// 单次汇聚最大数量
 			if apiConf.PostAPI.BatchNum < 1 {

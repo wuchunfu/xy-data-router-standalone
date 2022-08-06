@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
+	"github.com/fufuok/utils/jsongen"
 	"github.com/fufuok/utils/pools/bufferpool"
 	"github.com/fufuok/utils/pools/readerpool"
 	"github.com/panjf2000/ants/v2"
@@ -80,12 +81,19 @@ func getESBulkHeader(apiConf *conf.TAPIConf, ymd string) []byte {
 		esIndex = esIndex + "_" + ymd
 	}
 
-	indexType := ""
+	jsIndex := jsongen.NewMap()
+	js := jsongen.NewMap()
+	js.PutString("_index", esIndex)
 	if common.ESLessThan7 {
-		indexType = `","_type":"_doc`
+		js.PutString("_type", "_doc")
 	}
-
-	return utils.AddStringBytes(`{"index":{"_index":"`, esIndex, indexType, `"}}`, "\n")
+	if apiConf.ESPipeline != "" {
+		js.PutString("pipeline", apiConf.ESPipeline)
+	}
+	jsIndex.PutMap("index", js)
+	bs := jsIndex.Serialize(nil)
+	bs = append(bs, '\n')
+	return bs
 }
 
 // 每日更新所有接口 esBluk 索引头
