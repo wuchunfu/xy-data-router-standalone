@@ -122,6 +122,7 @@ type tStateConf struct {
 
 type TAPIConf struct {
 	APIName            string       `json:"api_name"`
+	ESDisableWrite     bool         `json:"es_disable_write"`
 	ESOptionalWrite    bool         `json:"es_optional_write"`
 	ESIndex            string       `json:"es_index"`
 	ESIndexSplit       string       `json:"es_index_split"`

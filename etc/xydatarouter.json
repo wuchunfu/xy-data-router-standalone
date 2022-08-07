@@ -119,6 +119,8 @@
     {
       "__接口名称": "接口为: http://api.domain:6600/v1/start",
       "api_name": "start",
+      "__ESDisableWrite": "是否关闭写入 ES (仅对该接口有效, 不影响分发给第三方接口), 默认不关闭, 正常写入",
+      "es_disable_write": false,
       "__ESOptionalWrite": "默认为 false, 可选写入 ES, 当 ES 繁忙时, 该选项为真的接口数据将不会发往 ES",
       "es_optional_write": false,
       "__ES 索引名称": "不指定索引名前缀时, 默认与接口名称相同",

@@ -75,14 +75,15 @@ func initESOptionalWrite() {
 func dataProcessor(dp *tDataProcessor) {
 	defer releaseDataProcessor(dp)
 
-	isPostToES := !(conf.Config.DataConf.ESDisableWrite || ESOptionalWrite && dp.dr.apiConf.ESOptionalWrite)
-	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
-	if !isPostToES {
-		// 丢弃可选写入 ES 数据项计数
+	// 丢弃可选写入 ES 数据项
+	isDiscards := ESOptionalWrite && dp.dr.apiConf.ESOptionalWrite
+	if isDiscards {
 		ESDataItemDiscards.Inc()
-		if !isPostToAPI {
-			return
-		}
+	}
+	isPostToES := !(isDiscards || conf.Config.DataConf.ESDisableWrite || dp.dr.apiConf.ESDisableWrite)
+	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
+	if !isPostToES && !isPostToAPI {
+		return
 	}
 
 	// 兼容 {body} 或 {body}=-:-=[{body},{body}]
