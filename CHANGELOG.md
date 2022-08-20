@@ -1,5 +1,10 @@
 # XY.DataRouter
 
+## v1.103.1.22032818
+
+- 增加接口配置 `es_pipeline` 参数, 指定写入 ES 时使用的 Pipeline
+- 增加接口配置 `es_disable_write` 参数, 可选不写 ES, 数据仅分发给第三方接口
+
 ## v1.103.0.22032111
 
 - 应用泛型
