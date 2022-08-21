@@ -18,6 +18,9 @@ import (
 func sendResult(c *fiber.Ctx, resp *tResponse, params *tParams) error {
 	params.ClientIP = common.GetClientIP(c)
 	ret := parseESResponse(resp, params)
+	ret.ReqUri = utils.CopyString(c.OriginalURL())
+	ret.ReqTime = common.Now3399UTC
+	ret.ReqType = conf.APPName
 	defer func() {
 		log(params, ret)
 		putResult(ret)

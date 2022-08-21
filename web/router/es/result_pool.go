@@ -11,6 +11,9 @@ type tResult struct {
 	Count      int    `json:"count"`
 	Error      string `json:"err"`
 	ErrMsg     string `json:"err_msg"`
+	ReqUri     string `json:"req_uri"`
+	ReqTime    string `json:"req_time"`
+	ReqType    string `json:"type"`
 }
 
 var resultPool = sync.Pool{
@@ -28,5 +31,6 @@ func putResult(r *tResult) {
 	r.Count = 0
 	r.Error = ""
 	r.ErrMsg = ""
+	r.ReqUri = ""
 	resultPool.Put(r)
 }
