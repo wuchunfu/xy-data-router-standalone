@@ -7,7 +7,7 @@ require (
 	github.com/fufuok/bytespool v1.1.1
 	github.com/fufuok/chanx v1.0.0
 	github.com/fufuok/timewheel v1.1.100
-	github.com/fufuok/utils v0.4.2
+	github.com/fufuok/utils v0.4.4
 	github.com/goccy/go-json v0.9.6
 	github.com/gofiber/fiber/v2 v2.31.0
 	github.com/imroc/req/v3 v3.10.0
@@ -34,7 +34,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
-	golang.org/x/net v0.0.0-20220403103023-749bd193bc2b // indirect
-	golang.org/x/sys v0.0.0-20220405210540-1e041c57c461 // indirect
+	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
