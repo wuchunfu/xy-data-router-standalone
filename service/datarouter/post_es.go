@@ -102,8 +102,7 @@ func updateESBulkHeader() {
 	for {
 		now := common.GTimeNow()
 		ymd := now.Format("060102")
-		dataRouters.Range(func(_ string, value any) bool {
-			dr := value.(*tDataRouter)
+		dataRouters.Range(func(_ string, dr *tDataRouter) bool {
 			dr.apiConf.ESBulkHeader = getESBulkHeader(dr.apiConf, ymd)
 			dr.apiConf.ESBulkHeaderLength = len(dr.apiConf.ESBulkHeader)
 			return true

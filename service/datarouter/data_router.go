@@ -10,10 +10,10 @@ import (
 // initDataRouter 根据接口配置初始化数据分发处理器
 func initDataRouter() {
 	// 关闭配置中已取消的接口
-	dataRouters.Range(func(key string, value any) bool {
-		if _, ok := conf.APIConfig[key]; !ok {
-			dataRouters.Delete(key)
-			close(value.(*tDataRouter).drChan.In)
+	dataRouters.Range(func(apiname string, dr *tDataRouter) bool {
+		if _, ok := conf.APIConfig[apiname]; !ok {
+			dataRouters.Delete(apiname)
+			close(dr.drChan.In)
 		}
 		return true
 	})
@@ -27,10 +27,9 @@ func initDataRouter() {
 		if conf.Debug {
 			common.Log.Info().RawJSON(apiname, apiConf.ESBulkHeader).Msg("ESBulkHeader")
 		}
-		v, ok := dataRouters.Load(apiname)
+		dr, ok := dataRouters.Load(apiname)
 		if ok {
 			// 更新接口配置
-			dr := v.(*tDataRouter)
 			dr.apiConf = apiConf
 		} else {
 			// 新建数据通道

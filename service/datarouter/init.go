@@ -18,7 +18,7 @@ var (
 	esBodySep = []byte(conf.ESBodySep)
 
 	// 以接口名为键的数据通道
-	dataRouters = xsync.NewMap()
+	dataRouters = xsync.NewMapOf[*tDataRouter]()
 
 	// ItemTotal 收到的数据项计数
 	ItemTotal xsync.Counter
@@ -151,7 +151,7 @@ func dataEntry() {
 			item.Release()
 			continue
 		}
-		dr.(*tDataRouter).drChan.In <- item
+		dr.drChan.In <- item
 	}
 	common.Log.Error().Msg("Exception: DataRouter entry worker exited")
 }

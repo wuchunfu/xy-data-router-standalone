@@ -65,7 +65,7 @@ func BenchmarkDataRouterLoad(b *testing.B) {
 			if !ok {
 				b.Fatal("expected ok")
 			}
-			if dr.(*tDataRouter).apiConf.APIName != apiname {
+			if dr.apiConf.APIName != apiname {
 				b.Fatalf("expected apiname is %s", apiname)
 			}
 		}
@@ -103,7 +103,7 @@ func BenchmarkDataRouterLoad(b *testing.B) {
 				if !ok {
 					b.Fatal("expected ok")
 				}
-				if dr.(*tDataRouter).apiConf.APIName != apiname {
+				if dr.apiConf.APIName != apiname {
 					b.Fatalf("expected apiname is %s", apiname)
 				}
 			}
