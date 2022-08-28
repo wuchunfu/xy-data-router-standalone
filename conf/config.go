@@ -151,25 +151,6 @@ type TFilesConf struct {
 	GetConfDuration time.Duration
 }
 
-type TFilesVer struct {
-	MD5        string
-	LastUpdate time.Time
-}
-
-// GetFilesVer 获取或初始化文件版本信息
-func GetFilesVer(k any) (ver *TFilesVer) {
-	v, ok := FilesVer.Load(k)
-	if ok {
-		ver, ok = v.(*TFilesVer)
-		if ok {
-			return
-		}
-	}
-	ver = new(TFilesVer)
-	FilesVer.Store(k, ver)
-	return
-}
-
 // LoadConf 加载配置
 func LoadConf() error {
 	config, apiConfig, whiteList, blackList, err := readConf()
@@ -459,6 +440,9 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	config.StateConf.CheckESBulkErrors = config.LogConf.ESBulkLevel <= int(zerolog.WarnLevel)
 	config.StateConf.RecordESBulkBody = config.LogConf.ESBulkLevel <= int(zerolog.InfoLevel)
 
+	ver := GetFilesVer(ConfigFile)
+	ver.MD5 = utils.MD5BytesHex(body)
+	ver.LastUpdate = time.Now()
 	if config.SYSConf.Debug {
 		fmt.Printf("\n\n%s\n\n", json.MustJSONIndent(config))
 		fmt.Printf("\nWhitelist:\n%s\n\n", whiteList)
