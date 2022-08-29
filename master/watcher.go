@@ -2,6 +2,7 @@ package master
 
 import (
 	"log"
+	"time"
 
 	"github.com/fufuok/utils"
 
@@ -18,20 +19,20 @@ func Watcher() {
 		log.Fatalln("Failed to initialize Watcher: miss executable", "\nbye.")
 	}
 
-	md5Main, _ := utils.MD5Sum(mainFile)
-	md5Conf, _ := utils.MD5Sum(conf.ConfigFile)
-
-	common.Log.Info().
-		Str("main", mainFile).Str("config", conf.ConfigFile).
-		Msg("Watching")
+	interval := conf.Config.SYSConf.WatcherIntervalDuration
+	intervalStr := interval.String()
+	md5Main := utils.MustMD5Sum(mainFile)
+	md5Conf := conf.GetFilesVer(conf.ConfigFile).MD5
+	common.Log.Info().Str("main", mainFile).Str("interval", intervalStr).Msg("Watching")
+	common.Log.Info().Str("config", conf.ConfigFile).Str("interval", intervalStr).Msg("Watching")
 
 	go func() {
-		ticker := common.TWm.NewTicker(conf.Config.SYSConf.WatcherIntervalDuration)
+		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
 		for range ticker.C {
 			// 程序二进制变化时重启
-			md5New, _ := utils.MD5Sum(mainFile)
+			md5New := utils.MustMD5Sum(mainFile)
 			if md5New != md5Main {
 				md5Main = md5New
 				common.Log.Warn().Msg(">>>>>>> restart main <<<<<<<")
@@ -39,7 +40,7 @@ func Watcher() {
 				continue
 			}
 			// 配置文件变化时热加载
-			md5New, _ = utils.MD5Sum(conf.ConfigFile)
+			md5New = utils.MustMD5Sum(conf.ConfigFile)
 			if md5New != md5Conf {
 				md5Conf = md5New
 				if err := conf.LoadConf(); err != nil {
@@ -59,7 +60,11 @@ func Watcher() {
 				web.InitRuntime()
 
 				// 更新配置文件监控周期
-				ticker.Reset(conf.Config.SYSConf.WatcherIntervalDuration)
+				if interval != conf.Config.SYSConf.WatcherIntervalDuration {
+					interval = conf.Config.SYSConf.WatcherIntervalDuration
+					ticker.Reset(interval)
+					common.Log.Warn().Str("interval", interval.String()).Msg("reset ticker")
+				}
 
 				common.Log.Warn().Msg(">>>>>>> reload config <<<<<<<")
 				reloadChan <- true
