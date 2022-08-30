@@ -18,9 +18,10 @@ var (
 	TWs  *timewheel.TimeWheel
 	TWm  *timewheel.TimeWheel
 
-	// Now3399UTC 当前时间
-	Now3399UTC = time.Now().Format("2006-01-02T15:04:05Z")
-	Now3399    = time.Now().Format(time.RFC3339)
+	// Now3339Z 当前时间 (强制 0 时区)
+	// Now3339 当前时间
+	Now3339Z = time.Now().Format("2006-01-02T15:04:05Z")
+	Now3339  = time.Now().Format(time.RFC3339)
 
 	IPv4Zero = "0.0.0.0"
 
@@ -123,8 +124,8 @@ func syncNow() {
 	defer ticker.Stop()
 	for range ticker.C {
 		now := GTimeNow()
-		Now3399UTC = now.Format("2006-01-02T15:04:05Z")
-		Now3399 = now.Format(time.RFC3339)
+		Now3339Z = now.Format("2006-01-02T15:04:05Z")
+		Now3339 = now.Format(time.RFC3339)
 	}
 }
 

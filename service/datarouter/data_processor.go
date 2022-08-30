@@ -162,9 +162,9 @@ func appendSYSField(js []byte, ip string) []byte {
 		buf = append(buf, `{"_cip":"`...)
 		buf = append(buf, ip...)
 		buf = append(buf, `","_ctime":"`...)
-		buf = append(buf, common.Now3399UTC...)
+		buf = append(buf, common.Now3339Z...)
 		buf = append(buf, `","_gtime":"`...)
-		buf = append(buf, common.Now3399...)
+		buf = append(buf, common.Now3339...)
 		buf = append(buf, `",`...)
 		i = 1
 	}

@@ -23,8 +23,8 @@ func testAppendSYSField(js []byte, ip string) []byte {
 	return append(
 		utils.AddStringBytes(
 			`{"_cip":"`, ip,
-			`","_ctime":"`, common.Now3399UTC,
-			`","_gtime":"`, common.Now3399, `",`,
+			`","_ctime":"`, common.Now3339Z,
+			`","_gtime":"`, common.Now3339, `",`,
 		),
 		js[1:]...,
 	)
