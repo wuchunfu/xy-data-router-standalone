@@ -1,5 +1,11 @@
 # XY.DataRouter
 
+## v1.103.2.22041414
+
+- ES 查询日志增加请求时间, URI 等字段
+- 替换 `xsync.NewMap` 为 `xsync.NewMapOf`
+- 优化配置文件变化监控
+
 ## v1.103.1.22032818
 
 - 增加接口配置 `es_pipeline` 参数, 指定写入 ES 时使用的 Pipeline
