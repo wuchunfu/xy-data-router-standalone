@@ -23,31 +23,42 @@
 
 ## 日志
 
-见: [CHANGELOG.md](CHANGELOG.md)
+更新日志见: [CHANGELOG.md](CHANGELOG.md)
 
 ## 结构
 
     .
-    ├── bin         程序二进制
-    ├── cli         程序入口 main.go
-    ├── common      公共结构定义和方法, 全局变量
-    ├── conf        配置文件目录
-    ├── controller  控制器, 路由
-    ├── doc         开发文档
-    ├── etc         配置文件
-    ├── internal    内部包
-    ├── log         日志目录
-    ├── master      服务端程序初始化
-    ├── middleware  Web 中间件
-    ├── schema      数据项
-    ├── script      环境变量脚本
-    ├── service     应用逻辑
-    ├── tools       环境变量加密小工具
-    └── tunnel      数据传递通道
-
-## 设计
-
-![xy-data-router](doc/standalone.png)
+    ├── bin                        (同线上) 程序二进制本地目录
+    ├── debian                     DEB 包构建信息
+    │   └── source
+    ├── doc                        需求, 设计, 方案, 里程碑文档
+    ├── etc                        (同线上) 配置文件目录
+    ├── log                        (同线上) 日志目录
+    ├── src                        源代码目录
+    │   ├── cli                    命令行程序 main 文件目录
+    │   │   └── xydatarouter
+    │   ├── common                 项目级全局定义
+    │   ├── conf                   公共配置定义, 配置加载方法目录
+    │   ├── internal               内部包
+    │   │   ├── gzip
+    │   │   ├── json
+    │   │   └── zstd
+    │   ├── master                 程序集成, 调度包
+    │   ├── service                各子服务业务逻辑
+    │   │   ├── datarouter
+    │   │   ├── schema
+    │   │   └── tunnel
+    │   ├── tools                  一些工具包
+    │   ├── vendor                 三方依赖包
+    │   └── web                    Web 接口服务
+    │       ├── assets             静态资源
+    │       ├── middleware         Web 中间件
+    │       ├── response           响应定义
+    │       └── router             各业务路由定义
+    │           ├── apiv1
+    │           ├── es
+    │           └── sys
+    └── tmp                        本地临时目录
 
 ## 使用
 
@@ -61,6 +72,10 @@
 6. 系统状态访问: http://api.domain:6600/sys/stats JSON 格式, 可用于报警
 7. 心跳检查地址: http://api.domain:6600/heartbeat 返回字符串 `OK`
 8. PING 地址: http://api.domain:6600/ping 返回字符串 `PONG`
+
+## 限制
+
+`=-:-=` 为数据分隔符, 请不要出现在上报内容中!!!
 
 ## HTTP/HTTPS 接口
 
@@ -80,7 +95,9 @@
 {
     "__接口名称": "接口为: http://api.domain:6600/v1/start (HTTP 接口必定回应 JSON 数据)",
     "api_name": "start",
-    "__ES 索引名称": "不指定索引名前缀时, 使用 api_name",
+    "__ESOptionalWrite": "默认为 false, 可选写入 ES, 当 ES 繁忙时, 该选项为真的接口数据将不会发往 ES",
+    "es_optional_write": false,
+    "__ES 索引名称": "不指定索引名前缀时, 默认与接口名称相同",
     "es_index": "xy",
     "__ES 索引切割": "默认按天切割: api_name_201123; none: 不切割; month: 按月切割; year: 按年切割",
     "es_index_split": "",
@@ -280,12 +297,6 @@ JSON 数据中必须有 `_x` 字段, 且不能为空, 不能包含 `:` 冒号.
   - 数据不是合法 JSON 键值对字符串
   - 数据中未包含 `_x` 字段, 或该字段值不符合要求
   - 接口配置中有限定必有字段, 但数据中未包含该字段
-
-## 限制
-
-`=-:-=` 为数据分隔符, 请不要出现在上报内容中!!!
-
-
 
 
 
