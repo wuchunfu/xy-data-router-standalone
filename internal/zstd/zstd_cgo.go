@@ -1,5 +1,4 @@
 //go:build cgo
-// +build cgo
 
 // Package zstd Ref: VictoriaMetrics/lib/encoding/zstd/
 package zstd

@@ -1,5 +1,4 @@
 //go:build !go_json
-// +build !go_json
 
 package json
 

@@ -168,21 +168,29 @@ func LoadConf() error {
 }
 
 // 读取配置
-func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[*net.IPNet]struct{}, error) {
-	body, err := os.ReadFile(ConfigFile)
+func readConf() (
+	config *tJSONConf,
+	apiConfig map[string]*TAPIConf,
+	whiteList map[*net.IPNet]struct{},
+	blackList map[*net.IPNet]struct{},
+	err error,
+) {
+	var body []byte
+	body, err = os.ReadFile(ConfigFile)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return
 	}
 
-	config := new(tJSONConf)
-	if err := json.Unmarshal(body, config); err != nil {
-		return nil, nil, nil, nil, err
+	config = new(tJSONConf)
+	if err = json.Unmarshal(body, config); err != nil {
+		return
 	}
 
 	// 基础密钥 Key
 	config.SYSConf.BaseSecretValue = utils.GetenvDecrypt(BaseSecretKeyName, BaseSecretSalt)
 	if config.SYSConf.BaseSecretValue == "" {
-		return nil, nil, nil, nil, fmt.Errorf("%s cannot be empty", BaseSecretKeyName)
+		err = fmt.Errorf("%s cannot be empty", BaseSecretKeyName)
+		return
 	}
 
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off
@@ -315,7 +323,7 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	}
 
 	// 以接口名为键的配置集合
-	apiConfig := make(map[string]*TAPIConf)
+	apiConfig = make(map[string]*TAPIConf)
 	for _, cfg := range config.APIConf {
 		apiConf := cfg
 		apiname := strings.TrimSpace(apiConf.APIName)
@@ -345,15 +353,15 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 	}
 
 	// ES 查询接口 IP 白名单
-	whiteList, err := getIPNetList(config.ESWhiteList)
+	whiteList, err = getIPNetList(config.ESWhiteList)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return
 	}
 
 	// 接口访问 IP 黑名单
-	blackList, err := getIPNetList(config.ESBlackList)
+	blackList, err = getIPNetList(config.ESBlackList)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return
 	}
 
 	// 每次获取远程主配置的时间间隔, < 30 秒则禁用该功能
@@ -363,7 +371,8 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 			config.MainConf.SecretValue = utils.GetenvDecrypt(config.MainConf.SecretName,
 				config.SYSConf.BaseSecretValue)
 			if config.MainConf.SecretValue == "" {
-				return nil, nil, nil, nil, fmt.Errorf("%s cannot be empty", config.MainConf.SecretName)
+				err = fmt.Errorf("%s cannot be empty", config.MainConf.SecretName)
+				return
 			}
 		}
 		config.MainConf.GetConfDuration = time.Duration(config.MainConf.Interval) * time.Second
@@ -448,7 +457,7 @@ func readConf() (*tJSONConf, map[string]*TAPIConf, map[*net.IPNet]struct{}, map[
 		fmt.Printf("\nWhitelist:\n%s\n\n", whiteList)
 		fmt.Printf("\nBlackList:\n%s\n\n", blackList)
 	}
-	return config, apiConfig, whiteList, blackList, nil
+	return
 }
 
 // IP 配置转换

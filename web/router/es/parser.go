@@ -40,14 +40,14 @@ func parseESResponse(resp *tResponse, params *tParams) *tResult {
 
 	if resp.err != nil {
 		common.LogSampled.Error().Err(resp.err).Msg("getting response")
-		ret.ErrMsg = "查询失败, 服务繁忙"
+		ret.ErrMsg = "请求失败, 服务繁忙"
 		ret.Error = resp.err.Error()
 		return ret
 	}
 
 	if resp.response.Body == nil {
 		common.LogSampled.Error().Int("status_code", ret.StatusCode).Msg("response.Body is nil")
-		ret.ErrMsg = "查询失败, 服务异常"
+		ret.ErrMsg = "请求失败, 服务异常"
 		return ret
 	}
 
@@ -63,14 +63,17 @@ func parseESResult(resp *tResponse, params *tParams, ret *tResult) *tResult {
 	res, err := io.ReadAll(resp.response.Body)
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("response.Body")
-		ret.ErrMsg = "查询失败, 请稍后重试"
+		ret.ErrMsg = "请求失败, 请稍后重试"
 		ret.Error = err.Error()
 		return ret
 	}
 
 	if resp.response.IsError() {
 		reason := gjson.GetBytes(res, "error.reason").String()
-		msg := "查询失败, 查询语句有误"
+		if reason == "" {
+			reason = gjson.GetBytes(res, "error").String()
+		}
+		msg := "请求错误"
 		ret.ErrMsg = utils.AddString(msg, ": ", reason)
 		common.LogSampled.Warn().
 			RawJSON("body", json.MustJSON(params.Body)).
