@@ -7,8 +7,8 @@ import (
 	"github.com/fufuok/utils/pools/bufferpool"
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/service/es"
 	"github.com/fufuok/xy-data-router/web/response"
 )
 
@@ -39,13 +39,14 @@ func searchHandler(c *fiber.Ctx) error {
 
 	_ = json.NewEncoder(bodyBuf).Encode(params.Body)
 
-	resp := getResponse()
-	resp.response, resp.err = common.ES.Search(
-		common.ES.Search.WithContext(context.Background()),
-		common.ES.Search.WithTrackTotalHits(true),
-		common.ES.Search.WithScroll(time.Duration(params.Scroll)*time.Second),
-		common.ES.Search.WithIndex(params.Index),
-		common.ES.Search.WithBody(bodyBuf),
+	resp := es.GetResponse()
+	defer es.PutResponse(resp)
+	resp.Response, resp.Err = es.Client.Search(
+		es.Client.Search.WithContext(context.Background()),
+		es.Client.Search.WithTrackTotalHits(true),
+		es.Client.Search.WithScroll(time.Duration(params.Scroll)*time.Second),
+		es.Client.Search.WithIndex(params.Index),
+		es.Client.Search.WithBody(bodyBuf),
 	)
 
 	return sendResult(c, resp, params)

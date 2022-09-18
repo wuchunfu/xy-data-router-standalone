@@ -5,7 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/service/es"
 	"github.com/fufuok/xy-data-router/web/response"
 )
 
@@ -26,12 +26,13 @@ func countHandler(c *fiber.Ctx) error {
 		return response.APIFailure(c, "必填参数: index")
 	}
 
-	resp := getResponse()
-	resp.response, resp.err = common.ES.Count(
-		common.ES.Count.WithContext(context.Background()),
-		common.ES.Count.WithIndex(params.Index),
+	resp := es.GetResponse()
+	defer es.PutResponse(resp)
+	resp.Response, resp.Err = es.Client.Count(
+		es.Client.Count.WithContext(context.Background()),
+		es.Client.Count.WithIndex(params.Index),
 	)
-	resp.totalPath = "count"
+	resp.TotalPath = "count"
 
 	return sendResult(c, resp, params)
 }

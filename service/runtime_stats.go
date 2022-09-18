@@ -11,6 +11,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
 	"github.com/fufuok/xy-data-router/service/datarouter"
+	"github.com/fufuok/xy-data-router/service/es"
 	"github.com/fufuok/xy-data-router/service/schema"
 	"github.com/fufuok/xy-data-router/service/tunnel"
 )
@@ -62,8 +63,8 @@ func sysStats() map[string]any {
 		"JSON": json.Name,
 
 		// ES 版本信息
-		"ESVersionServer": common.ESVersionServer,
-		"ESVersionClient": common.ESVersionClient,
+		"ESServerVer": es.ServerVer,
+		"ESClientVer": es.ClientVer,
 	}
 }
 
@@ -145,9 +146,9 @@ func dataStats() map[string]any {
 		// ES 总数据量, 排队, 待批量写入任务数, 丢弃任务数, 写入错误任务数, 繁忙状态
 		"ESDataTotal":                utils.Comma(datarouter.ESDataTotal.Value()),
 		"ESBulkTodoCount___________": datarouter.ESBulkTodoCount.Value(),
-		"ESBulkCount":                utils.Comma(datarouter.ESBulkCount.Value()),
+		"ESBulkCount":                utils.Comma(es.BulkCount.Value()),
+		"ESBulkErrors______________": es.BulkErrors.Value(),
 		"ESBulkDiscards____________": datarouter.ESBulkDiscards.Value(),
-		"ESBulkErrors______________": datarouter.ESBulkErrors.Value(),
 		"ESBulkWorkerRunning":        datarouter.ESBulkPool.Running(),
 		"ESBulkWorkerFree__________": datarouter.ESBulkPool.Free(),
 

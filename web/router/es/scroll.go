@@ -6,7 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/service/es"
 	"github.com/fufuok/xy-data-router/web/response"
 )
 
@@ -43,11 +43,12 @@ func scrollHandler(c *fiber.Ctx) error {
 		return response.APIFailure(c, "必填参数: scroll, scroll_id")
 	}
 
-	resp := getResponse()
-	resp.response, resp.err = common.ES.Scroll(
-		common.ES.Scroll.WithContext(context.Background()),
-		common.ES.Scroll.WithScroll(time.Duration(params.Scroll)*time.Second),
-		common.ES.Scroll.WithScrollID(params.ScrollID),
+	resp := es.GetResponse()
+	defer es.PutResponse(resp)
+	resp.Response, resp.Err = es.Client.Scroll(
+		es.Client.Scroll.WithContext(context.Background()),
+		es.Client.Scroll.WithScroll(time.Duration(params.Scroll)*time.Second),
+		es.Client.Scroll.WithScrollID(params.ScrollID),
 	)
 
 	return sendResult(c, resp, params)

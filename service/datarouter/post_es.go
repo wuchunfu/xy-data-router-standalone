@@ -3,39 +3,16 @@ package datarouter
 import (
 	"time"
 
-	"github.com/elastic/go-elasticsearch/v7/esapi"
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
 	"github.com/fufuok/utils/jsongen"
-	"github.com/fufuok/utils/pools/bufferpool"
 	"github.com/fufuok/utils/pools/readerpool"
 	"github.com/panjf2000/ants/v2"
-	"github.com/tidwall/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/service/es"
 )
-
-// ES 批量写入响应
-type tESBulkResponse struct {
-	Errors bool `json:"errors"`
-	Items  []struct {
-		Index struct {
-			ID     string `json:"_id"`
-			Result string `json:"result"`
-			Status int    `json:"status"`
-			Error  struct {
-				Type   string `json:"type"`
-				Reason string `json:"reason"`
-				Cause  struct {
-					Type   string `json:"type"`
-					Reason string `json:"reason"`
-				} `json:"caused_by"`
-			} `json:"error"`
-		} `json:"index"`
-	} `json:"items"`
-}
 
 // ES 批量写入协程池初始化
 func initESBulkPool() {
@@ -50,16 +27,6 @@ func initESBulkPool() {
 			common.LogSampled.Error().Interface("recover", r).Msg("panic")
 		}),
 	)
-}
-
-// 获取 ES 索引名称
-func getUDPESIndex(body []byte, key string) string {
-	index := gjson.GetBytes(body, key).String()
-	if index != "" {
-		return utils.ToLower(utils.Trim(index, ' '))
-	}
-
-	return ""
 }
 
 // 生成 esBluk 索引头
@@ -84,7 +51,7 @@ func getESBulkHeader(apiConf *conf.TAPIConf, ymd string) []byte {
 	jsIndex := jsongen.NewMap()
 	js := jsongen.NewMap()
 	js.PutString("_index", esIndex)
-	if common.ESLessThan7 {
+	if es.ServerLessThan7 {
 		js.PutString("_type", "_doc")
 	}
 	if apiConf.ESPipeline != "" {
@@ -178,84 +145,5 @@ func esBulk(dis *tDataItems) bool {
 		readerpool.Release(rBody)
 	}()
 
-	resp, err := common.ES.Bulk(rBody)
-	if err != nil {
-		common.LogSampled.Error().Err(err).Msg("es bulk")
-		ESBulkErrors.Inc()
-		return false
-	}
-
-	// 批量写入完成计数
-	ESBulkCount.Inc()
-
-	if resp.Body == nil {
-		return false
-	}
-
-	defer func() {
-		_ = resp.Body.Close()
-	}()
-
-	return esBulkResult(resp, esBody)
-}
-
-func esBulkResult(resp *esapi.Response, esBody []byte) bool {
-	// 低级别日志配置时(Warn), 开启批量写入错误抽样日志, Error 时关闭批量写入错误日志
-	if !conf.Config.StateConf.CheckESBulkResult {
-		return true
-	}
-
-	if resp.IsError() {
-		ESBulkErrors.Inc()
-		buf := bufferpool.Get()
-		defer bufferpool.Put(buf)
-		if _, err := buf.ReadFrom(resp.Body); err != nil {
-			return false
-		}
-		common.LogSampled.Warn().
-			Int("http_code", resp.StatusCode).
-			Str("error_type", gjson.GetBytes(buf.Bytes(), "error.type").String()).
-			Str("error_reason", gjson.GetBytes(buf.Bytes(), "error.reason").String()).
-			Msg("es bulk")
-		return false
-	}
-
-	// 低级别批量日志时(Warn), 解析批量写入结果
-	if !conf.Config.StateConf.CheckESBulkErrors {
-		return true
-	}
-
-	var blk tESBulkResponse
-	if err := json.NewDecoder(resp.Body).Decode(&blk); err != nil {
-		common.LogSampled.Error().Err(err).
-			Str("resp", resp.String()).
-			Str("error_reason", "failure to to parse response body").
-			Msg("es bulk")
-		return false
-	}
-
-	if !blk.Errors {
-		return true
-	}
-
-	ESBulkErrors.Inc()
-
-	for _, d := range blk.Items {
-		if d.Index.Status <= 201 {
-			continue
-		}
-		l := common.LogSampled.Warn().Int("status", d.Index.Status).
-			Str("error_type", d.Index.Error.Type).
-			Str("error_reason", d.Index.Error.Reason).
-			Str("error_cause_type", d.Index.Error.Cause.Type).
-			Str("error_cause_reason", d.Index.Error.Cause.Reason)
-
-		// Warn 级别时, 抽样数据详情
-		if conf.Config.StateConf.RecordESBulkBody {
-			l.Bytes("body", esBody)
-		}
-		l.Msg("es bulk")
-	}
-
-	return false
+	return es.BulkRequest(rBody, esBody)
 }

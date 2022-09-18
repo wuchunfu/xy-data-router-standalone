@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/fufuok/utils"
+	"github.com/tidwall/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -153,4 +154,13 @@ func saveUDPData(item *schema.DataItem) bool {
 	schema.PushDataToChanx(item)
 
 	return true
+}
+
+// 获取 ES 索引名称
+func getUDPESIndex(body []byte, key string) string {
+	index := gjson.GetBytes(body, key).String()
+	if index != "" {
+		return utils.ToLower(utils.Trim(index, ' '))
+	}
+	return ""
 }

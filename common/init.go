@@ -68,20 +68,12 @@ func InitMain() {
 
 	// 初始化代理参数
 	initProxy()
-
-	// 初始化 ES 连接
-	initES()
 }
 
 // InitRuntime 重新加载或初始化运行时配置
 func InitRuntime() {
 	loadLogger()
 	loadReq()
-
-	// 重新连接 ES
-	if err := loadES(); err != nil {
-		Log.Error().Err(err).Msg("Failed to update elasticsearch connection")
-	}
 }
 
 func Stop() {

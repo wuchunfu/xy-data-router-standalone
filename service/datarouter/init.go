@@ -38,12 +38,6 @@ var (
 	// ESDataTotal ES 收到数据数量计数
 	ESDataTotal xsync.Counter
 
-	// ESBulkCount ES Bulk 批量写入完成计数
-	ESBulkCount xsync.Counter
-
-	// ESBulkErrors ES Bulk 写入错误次数
-	ESBulkErrors xsync.Counter
-
 	// ESBulkTodoCount ES Bulk 待处理项计数
 	ESBulkTodoCount xsync.Counter
 
