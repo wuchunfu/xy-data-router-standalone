@@ -9,16 +9,16 @@ import (
 var apiSuccessNil = json.MustJSON(APISuccessNilData())
 
 // APIException 通用异常处理
-func APIException(c *fiber.Ctx, code int, msg string) error {
+func APIException(c *fiber.Ctx, code int, msg string, data any) error {
 	if msg == "" {
 		msg = "错误的请求"
 	}
-	return c.Status(code).JSON(APIFailureData(msg))
+	return c.Status(code).JSON(APIFailureData(msg, data))
 }
 
 // APIFailure 返回失败, 状态码: 200
-func APIFailure(c *fiber.Ctx, msg string) error {
-	return APIException(c, fiber.StatusOK, msg)
+func APIFailure(c *fiber.Ctx, msg string, data any) error {
+	return APIException(c, fiber.StatusOK, msg, data)
 }
 
 // APISuccess 返回成功, 状态码: 200

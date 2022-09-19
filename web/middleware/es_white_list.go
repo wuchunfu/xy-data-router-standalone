@@ -15,14 +15,14 @@ func CheckESWhiteList(asAPI bool) fiber.Handler {
 		if len(conf.ESWhiteListConfig) > 0 {
 			clientIP := common.GetClientIP(c)
 			if !utils.InIPNetString(clientIP, conf.ESWhiteListConfig) {
-				msg := "非法来访: " + clientIP
+				msg := "非法来访"
 				common.LogSampled.Info().
 					Str("cip", c.IP()).Str("x_forwarded_for", c.Get(fiber.HeaderXForwardedFor)).
 					Str(common.HeaderXProxyClientIP, c.Get(common.HeaderXProxyClientIP)).
-					Str("method", c.Method()).Str("uri", c.OriginalURL()).
+					Str("method", c.Method()).Str("uri", c.OriginalURL()).Str("client_ip", clientIP).
 					Msg(msg)
 				if asAPI {
-					return response.APIFailure(c, msg)
+					return response.APIFailure(c, msg, clientIP)
 				} else {
 					return response.TxtMsg(c, msg)
 				}

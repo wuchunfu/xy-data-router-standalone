@@ -20,7 +20,7 @@ func sendResult(c *fiber.Ctx, resp *es.TResponse, params *tParams) error {
 	params.ClientIP = common.GetClientIP(c)
 	ret := parseESResponse(resp, params)
 	ret.ReqUri = utils.CopyString(c.OriginalURL())
-	ret.ReqTime = common.Now3339Z
+	ret.ReqTime = common.Now3399
 	ret.ReqType = conf.APPName
 	defer func() {
 		log(params, ret)
@@ -28,7 +28,7 @@ func sendResult(c *fiber.Ctx, resp *es.TResponse, params *tParams) error {
 	}()
 
 	if ret.ErrMsg != "" {
-		return response.APIFailure(c, ret.ErrMsg)
+		return response.APIFailure(c, ret.ErrMsg, ret.Error)
 	}
 	return response.APISuccessBytes(c, ret.result, ret.Count)
 }
@@ -72,6 +72,9 @@ func parseESResult(resp *es.TResponse, params *tParams, ret *tResult) *tResult {
 		ret.Error = gjson.GetBytes(res, "error.reason").String()
 		if ret.Error == "" {
 			ret.Error = gjson.GetBytes(res, "error").String()
+			if ret.Error == "" {
+				ret.Error = "Status: " + resp.Response.Status()
+			}
 		}
 		ret.ErrMsg = "请求错误, 请检查参数"
 		common.LogSampled.Warn().

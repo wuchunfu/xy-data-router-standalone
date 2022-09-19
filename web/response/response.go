@@ -26,13 +26,13 @@ type TAPIData struct {
 }
 
 // APIFailureData API 请求失败返回值
-func APIFailureData(msg string) *TAPIData {
+func APIFailureData(msg string, data any) *TAPIData {
 	return &TAPIData{
 		ID:    0,
 		OK:    0,
 		Code:  1,
 		Msg:   msg,
-		Data:  nil,
+		Data:  data,
 		Count: 0,
 	}
 }

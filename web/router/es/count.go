@@ -11,10 +11,6 @@ import (
 
 // ES 统计数量接口
 //
-// POST /es/count HTTP/1.1
-// Content-Type: application/json
-// Content-Length: 25
-//
 // {
 //    "index": "test"
 // }
@@ -23,7 +19,7 @@ func countHandler(c *fiber.Ctx) error {
 	defer putParams(params)
 
 	if err := c.BodyParser(params); err != nil || params.Index == "" {
-		return response.APIFailure(c, "必填参数: index")
+		return response.APIFailure(c, "缺失必填参数", "index")
 	}
 
 	resp := es.GetResponse()

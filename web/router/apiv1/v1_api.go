@@ -26,7 +26,7 @@ func apiHandler(c *fiber.Ctx) error {
 		common.LogSampled.Info().
 			Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).Int("len", len(apiname)).
 			Msg("api not found")
-		return response.APIFailure(c, "接口配置有误")
+		return response.APIFailure(c, "接口配置有误", nil)
 	}
 
 	// 按场景获取数据
@@ -43,7 +43,7 @@ func apiHandler(c *fiber.Ctx) error {
 			uri = uri[:len(uri)-5]
 			body, err = gzip.Unzip(c.Body())
 			if err != nil {
-				return response.APIFailure(c, "数据解压失败: "+err.Error())
+				return response.APIFailure(c, "数据解压失败", err.Error())
 			}
 		} else {
 			body = bytespool.NewBytes(c.Body())
@@ -56,13 +56,13 @@ func apiHandler(c *fiber.Ctx) error {
 	}
 
 	if len(body) == 0 {
-		return response.APIFailure(c, "数据为空")
+		return response.APIFailure(c, "请求数据为空", nil)
 	}
 
 	if chkField {
 		// 检查必有字段, POST 非标准 JSON 时(多条数据), 不一定准确
 		if !common.CheckRequiredField(body, apiConf.RequiredField) {
-			return response.APIFailure(c, utils.AddString("必填字段: ", strings.Join(apiConf.RequiredField, ",")))
+			return response.APIFailure(c, "缺失必填字段", apiConf.RequiredField)
 		}
 	}
 

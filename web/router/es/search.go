@@ -14,10 +14,6 @@ import (
 
 // ES 通用查询接口
 //
-// POST /es/search HTTP/1.1
-// Content-Type: application/json
-// Content-Length: 108
-//
 // {
 //    "index": "test",
 //    "body": {
@@ -31,7 +27,7 @@ func searchHandler(c *fiber.Ctx) error {
 	defer putParams(params)
 
 	if err := c.BodyParser(params); err != nil || params.Index == "" || params.Body == nil {
-		return response.APIFailure(c, "必填参数: index, body[查询语句JSON]")
+		return response.APIFailure(c, "缺失必填参数", "index, body(查询语句JSON)")
 	}
 
 	bodyBuf := bufferpool.Get()
