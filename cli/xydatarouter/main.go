@@ -8,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/master"
+	"github.com/fufuok/xy-data-router/service/es"
 )
 
 var version bool
@@ -23,6 +24,7 @@ func main() {
 	if version {
 		fmt.Println(">>>", conf.APPName, conf.Version, conf.GoVersion)
 		fmt.Println(">>>", conf.GitCommit)
+		fmt.Println(">>> Elasticsearch client version:", es.ClientVer)
 		return
 	}
 
