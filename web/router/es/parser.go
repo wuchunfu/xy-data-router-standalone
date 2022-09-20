@@ -20,7 +20,7 @@ func sendResult(c *fiber.Ctx, resp *es.TResponse, params *tParams) error {
 	params.ClientIP = common.GetClientIP(c)
 	ret := parseESResponse(resp, params)
 	ret.ReqUri = utils.CopyString(c.OriginalURL())
-	ret.ReqTime = common.Now3399
+	ret.ReqTime = common.Now3339
 	ret.ReqType = conf.APPName
 	defer func() {
 		log(params, ret)
