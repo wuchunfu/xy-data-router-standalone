@@ -34,7 +34,11 @@ func SetupRouter(app *fiber.App) {
 		es.Post("/count", countHandler)
 		// ES DSL 通用查询
 		es.Post("/search", searchHandler)
-		// ES Scroll
+		// ES Scroll 滚动查询
 		es.Post("/scroll", scrollHandler)
+		// ES Update 更新单个文档
+		es.Post("/update", updateHandler)
+		// ES Delete 删除单个文档
+		es.Post("/delete", deleteHandler)
 	}
 }

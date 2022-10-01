@@ -5,11 +5,12 @@ import (
 )
 
 type tParams struct {
-	Index    string         `json:"index"`
-	Scroll   int            `json:"scroll"`
-	ScrollID string         `json:"scroll_id"`
-	Body     map[string]any `json:"body"`
-	ClientIP string         `json:"client_ip"`
+	Index      string         `json:"index"`
+	DocumentID string         `json:"document_id"`
+	Scroll     int            `json:"scroll"`
+	ScrollID   string         `json:"scroll_id"`
+	Body       map[string]any `json:"body"`
+	ClientIP   string         `json:"client_ip"`
 }
 
 var paramsPool = sync.Pool{
