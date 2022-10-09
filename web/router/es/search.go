@@ -40,6 +40,7 @@ func searchHandler(c *fiber.Ctx) error {
 	resp.Response, resp.Err = es.Client.Search(
 		es.Client.Search.WithContext(context.Background()),
 		es.Client.Search.WithTrackTotalHits(true),
+		es.Client.Search.WithIgnoreUnavailable(true),
 		es.Client.Search.WithScroll(time.Duration(params.Scroll)*time.Second),
 		es.Client.Search.WithIndex(params.Index),
 		es.Client.Search.WithBody(bodyBuf),
