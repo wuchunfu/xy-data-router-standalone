@@ -58,7 +58,7 @@ func dataRouter(dr *tDataRouter) {
 			if err := DataProcessorPool.Invoke(dp); err != nil {
 				releaseDataProcessor(dp)
 				DataProcessorDiscards.Inc()
-				common.LogSampled.Error().Err(err).Msg("go dataProcessor")
+				common.LogSampled.Warn().Err(err).Msg("go dataProcessor discards")
 			}
 		})
 	}

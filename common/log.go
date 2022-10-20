@@ -2,13 +2,14 @@ package common
 
 import (
 	"os"
-	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/rs/zerolog"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/json"
 )
 
 var (
@@ -31,8 +32,17 @@ func initLogger() {
 	zerolog.CallerFieldName = "F"
 	zerolog.ErrorStackFieldName = "S"
 	zerolog.DurationFieldInteger = true
+	zerolog.InterfaceMarshalFunc = json.Marshal
 	zerolog.CallerMarshalFunc = func(file string, line int) string {
-		return filepath.Base(file) + ":" + strconv.Itoa(line)
+		i := strings.LastIndexByte(file, '/')
+		if i == -1 {
+			return file
+		}
+		i = strings.LastIndexByte(file[:i], '/')
+		if i == -1 {
+			return file
+		}
+		return file[i+1:] + ":" + strconv.Itoa(line)
 	}
 }
 

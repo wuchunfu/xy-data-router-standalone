@@ -46,7 +46,7 @@ func loadES() error {
 
 	client, cfgErr, esErr := newES()
 	if cfgErr != nil || esErr != nil {
-		return fmt.Errorf("%s%s", cfgErr, esErr)
+		return fmt.Errorf("cfgErr: %v, esErr: %v", cfgErr, esErr)
 	}
 
 	Client = client.client

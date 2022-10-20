@@ -23,8 +23,9 @@ func initESBulkPool() {
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.DataConf.ESBulkMaxWorkerSize),
+		ants.WithLogger(common.NewAppLogger()),
 		ants.WithPanicHandler(func(r any) {
-			common.LogSampled.Error().Interface("recover", r).Msg("panic")
+			common.LogSampled.Error().Msgf("Recovery dataProcessor: %s", r)
 		}),
 	)
 }
@@ -125,7 +126,7 @@ func submitESBulk(dis *tDataItems) {
 		if err := ESBulkPool.Invoke(dis); err != nil {
 			ESBulkDiscards.Inc()
 			ESBulkTodoCount.Dec()
-			common.LogSampled.Error().Err(err).Msg("go esBulk")
+			common.LogSampled.Warn().Err(err).Msg("go esBulk discards")
 		}
 	})
 }

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"fmt"
+	"runtime/debug"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -22,8 +22,8 @@ func WebAPILogger() fiber.Handler {
 		if chainErr != nil {
 			common.LogSampled.Error().Err(chainErr).
 				Bytes("body", c.Body()).
-				Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).
-				Msg(c.Method())
+				Str("client_ip", common.GetClientIP(c)).Str("method", c.Method()).
+				Msg(c.OriginalURL())
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
@@ -34,8 +34,8 @@ func WebAPILogger() fiber.Handler {
 			common.LogSampled.Warn().
 				Bytes("body", c.Body()).
 				Str("client_ip", common.GetClientIP(c)).Dur("duration", costTime).
-				Str("uri", c.OriginalURL()).Int("http_code", c.Response().StatusCode()).
-				Msg(c.Method())
+				Str("method", c.Method()).Int("http_code", c.Response().StatusCode()).
+				Msg(c.OriginalURL())
 		}
 
 		return nil
@@ -45,21 +45,24 @@ func WebAPILogger() fiber.Handler {
 // RecoverLogger Recover 并记录日志
 func RecoverLogger() fiber.Handler {
 	return func(c *fiber.Ctx) (err error) {
-		// Catch panics
 		defer func() {
 			if r := recover(); r != nil {
 				var ok bool
-				if err, ok = r.(error); !ok {
-					// Set error that will call the global error handler
-					err = fmt.Errorf("%v", r)
+				if err, ok = r.(*fiber.Error); !ok {
+					// 屏蔽错误细节, 让全局错误处理响应 500
+					err = &fiber.Error{
+						Code:    500,
+						Message: "Internal Server Error",
+					}
 				}
-				common.LogSampled.Error().Err(err).
+				common.LogSampled.Error().
+					Bytes("stack", debug.Stack()).
 					Bytes("body", c.Body()).
-					Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).
-					Msg(c.Method())
+					Str("client_ip", c.IP()).
+					Str("method", c.Method()).Str("uri", c.OriginalURL()).
+					Msgf("Recovery: %s", r)
 			}
 		}()
-
 		return c.Next()
 	}
 }

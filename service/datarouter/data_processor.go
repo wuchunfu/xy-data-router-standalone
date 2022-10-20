@@ -51,8 +51,9 @@ func initDataProcessorPool() {
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.DataConf.ProcessorMaxWorkerSize),
+		ants.WithLogger(common.NewAppLogger()),
 		ants.WithPanicHandler(func(r any) {
-			common.LogSampled.Error().Interface("recover", r).Msg("panic")
+			common.LogSampled.Error().Msgf("Recovery dataProcessor: %s", r)
 		}),
 	)
 }

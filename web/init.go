@@ -13,6 +13,7 @@ import (
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
 	"github.com/fufuok/xy-data-router/web/middleware"
+	"github.com/fufuok/xy-data-router/web/response"
 )
 
 //go:embed assets/favicon.ico
@@ -86,14 +87,11 @@ func errorHandler(c *fiber.Ctx, err error) error {
 	if e, ok := err.(*fiber.Error); ok {
 		code = e.Code
 	}
-
 	common.HTTPBadRequestCount.Inc()
 	if conf.Debug {
 		common.LogSampled.Error().Err(err).
-			Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).
-			Msg(c.Method())
+			Str("client_ip", common.GetClientIP(c)).Str("method", c.Method()).Int("status_code", code).
+			Msg(c.OriginalURL())
 	}
-
-	c.Set(fiber.HeaderContentType, fiber.MIMETextPlainCharsetUTF8)
-	return c.Status(code).SendString(err.Error())
+	return response.APIException(c, code, err.Error(), nil)
 }
