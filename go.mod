@@ -8,14 +8,14 @@ require (
 	github.com/fufuok/bytespool v1.1.1
 	github.com/fufuok/chanx v1.0.0
 	github.com/fufuok/timewheel v1.1.100
-	github.com/fufuok/utils v0.4.5
+	github.com/fufuok/utils v0.4.6
 	github.com/goccy/go-json v0.9.7
 	github.com/gofiber/fiber/v2 v2.33.0
 	github.com/imroc/req/v3 v3.11.0
-	github.com/klauspost/compress v1.15.2
+	github.com/klauspost/compress v1.15.3
 	github.com/lesismal/arpc v1.2.8
 	github.com/panjf2000/ants/v2 v2.4.8
-	github.com/panjf2000/gnet v1.6.4
+	github.com/panjf2000/gnet/v2 v2.0.3
 	github.com/rs/zerolog v1.26.1
 	github.com/tidwall/gjson v1.14.1
 	github.com/tidwall/pretty v1.2.0

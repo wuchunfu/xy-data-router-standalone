@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/fufuok/utils"
+	"github.com/fufuok/utils/sync/errgroup"
 	"github.com/tidwall/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
@@ -18,31 +19,9 @@ var (
 )
 
 func initUDPServer() {
-	exitUDPChan := make(chan error)
-
-	switch conf.Config.UDPConf.Proto {
-	case "gnet":
-		go func() {
-			if err := udpServerG(conf.Config.UDPConf.ServerRWAddr, true); err != nil {
-				exitUDPChan <- err
-			}
-		}()
-		go func() {
-			if err := udpServerG(conf.Config.UDPConf.ServerRAddr, false); err != nil {
-				exitUDPChan <- err
-			}
-		}()
-	default:
-		go func() {
-			if err := udpServer(conf.Config.UDPConf.ServerRWAddr, true); err != nil {
-				exitUDPChan <- err
-			}
-		}()
-		go func() {
-			if err := udpServer(conf.Config.UDPConf.ServerRAddr, false); err != nil {
-				exitUDPChan <- err
-			}
-		}()
+	fn := udpServer
+	if conf.Config.UDPConf.Proto == "gnet" {
+		fn = udpServerG
 	}
 
 	common.Log.Info().
@@ -51,8 +30,16 @@ func initUDPServer() {
 		Str("proto", conf.Config.UDPConf.Proto).
 		Msg("Listening and serving UDP")
 
-	err := <-exitUDPChan
-	log.Fatalln("Failed to start UDP Server:", err, "\nbye.")
+	eg := errgroup.Group{}
+	eg.Go(func() error {
+		return fn(conf.Config.UDPConf.ServerRAddr, false)
+	})
+	eg.Go(func() error {
+		return fn(conf.Config.UDPConf.ServerRWAddr, true)
+	})
+	if err := eg.Wait(); err != nil {
+		log.Fatalln("Failed to start UDP Server:", err, "\nbye.")
+	}
 }
 
 // 标准的 UDP 服务

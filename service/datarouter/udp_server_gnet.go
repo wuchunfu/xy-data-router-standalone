@@ -1,8 +1,10 @@
 package datarouter
 
 import (
+	"fmt"
+
 	"github.com/fufuok/utils"
-	"github.com/panjf2000/gnet"
+	"github.com/panjf2000/gnet/v2"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/service/schema"
@@ -12,43 +14,46 @@ type tUDPServerG struct {
 	// 是否应答
 	withSendTo bool
 
-	*gnet.EventServer
+	gnet.BuiltinEventEngine
 }
 
 func udpServerG(addr string, withSendTo bool) error {
-	return gnet.Serve(
+	return gnet.Run(
 		&tUDPServerG{withSendTo: withSendTo},
-		"udp://"+addr,
+		fmt.Sprintf("udp://%s", addr),
 		gnet.WithMulticore(true),
 		gnet.WithReusePort(true),
 	)
 }
 
-// React PS: 一次接收的数据上限为: 64K
-func (s *tUDPServerG) React(frame []byte, c gnet.Conn) (out []byte, action gnet.Action) {
+func (s *tUDPServerG) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	ip, _, err := utils.GetIPPort(c.RemoteAddr())
 	if err != nil {
 		return
 	}
 	clientIP := ip.String()
 
-	n := len(frame)
+	buf, _ := c.Next(-1)
+	n := len(buf)
 	if s.withSendTo || n < jsonMinLen {
-		out = outBytes
+		// echo 服务
+		out := outBytes
 		if n == 2 {
 			// 返回客户端 IP
 			out = utils.S2B(clientIP)
 		}
+		_ = common.GoPool.Submit(func() {
+			_ = c.AsyncWrite(out, nil)
+		})
 	}
 
 	if n >= jsonMinLen {
-		item := schema.NewSafeBody("", clientIP, frame)
+		item := schema.NewSafeBody("", clientIP, buf)
 		_ = common.GoPool.Submit(func() {
 			if !saveUDPData(item) {
 				item.Release()
 			}
 		})
 	}
-
 	return
 }
