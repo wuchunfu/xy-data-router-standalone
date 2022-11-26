@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
+	"github.com/fufuok/utils/xcrypto"
 	"github.com/rs/zerolog"
 
 	"github.com/fufuok/xy-data-router/internal/json"
@@ -187,7 +188,7 @@ func readConf() (
 	}
 
 	// 基础密钥 Key
-	config.SYSConf.BaseSecretValue = utils.GetenvDecrypt(BaseSecretKeyName, BaseSecretSalt)
+	config.SYSConf.BaseSecretValue = xcrypto.GetenvDecrypt(BaseSecretKeyName, BaseSecretSalt)
 	if config.SYSConf.BaseSecretValue == "" {
 		err = fmt.Errorf("%s cannot be empty", BaseSecretKeyName)
 		return
@@ -368,7 +369,7 @@ func readConf() (
 	if config.MainConf.Interval > 29 {
 		// 远程获取主配置 API, 解密 SecretName
 		if config.MainConf.SecretName != "" {
-			config.MainConf.SecretValue = utils.GetenvDecrypt(config.MainConf.SecretName,
+			config.MainConf.SecretValue = xcrypto.GetenvDecrypt(config.MainConf.SecretName,
 				config.SYSConf.BaseSecretValue)
 			if config.MainConf.SecretValue == "" {
 				err = fmt.Errorf("%s cannot be empty", config.MainConf.SecretName)
