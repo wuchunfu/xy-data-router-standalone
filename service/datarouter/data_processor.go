@@ -2,74 +2,15 @@ package datarouter
 
 import (
 	"bytes"
-	"sync"
-	"time"
 
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
-	"github.com/panjf2000/ants/v2"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/pretty"
 
 	"github.com/fufuok/xy-data-router/common"
-	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
-
-var (
-	// ESOptionalWrite 为真时, 接口配置了该选项的数据将不会写入 ES
-	ESOptionalWrite bool
-
-	// 数据处理池
-	dpPool = sync.Pool{
-		New: func() any {
-			return new(tDataProcessor)
-		},
-	}
-)
-
-func newDataPorcessor(dr *tDataRouter, data *schema.DataItem) *tDataProcessor {
-	dp := dpPool.Get().(*tDataProcessor)
-	dp.dr = dr
-	dp.data = data
-	return dp
-}
-
-func releaseDataProcessor(dp *tDataProcessor) {
-	dp.dr = nil
-	dp.data.Release()
-	dpPool.Put(dp)
-	DataProcessorTodoCount.Dec()
-}
-
-// 数据处理协程池初始化
-func initDataProcessorPool() {
-	DataProcessorPool, _ = ants.NewPoolWithFunc(
-		conf.Config.DataConf.ProcessorSize,
-		func(i any) {
-			dataProcessor(i.(*tDataProcessor))
-		},
-		ants.WithExpiryDuration(10*time.Second),
-		ants.WithMaxBlockingTasks(conf.Config.DataConf.ProcessorMaxWorkerSize),
-		ants.WithLogger(common.NewAppLogger()),
-		ants.WithPanicHandler(func(r any) {
-			common.LogSampled.Error().Msgf("Recovery dataProcessor: %s", r)
-		}),
-	)
-}
-
-// ES 繁忙时禁止可选写入的状态初始化
-func initESOptionalWrite() {
-	ticker := common.TWms.NewTicker(conf.UpdateESOptionalInterval)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		// ES 批量写入排队数 > 10 且 > 最大排队数 * 0.5
-		n := ESBulkTodoCount.Value()
-		m := int64(float64(conf.Config.DataConf.ESBulkMaxWorkerSize) * conf.Config.DataConf.ESBusyPercent)
-		ESOptionalWrite = n > int64(conf.ESBulkMinWorkerSize) && n > m
-	}
-}
 
 // 数据处理和分发
 // 格式化每个 JSON 数据, 附加系统字段, 发送给 ES 和 API 队列, 释放 DataItem
@@ -77,11 +18,11 @@ func dataProcessor(dp *tDataProcessor) {
 	defer releaseDataProcessor(dp)
 
 	// 丢弃可选写入 ES 数据项
-	isDiscards := ESOptionalWrite && dp.dr.apiConf.ESOptionalWrite
+	isDiscards := ESOptionalWrite.Load() && dp.dr.apiConf.ESOptionalWrite
 	if isDiscards {
 		ESDataItemDiscards.Inc()
 	}
-	isPostToES := !(isDiscards || conf.Config.DataConf.ESDisableWrite || dp.dr.apiConf.ESDisableWrite)
+	isPostToES := !(isDiscards || ESDisableWrite.Load() || dp.dr.apiConf.ESDisableWrite)
 	isPostToAPI := dp.dr.apiConf.PostAPI.Interval > 0
 	if !isPostToES && !isPostToAPI {
 		return

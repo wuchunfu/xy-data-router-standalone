@@ -51,10 +51,8 @@ func sysStats() map[string]any {
 		"DisableKeepalive": conf.Config.WebConf.DisableKeepalive,
 		// Tun 数据转发地址, 为空时本地处理数据
 		"ForwardHost": conf.ForwardHost,
-		// 是否关闭了 ES 写入
-		"ESDisableWrite": conf.Config.DataConf.ESDisableWrite,
-		// 繁忙时自动开启, 开启时所有设置了该标识的接口数据将不会写入 ES
-		"ESOptionalWrite": datarouter.ESOptionalWrite,
+		// 配置中是否关闭了 ES 写入
+		"ConfESDisableWrite": conf.Config.DataConf.ESDisableWrite,
 		// UDP 协议原型
 		"UDPProto": conf.Config.UDPConf.Proto,
 		// 是否启用了 HTTPS
@@ -151,6 +149,12 @@ func dataStats() map[string]any {
 		"ESBulkDiscards____________": datarouter.ESBulkDiscards.Value(),
 		"ESBulkWorkerRunning":        datarouter.ESBulkPool.Running(),
 		"ESBulkWorkerFree__________": datarouter.ESBulkPool.Free(),
+		// ES 写入熔断次数
+		"ESBreakerCount____________": datarouter.ESBreakerCount.Value(),
+		// 是否关闭了 ES 写入
+		"ESDisableWrite____________": datarouter.ESDisableWrite.Load(),
+		// 繁忙时自动开启, 开启时所有设置了该标识的接口数据将不会写入 ES
+		"ESOptionalWrite___________": datarouter.ESOptionalWrite.Load(),
 
 		// HTTP 请求数, 非法/错误请求数, UDP 请求数, Tunnel 收发数据数
 		"HTTPRequestCount":           utils.Comma(common.HTTPRequestCount.Value()),

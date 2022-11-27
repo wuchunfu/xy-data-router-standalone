@@ -77,7 +77,7 @@ func InitMain() {
 	// 初始化 ES 数据信道
 	ESChan = common.NewChanx[*schema.DataItem]()
 
-	// 初始化数据分发器
+	initESWriteStatus()
 	initDataRouter()
 
 	// 开启 ES 写入
@@ -91,14 +91,15 @@ func InitMain() {
 
 	// 初始化数据处理
 	go initDataProcessorPool()
-	go initESOptionalWrite()
+	go initESWriteBreaker()
 	go initESBulkPool()
 	go dataEntry()
 }
 
 // InitRuntime 重新加载或初始化运行时配置
 func InitRuntime() {
-	// 同步数据分发器配置
+	// 配置变化时, 热加载
+	initESWriteStatus()
 	initDataRouter()
 
 	// 调节协程池
