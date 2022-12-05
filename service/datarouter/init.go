@@ -1,9 +1,9 @@
 package datarouter
 
 import (
+	"github.com/fufuok/ants"
 	"github.com/fufuok/chanx"
 	"github.com/fufuok/utils/xsync"
-	"github.com/panjf2000/ants/v2"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -103,8 +103,8 @@ func InitRuntime() {
 	initDataRouter()
 
 	// 调节协程池
-	tuneDataProcessorSize(conf.Config.DataConf.ProcessorSize)
-	tuneESBulkWorkerSize(conf.Config.DataConf.ESBulkWorkerSize)
+	tuneDataProcessorSize()
+	tuneESBulkWorkerSize()
 }
 
 func Stop() {
@@ -116,14 +116,16 @@ func poolRelease() {
 	ESBulkPool.Release()
 }
 
-// tuneDataProcessorSize 调节协程并发数
-func tuneDataProcessorSize(n int) {
-	DataProcessorPool.Tune(n)
+// tuneDataProcessorSize 调节协程并发数, 最大阻塞任务数
+func tuneDataProcessorSize() {
+	DataProcessorPool.Tune(conf.Config.DataConf.ProcessorWorkerSize)
+	DataProcessorPool.TuneMaxBlockingTasks(conf.Config.DataConf.ProcessorMaxWorkerSize)
 }
 
-// tuneESBulkWorkerSize 调节协程并发数
-func tuneESBulkWorkerSize(n int) {
-	ESBulkPool.Tune(n)
+// tuneESBulkWorkerSize 调节协程并发数, 最大阻塞任务数
+func tuneESBulkWorkerSize() {
+	ESBulkPool.Tune(conf.Config.DataConf.ESBulkWorkerSize)
+	ESBulkPool.TuneMaxBlockingTasks(conf.Config.DataConf.ESBulkMaxWorkerSize)
 }
 
 // 新数据信道

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/panjf2000/ants/v2"
+	"github.com/fufuok/ants"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -35,7 +35,7 @@ func releaseDataProcessor(dp *tDataProcessor) {
 // 数据处理协程池初始化
 func initDataProcessorPool() {
 	DataProcessorPool, _ = ants.NewPoolWithFunc(
-		conf.Config.DataConf.ProcessorSize,
+		conf.Config.DataConf.ProcessorWorkerSize,
 		func(i any) {
 			dataProcessor(i.(*tDataProcessor))
 		},

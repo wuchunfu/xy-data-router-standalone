@@ -109,7 +109,7 @@ type tDataConf struct {
 	ESBusyPercent             float64  `json:"es_busy_percent"`
 	ChanSize                  int      `json:"chan_size"`
 	ChanMaxBufCap             int      `json:"chan_max_buf_cap"`
-	ProcessorSize             int      `json:"processor_size"`
+	ProcessorWorkerSize       int      `json:"processor_worker_size"`
 	ProcessorMaxWorkerSize    int      `json:"processor_max_worker_size"`
 	ESPostBatchBytes          int
 	ESPostMaxIntervalDuration time.Duration
@@ -398,8 +398,8 @@ func readConf() (
 	}
 
 	// 数据处理并发协程数限制
-	if config.DataConf.ProcessorSize < 10 {
-		config.DataConf.ProcessorSize = DataProcessorSize
+	if config.DataConf.ProcessorWorkerSize < 10 {
+		config.DataConf.ProcessorWorkerSize = DataProcessorSize
 	}
 	if config.DataConf.ProcessorMaxWorkerSize < 10000 {
 		config.DataConf.ProcessorMaxWorkerSize = DataProcessorMaxWorkerSize

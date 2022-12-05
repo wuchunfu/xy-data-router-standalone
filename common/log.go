@@ -44,6 +44,7 @@ func initLogger() {
 		}
 		return file[i+1:] + ":" + strconv.Itoa(line)
 	}
+	Log.Info().Msg("Logger initialized successfully")
 }
 
 func loadLogger() {

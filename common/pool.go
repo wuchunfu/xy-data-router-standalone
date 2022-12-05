@@ -3,10 +3,10 @@ package common
 import (
 	"time"
 
+	"github.com/fufuok/ants"
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/chanx"
 	"github.com/fufuok/utils/pools/bufferpool"
-	"github.com/panjf2000/ants/v2"
 
 	"github.com/fufuok/xy-data-router/conf"
 )

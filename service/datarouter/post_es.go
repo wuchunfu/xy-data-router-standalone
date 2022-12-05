@@ -3,11 +3,11 @@ package datarouter
 import (
 	"time"
 
+	"github.com/fufuok/ants"
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
 	"github.com/fufuok/utils/jsongen"
 	"github.com/fufuok/utils/pools/readerpool"
-	"github.com/panjf2000/ants/v2"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"

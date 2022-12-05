@@ -110,8 +110,8 @@
     "chan_size": 50,
     "__ChanMaxBufCap": "无限缓冲信道最大缓冲数量, 0 为无限(默认), 超过限制(DataChanSize + DataChanMaxBufCap)丢弃数据",
     "chan_max_buf_cap": 500000,
-    "__ProcessorSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",
-    "processor_size": 3000,
+    "__ProcessorWorkerSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",
+    "processor_worker_size": 3000,
     "__ProcessorMaxWorkerSize": "数据处理最大排队大小, 达到该值会丢弃, 最低: 10000, 默认 100000 个数据",
     "processor_max_worker_size": 100000
   },
