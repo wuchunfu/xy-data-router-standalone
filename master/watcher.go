@@ -22,7 +22,7 @@ func Watcher() {
 	interval := conf.Config.SYSConf.WatcherIntervalDuration
 	intervalStr := interval.String()
 	md5Main := utils.MustMD5Sum(mainFile)
-	md5Conf := conf.GetFilesVer(conf.ConfigFile).MD5
+	md5Conf := conf.GetFileVer(conf.ConfigFile).MD5
 	common.Log.Info().Str("main", mainFile).Str("interval", intervalStr).Msg("Watching")
 	common.Log.Info().Str("config", conf.ConfigFile).Str("interval", intervalStr).Msg("Watching")
 

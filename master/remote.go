@@ -17,7 +17,7 @@ func startRemoteConf(ctx context.Context) {
 }
 
 // 执行获取远端配置
-func getRemoteConf(ctx context.Context, c *conf.TFilesConf) {
+func getRemoteConf(ctx context.Context, c *conf.FilesConf) {
 	v := reflect.ValueOf(c)
 	m := v.MethodByName(c.Method)
 	if m.Kind() != reflect.Func {

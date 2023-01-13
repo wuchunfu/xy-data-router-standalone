@@ -15,15 +15,15 @@ import (
 func BenchmarkDataRouterLoad(b *testing.B) {
 	// 模拟 Config 构建以接口名为键的配置集合
 	apiNamePrefix := "TestAPI.Name."
-	apiConfig := make(map[string]*conf.TAPIConf)
+	apiConfig := make(map[string]*conf.APIConf)
 	for i := 0; i < 5000; i++ {
 		apiname := apiNamePrefix + strconv.Itoa(i)
-		apiConfig[apiname] = &conf.TAPIConf{
+		apiConfig[apiname] = &conf.APIConf{
 			APIName:       apiname,
 			ESIndex:       apiname,
 			ESIndexSplit:  "day",
 			RequiredField: []string{"timestamp", "name", "msg", "more"},
-			PostAPI: conf.TPostAPIConf{
+			PostAPI: conf.PostAPIConf{
 				API: []string{"https://test.demo.com/v1/apiname",
 					"http://localhost/api",
 				},
@@ -33,7 +33,7 @@ func BenchmarkDataRouterLoad(b *testing.B) {
 
 	// 原子存放方案
 	var av atomic.Value
-	type avDataRouter map[string]*tDataRouter
+	type avDataRouter map[string]*router
 	avmap := make(avDataRouter)
 
 	var sm sync.Map
@@ -42,7 +42,7 @@ func BenchmarkDataRouterLoad(b *testing.B) {
 	for apiname, cfg := range apiConfig {
 		apiConf := cfg
 		apiConf.ESBulkHeader = []byte(`{"index":{"_index":"` + apiname + `","_type":"_doc"}}`)
-		dr := &tDataRouter{
+		dr := &router{
 			apiConf: apiConf,
 		}
 		dataRouters.Store(apiname, dr)
@@ -77,7 +77,7 @@ func BenchmarkDataRouterLoad(b *testing.B) {
 			if !ok {
 				b.Fatal("expected ok")
 			}
-			if dr.(*tDataRouter).apiConf.APIName != apiname {
+			if dr.(*router).apiConf.APIName != apiname {
 				b.Fatalf("expected apiname is %s", apiname)
 			}
 		}
@@ -117,7 +117,7 @@ func BenchmarkDataRouterLoad(b *testing.B) {
 				if !ok {
 					b.Fatal("expected ok")
 				}
-				if dr.(*tDataRouter).apiConf.APIName != apiname {
+				if dr.(*router).apiConf.APIName != apiname {
 					b.Fatalf("expected apiname is %s", apiname)
 				}
 			}

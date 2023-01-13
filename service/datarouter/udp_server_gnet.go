@@ -10,7 +10,7 @@ import (
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
-type tUDPServerG struct {
+type udpServerGnet struct {
 	// 是否应答
 	withSendTo bool
 
@@ -19,14 +19,14 @@ type tUDPServerG struct {
 
 func udpServerG(addr string, withSendTo bool) error {
 	return gnet.Run(
-		&tUDPServerG{withSendTo: withSendTo},
+		&udpServerGnet{withSendTo: withSendTo},
 		fmt.Sprintf("udp://%s", addr),
 		gnet.WithMulticore(true),
 		gnet.WithReusePort(true),
 	)
 }
 
-func (s *tUDPServerG) OnTraffic(c gnet.Conn) (action gnet.Action) {
+func (s *udpServerGnet) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	ip, _, err := utils.GetIPPort(c.RemoteAddr())
 	if err != nil {
 		return

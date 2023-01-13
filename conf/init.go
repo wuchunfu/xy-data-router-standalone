@@ -29,10 +29,10 @@ var (
 	LogDaemon = filepath.Join(LogDir, "daemon.log")
 
 	// Config 所有配置
-	Config *tJSONConf
+	Config *allConf
 
 	// APIConfig 以接口名为键的配置
-	APIConfig map[string]*TAPIConf
+	APIConfig map[string]*APIConf
 
 	// ESWhiteListConfig ES 查询接口 IP 白名单配置
 	ESWhiteListConfig map[*net.IPNet]struct{}

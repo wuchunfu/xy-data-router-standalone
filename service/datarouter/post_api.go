@@ -10,7 +10,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 )
 
-func apiWorker(dr *tDataRouter) {
+func apiWorker(dr *router) {
 	// 默认 1s 空转
 	interval := 1
 	if dr.apiConf.PostAPI.Interval > 0 {
@@ -64,7 +64,7 @@ func apiWorker(dr *tDataRouter) {
 }
 
 // 推送数据到 API
-func postAPI(dis *tDataItems, api []string) {
+func postAPI(dis *dataItems, api []string) {
 	defer dis.release()
 	if len(api) == 0 {
 		return

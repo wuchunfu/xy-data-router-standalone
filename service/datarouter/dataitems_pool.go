@@ -9,32 +9,32 @@ import (
 var dataItemsPool sync.Pool
 
 // DataItem 数据集
-type tDataItems struct {
+type dataItems struct {
 	items []*schema.DataItem
 	size  int
 	count int
 }
 
-func (dis *tDataItems) add(item *schema.DataItem) {
+func (dis *dataItems) add(item *schema.DataItem) {
 	dis.items = append(dis.items, item)
 	dis.size += len(item.Body)
 	dis.count++
 }
 
-func (dis *tDataItems) release() {
+func (dis *dataItems) release() {
 	putDataItems(dis)
 }
 
-func getDataItems() *tDataItems {
+func getDataItems() *dataItems {
 	v := dataItemsPool.Get()
 	if v != nil {
-		return v.(*tDataItems)
+		return v.(*dataItems)
 	}
-	return new(tDataItems)
+	return new(dataItems)
 }
 
 // 回收所有数据项
-func putDataItems(dis *tDataItems) {
+func putDataItems(dis *dataItems) {
 	for i := range dis.items {
 		dis.items[i].Release()
 	}

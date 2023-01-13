@@ -12,7 +12,7 @@ import (
 )
 
 // ES 批量写入响应
-type tESBulkResponse struct {
+type esBulkResponse struct {
 	Errors bool `json:"errors"`
 	Items  []struct {
 		Index struct {
@@ -56,7 +56,7 @@ func BulkRequest(body io.Reader, esBody []byte) bool {
 	return esBulkResult(resp, esBody)
 }
 
-func esBulkResult(resp *TResponse, esBody []byte) bool {
+func esBulkResult(resp *Response, esBody []byte) bool {
 	// 低级别日志配置时(Warn), 开启批量写入错误抽样日志, Error 时关闭批量写入错误日志
 	if !conf.Config.StateConf.CheckESBulkResult {
 		return true
@@ -82,7 +82,7 @@ func esBulkResult(resp *TResponse, esBody []byte) bool {
 		return true
 	}
 
-	var blk tESBulkResponse
+	var blk esBulkResponse
 	if err := json.NewDecoder(resp.Response.Body).Decode(&blk); err != nil {
 		common.LogSampled.Error().Err(err).
 			Str("resp", resp.Response.String()).

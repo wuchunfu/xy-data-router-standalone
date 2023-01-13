@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-type tParams struct {
+type params struct {
 	Index      string         `json:"index"`
 	DocumentID string         `json:"document_id"`
 	Scroll     int            `json:"scroll"`
@@ -15,15 +15,15 @@ type tParams struct {
 
 var paramsPool = sync.Pool{
 	New: func() any {
-		return new(tParams)
+		return new(params)
 	},
 }
 
-func getParams() *tParams {
-	return paramsPool.Get().(*tParams)
+func getParams() *params {
+	return paramsPool.Get().(*params)
 }
 
-func putParams(p *tParams) {
+func putParams(p *params) {
 	p.Index = ""
 	p.Body = nil
 	p.ClientIP = ""

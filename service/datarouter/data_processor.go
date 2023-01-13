@@ -14,7 +14,7 @@ import (
 
 // 数据处理和分发
 // 格式化每个 JSON 数据, 附加系统字段, 发送给 ES 和 API 队列, 释放 DataItem
-func dataProcessor(dp *tDataProcessor) {
+func dataProcessor(dp *processor) {
 	defer releaseDataProcessor(dp)
 
 	// 丢弃可选写入 ES 数据项
@@ -56,7 +56,7 @@ func dataProcessor(dp *tDataProcessor) {
 	}
 }
 
-func sendOneData(dp *tDataProcessor, js []byte, isPostToES, isPostToAPI bool) {
+func sendOneData(dp *processor, js []byte, isPostToES, isPostToAPI bool) {
 	jsData := appendSYSField(js, dp.data.IP)
 	if jsData == nil {
 		return

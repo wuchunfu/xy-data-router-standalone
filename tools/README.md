@@ -79,12 +79,12 @@ const (
 	RedisAuthKeyName = "PROJECT_1_REDIS_AUTH"
 )
 
-type tConfig struct {
+type config struct {
 	BaseSecret string
 	RedisAuth  string
 }
 
-var Conf tConfig
+var Conf config
 
 func init() {
 	// 前置: 假如项目环境中已经执行了下面的配置

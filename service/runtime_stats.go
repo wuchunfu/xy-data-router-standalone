@@ -27,7 +27,7 @@ func RuntimeStats() map[string]any {
 
 // 系统信息
 func sysStats() map[string]any {
-	ver := conf.GetFilesVer(conf.ConfigFile)
+	ver := conf.GetFileVer(conf.ConfigFile)
 	return map[string]any{
 		"APPName":      conf.APPName,
 		"Version":      conf.Version,

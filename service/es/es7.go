@@ -17,18 +17,18 @@ var (
 	ClientVer = elasticsearch.Version
 )
 
-type tESClient struct {
+type esClient struct {
 	client *elasticsearch.Client
 }
 
-// TResponse 通用请求响应体
-type TResponse struct {
+// Response 通用请求响应体
+type Response struct {
 	Response  *esapi.Response
 	TotalPath string
 	Err       error
 }
 
-func newES() (client tESClient, cfgErr error, esErr error) {
+func newES() (client esClient, cfgErr error, esErr error) {
 	common.Log.Info().Strs("hosts", conf.Config.DataConf.ESAddress).Msg("Initialize ES connection")
 	client.client, cfgErr = elasticsearch.NewClient(elasticsearch.Config{
 		Addresses:     conf.Config.DataConf.ESAddress,

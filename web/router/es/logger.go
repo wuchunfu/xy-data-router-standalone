@@ -11,13 +11,13 @@ import (
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
-type tLog struct {
-	*tParams
-	*tResult
+type logData struct {
+	*params
+	*result
 }
 
-func log(params *tParams, ret *tResult) {
-	res := &tLog{params, ret}
+func log(params *params, ret *result) {
+	res := &logData{params, ret}
 	buf := bufferpool.Get()
 	defer bufferpool.Put(buf)
 

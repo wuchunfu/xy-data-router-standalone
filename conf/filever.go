@@ -4,21 +4,21 @@ import (
 	"time"
 )
 
-type TFilesVer struct {
+type FileVer struct {
 	MD5        string
 	LastUpdate time.Time
 }
 
-// GetFilesVer 获取或初始化文件版本信息
-func GetFilesVer(k interface{}) (ver *TFilesVer) {
+// GetFileVer 获取或初始化文件版本信息
+func GetFileVer(k interface{}) (ver *FileVer) {
 	v, ok := FilesVer.Load(k)
 	if ok {
-		ver, ok = v.(*TFilesVer)
+		ver, ok = v.(*FileVer)
 		if ok {
 			return
 		}
 	}
-	ver = new(TFilesVer)
+	ver = new(FileVer)
 	FilesVer.Store(k, ver)
 	return
 }

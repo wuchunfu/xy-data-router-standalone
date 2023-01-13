@@ -15,23 +15,23 @@ import (
 	"github.com/fufuok/xy-data-router/internal/json"
 )
 
-// tJSONConf 接口配置
-type tJSONConf struct {
-	SYSConf     tSYSConf   `json:"sys_conf"`
-	MainConf    TFilesConf `json:"main_conf"`
-	LogConf     tLogConf   `json:"log_conf"`
-	WebConf     tWebConf   `json:"web_conf"`
-	UDPConf     tUDPConf   `json:"udp_conf"`
-	TunConf     tTunConf   `json:"tun_conf"`
-	DataConf    tDataConf  `json:"data_conf"`
-	APIConf     []TAPIConf `json:"api_conf"`
-	ESWhiteList []string   `json:"es_white_list"`
-	ESBlackList []string   `json:"es_black_list"`
-	StateConf   tStateConf
+// 接口配置
+type allConf struct {
+	SYSConf     sysConf   `json:"sys_conf"`
+	MainConf    FilesConf `json:"main_conf"`
+	LogConf     LogConf   `json:"log_conf"`
+	WebConf     webConf   `json:"web_conf"`
+	UDPConf     udpConf   `json:"udp_conf"`
+	TunConf     tunConf   `json:"tun_conf"`
+	DataConf    dataConf  `json:"data_conf"`
+	APIConf     []APIConf `json:"api_conf"`
+	ESWhiteList []string  `json:"es_white_list"`
+	ESBlackList []string  `json:"es_black_list"`
+	StateConf   stateConf
 }
 
-// tSYSConf 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
-type tSYSConf struct {
+// 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
+type sysConf struct {
 	Debug                   bool   `json:"debug"`
 	PProfAddr               string `json:"pprof_addr"`
 	RestartMain             bool   `json:"restart_main"`
@@ -43,21 +43,22 @@ type tSYSConf struct {
 	BaseSecretValue         string
 }
 
-type tLogConf struct {
-	Level       int    `json:"level"`
-	NoColor     bool   `json:"no_color"`
-	File        string `json:"file"`
-	Period      int    `json:"period"`
-	Burst       uint32 `json:"burst"`
-	MaxSize     int    `json:"max_size"`
-	MaxBackups  int    `json:"max_backups"`
-	MaxAge      int    `json:"max_age"`
-	ESBulkLevel int    `json:"es_bulk_level"`
-	ESIndex     string `json:"es_index"`
-	PeriodDur   time.Duration
+type LogConf struct {
+	Level        int    `json:"level"`
+	NoColor      bool   `json:"no_color"`
+	File         string `json:"file"`
+	Period       int    `json:"period"`
+	Burst        uint32 `json:"burst"`
+	MaxSize      int64  `json:"max_size"`
+	MaxBackups   int    `json:"max_backups"`
+	MaxAge       int    `json:"max_age"`
+	ESBulkLevel  int    `json:"es_bulk_level"`
+	ESIndex      string `json:"es_index"`
+	PostAlarmAPI string `json:"post_alarm_api"`
+	PeriodDur    time.Duration
 }
 
-type tWebConf struct {
+type webConf struct {
 	ServerAddr              string   `json:"server_addr"`
 	ServerHttpsAddr         string   `json:"server_https_addr"`
 	DisableKeepalive        bool     `json:"disable_keepalive"`
@@ -79,7 +80,7 @@ type tWebConf struct {
 	KeyFile                 string
 }
 
-type tUDPConf struct {
+type udpConf struct {
 	ServerRAddr   string `json:"server_raddr"`
 	ServerRWAddr  string `json:"server_rwaddr"`
 	GoReadNum1CPU int    `json:"go_read_num_1cpu"`
@@ -87,7 +88,7 @@ type tUDPConf struct {
 	GoReadNum     int
 }
 
-type tTunConf struct {
+type tunConf struct {
 	ServerAddr      string `json:"server_addr"`
 	ClientNum1CPU   int    `json:"client_num_1_cpu"`
 	SendQueueSize   int    `json:"send_queue_size"`
@@ -95,7 +96,7 @@ type tTunConf struct {
 	ClientNum       int
 }
 
-type tDataConf struct {
+type dataConf struct {
 	ESAddress                 []string `json:"es_address"`
 	ESDisableWrite            bool     `json:"es_disable_write"`
 	ESPostBatchNum            int      `json:"es_post_batch_num"`
@@ -115,26 +116,26 @@ type tDataConf struct {
 	ESPostMaxIntervalDuration time.Duration
 }
 
-type tStateConf struct {
+type stateConf struct {
 	CheckESBulkResult bool
 	CheckESBulkErrors bool
 	RecordESBulkBody  bool
 }
 
-type TAPIConf struct {
-	APIName            string       `json:"api_name"`
-	ESDisableWrite     bool         `json:"es_disable_write"`
-	ESOptionalWrite    bool         `json:"es_optional_write"`
-	ESIndex            string       `json:"es_index"`
-	ESIndexSplit       string       `json:"es_index_split"`
-	ESPipeline         string       `json:"es_pipeline"`
-	RequiredField      []string     `json:"required_field"`
-	PostAPI            TPostAPIConf `json:"post_api"`
+type APIConf struct {
+	APIName            string      `json:"api_name"`
+	ESDisableWrite     bool        `json:"es_disable_write"`
+	ESOptionalWrite    bool        `json:"es_optional_write"`
+	ESIndex            string      `json:"es_index"`
+	ESIndexSplit       string      `json:"es_index_split"`
+	ESPipeline         string      `json:"es_pipeline"`
+	RequiredField      []string    `json:"required_field"`
+	PostAPI            PostAPIConf `json:"post_api"`
 	ESBulkHeader       []byte
 	ESBulkHeaderLength int
 }
 
-type TPostAPIConf struct {
+type PostAPIConf struct {
 	API        []string `json:"api"`
 	Interval   int      `json:"interval"`
 	BatchNum   int      `json:"batch_num"`
@@ -142,7 +143,7 @@ type TPostAPIConf struct {
 	BatchBytes int
 }
 
-type TFilesConf struct {
+type FilesConf struct {
 	Path            string `json:"-"`
 	Method          string `json:"method"`
 	SecretName      string `json:"secret_name"`
@@ -170,8 +171,8 @@ func LoadConf() error {
 
 // 读取配置
 func readConf() (
-	config *tJSONConf,
-	apiConfig map[string]*TAPIConf,
+	config *allConf,
+	apiConfig map[string]*APIConf,
 	whiteList map[*net.IPNet]struct{},
 	blackList map[*net.IPNet]struct{},
 	err error,
@@ -182,7 +183,7 @@ func readConf() (
 		return
 	}
 
-	config = new(tJSONConf)
+	config = new(allConf)
 	if err = json.Unmarshal(body, config); err != nil {
 		return
 	}
@@ -324,7 +325,7 @@ func readConf() (
 	}
 
 	// 以接口名为键的配置集合
-	apiConfig = make(map[string]*TAPIConf)
+	apiConfig = make(map[string]*APIConf)
 	for _, cfg := range config.APIConf {
 		apiConf := cfg
 		apiname := strings.TrimSpace(apiConf.APIName)
@@ -450,7 +451,7 @@ func readConf() (
 	config.StateConf.CheckESBulkErrors = config.LogConf.ESBulkLevel <= int(zerolog.WarnLevel)
 	config.StateConf.RecordESBulkBody = config.LogConf.ESBulkLevel <= int(zerolog.InfoLevel)
 
-	ver := GetFilesVer(ConfigFile)
+	ver := GetFileVer(ConfigFile)
 	ver.MD5 = utils.MD5BytesHex(body)
 	ver.LastUpdate = time.Now()
 	if config.SYSConf.Debug {

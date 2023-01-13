@@ -16,7 +16,7 @@ import (
 )
 
 // 发送响应, 记录日志
-func sendResult(c *fiber.Ctx, resp *es.TResponse, params *tParams) error {
+func sendResult(c *fiber.Ctx, resp *es.Response, params *params) error {
 	params.ClientIP = common.GetClientIP(c)
 	ret := parseESResponse(resp, params)
 	ret.ReqUri = utils.CopyString(c.OriginalURL())
@@ -34,7 +34,7 @@ func sendResult(c *fiber.Ctx, resp *es.TResponse, params *tParams) error {
 }
 
 // 解析 ES 请求结果
-func parseESResponse(resp *es.TResponse, params *tParams) *tResult {
+func parseESResponse(resp *es.Response, params *params) *result {
 	ret := getResult()
 	ret.StatusCode = resp.Response.StatusCode
 
@@ -59,7 +59,7 @@ func parseESResponse(resp *es.TResponse, params *tParams) *tResult {
 }
 
 // 处理搜索结果
-func parseESResult(resp *es.TResponse, params *tParams, ret *tResult) *tResult {
+func parseESResult(resp *es.Response, params *params, ret *result) *result {
 	res, err := io.ReadAll(resp.Response.Body)
 	if err != nil {
 		common.LogSampled.Error().Err(err).Msg("response.Body")

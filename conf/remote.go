@@ -11,7 +11,7 @@ import (
 )
 
 // GetMonitorSource 获取监控平台源数据配置
-func (c *TFilesConf) GetMonitorSource() error {
+func (c *FilesConf) GetMonitorSource() error {
 	// Token: md5(timestamp + auth_key)
 	timestamp := utils.MustString(time.Now().Unix())
 	token := utils.MD5Hex(timestamp + c.SecretValue)
@@ -33,7 +33,7 @@ func (c *TFilesConf) GetMonitorSource() error {
 			}
 
 			// 当前版本信息
-			ver := GetFilesVer(c.Path)
+			ver := GetFileVer(c.Path)
 			md5New := utils.MD5Hex(body)
 			if md5New != ver.MD5 {
 				// 保存到配置文件

@@ -14,18 +14,18 @@ import (
 // 数据处理池
 var dpPool = sync.Pool{
 	New: func() any {
-		return new(tDataProcessor)
+		return new(processor)
 	},
 }
 
-func newDataPorcessor(dr *tDataRouter, data *schema.DataItem) *tDataProcessor {
-	dp := dpPool.Get().(*tDataProcessor)
+func newDataPorcessor(dr *router, data *schema.DataItem) *processor {
+	dp := dpPool.Get().(*processor)
 	dp.dr = dr
 	dp.data = data
 	return dp
 }
 
-func releaseDataProcessor(dp *tDataProcessor) {
+func releaseDataProcessor(dp *processor) {
 	dp.dr = nil
 	dp.data.Release()
 	dpPool.Put(dp)
@@ -36,7 +36,7 @@ func initDataProcessorPool() {
 	DataProcessorPool, _ = ants.NewPoolWithFunc(
 		conf.Config.DataConf.ProcessorSize,
 		func(i any) {
-			dataProcessor(i.(*tDataProcessor))
+			dataProcessor(i.(*processor))
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.DataConf.ProcessorWaitingLimit),

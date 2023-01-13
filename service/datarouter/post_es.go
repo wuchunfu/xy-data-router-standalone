@@ -19,7 +19,7 @@ func initESBulkPool() {
 	ESBulkPool, _ = ants.NewPoolWithFunc(
 		conf.Config.DataConf.ESBulkerSize,
 		func(v any) {
-			esBulk(v.(*tDataItems))
+			esBulk(v.(*dataItems))
 		},
 		ants.WithExpiryDuration(10*time.Second),
 		ants.WithMaxBlockingTasks(conf.Config.DataConf.ESBulkerWaitingLimit),
@@ -31,7 +31,7 @@ func initESBulkPool() {
 }
 
 // 生成 esBluk 索引头
-func getESBulkHeader(apiConf *conf.TAPIConf, ymd string) []byte {
+func getESBulkHeader(apiConf *conf.APIConf, ymd string) []byte {
 	esIndex := apiConf.ESIndex
 	if esIndex == "" {
 		esIndex = apiConf.APIName
@@ -70,7 +70,7 @@ func updateESBulkHeader() {
 	for {
 		now := common.GTimeNow()
 		ymd := now.Format("060102")
-		dataRouters.Range(func(_ string, dr *tDataRouter) bool {
+		dataRouters.Range(func(_ string, dr *router) bool {
 			dr.apiConf.ESBulkHeader = getESBulkHeader(dr.apiConf, ymd)
 			dr.apiConf.ESBulkHeaderLength = len(dr.apiConf.ESBulkHeader)
 			return true
@@ -120,7 +120,7 @@ func esWorker() {
 }
 
 // 提交批量任务, 提交不阻塞, 有执行并发限制, 最大排队数限制
-func submitESBulk(dis *tDataItems) {
+func submitESBulk(dis *dataItems) {
 	_ = common.GoPool.Submit(func() {
 		if err := ESBulkPool.Invoke(dis); err != nil {
 			ESBulkDiscards.Inc()
@@ -130,7 +130,7 @@ func submitESBulk(dis *tDataItems) {
 }
 
 // 批量写入 ES
-func esBulk(dis *tDataItems) bool {
+func esBulk(dis *dataItems) bool {
 	esBody := bytespool.Make(dis.size)
 	for i := 0; i < dis.count; i++ {
 		esBody = append(esBody, dis.items[i].Body...)

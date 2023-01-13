@@ -54,7 +54,7 @@ func loadES() error {
 	return nil
 }
 
-func parseVersion(client tESClient) error {
+func parseVersion(client esClient) error {
 	resp := GetResponse()
 	defer PutResponse(resp)
 	resp.Response, resp.Err = client.client.Info()

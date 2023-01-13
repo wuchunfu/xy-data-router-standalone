@@ -10,7 +10,7 @@ import (
 // initDataRouter 根据接口配置初始化数据分发处理器
 func initDataRouter() {
 	// 关闭配置中已取消的接口
-	dataRouters.Range(func(apiname string, dr *tDataRouter) bool {
+	dataRouters.Range(func(apiname string, dr *router) bool {
 		if _, ok := conf.APIConfig[apiname]; !ok {
 			dataRouters.Delete(apiname)
 			close(dr.drChan.In)
@@ -43,7 +43,7 @@ func initDataRouter() {
 }
 
 // 数据分发处理器
-func dataRouter(dr *tDataRouter) {
+func dataRouter(dr *router) {
 	common.Log.Info().Str("apiname", dr.apiConf.APIName).Msg("Start DataRouter worker")
 
 	// 开启接口对应 API 推送处理器

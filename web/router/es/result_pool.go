@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-type tResult struct {
+type result struct {
 	result     []byte
 	StatusCode int    `json:"status_code"`
 	Took       int64  `json:"took"`
@@ -18,15 +18,15 @@ type tResult struct {
 
 var resultPool = sync.Pool{
 	New: func() any {
-		return new(tResult)
+		return new(result)
 	},
 }
 
-func getResult() *tResult {
-	return resultPool.Get().(*tResult)
+func getResult() *result {
+	return resultPool.Get().(*result)
 }
 
-func putResult(r *tResult) {
+func putResult(r *result) {
 	r.result = r.result[:0]
 	r.Count = 0
 	r.Error = ""

@@ -13,10 +13,10 @@ var (
 	okC = []byte(`}`)
 )
 
-// TAPIData API 标准返回, 内部规范
+// APIData API 标准返回, 内部规范
 // id: 1, ok: 1, code: 0 成功; id: 0, ok: 0, code: 1 失败
 // 成功时 msg 必定为空
-type TAPIData struct {
+type APIData struct {
 	ID    int    `json:"id"`
 	OK    int    `json:"ok"`
 	Code  int    `json:"code"`
@@ -26,8 +26,8 @@ type TAPIData struct {
 }
 
 // APIFailureData API 请求失败返回值
-func APIFailureData(msg string, data any) *TAPIData {
-	return &TAPIData{
+func APIFailureData(msg string, data any) *APIData {
+	return &APIData{
 		ID:    0,
 		OK:    0,
 		Code:  1,
@@ -38,8 +38,8 @@ func APIFailureData(msg string, data any) *TAPIData {
 }
 
 // APISuccessData API 请求成功返回值
-func APISuccessData(data any, count int) *TAPIData {
-	return &TAPIData{
+func APISuccessData(data any, count int) *APIData {
+	return &APIData{
 		ID:    1,
 		OK:    1,
 		Code:  0,
@@ -56,8 +56,8 @@ func APISuccessBytesData(data []byte, count int) []byte {
 }
 
 // APISuccessNilData API 请求成功返回, 无数据
-func APISuccessNilData() *TAPIData {
-	return &TAPIData{
+func APISuccessNilData() *APIData {
+	return &APIData{
 		ID:    1,
 		OK:    1,
 		Code:  0,

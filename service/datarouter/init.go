@@ -18,7 +18,7 @@ var (
 	esBodySep = []byte(conf.ESBodySep)
 
 	// 以接口名为键的数据通道
-	dataRouters = xsync.NewMapOf[*tDataRouter]()
+	dataRouters = xsync.NewMapOf[*router]()
 
 	// ItemTotal 收到的数据项计数
 	ItemTotal xsync.Counter
@@ -49,7 +49,7 @@ var (
 )
 
 // 数据分发
-type tDataRouter struct {
+type router struct {
 	// 数据接收信道
 	drChan *chanx.UnboundedChan[*schema.DataItem]
 
@@ -57,12 +57,12 @@ type tDataRouter struct {
 	apiChan *chanx.UnboundedChan[*schema.DataItem]
 
 	// 接口配置
-	apiConf *conf.TAPIConf
+	apiConf *conf.APIConf
 }
 
 // 数据处理
-type tDataProcessor struct {
-	dr   *tDataRouter
+type processor struct {
+	dr   *router
 	data *schema.DataItem
 }
 
@@ -123,8 +123,8 @@ func tuneESBulkerSize() {
 }
 
 // 新数据信道
-func newDataRouter(apiConf *conf.TAPIConf) *tDataRouter {
-	return &tDataRouter{
+func newDataRouter(apiConf *conf.APIConf) *router {
+	return &router{
 		drChan:  common.NewChanx[*schema.DataItem](),
 		apiChan: common.NewChanx[*schema.DataItem](),
 		apiConf: apiConf,

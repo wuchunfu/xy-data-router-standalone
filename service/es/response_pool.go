@@ -6,12 +6,12 @@ import (
 
 var responsePool = sync.Pool{
 	New: func() any {
-		return new(TResponse)
+		return new(Response)
 	},
 }
 
-func GetResponse() *TResponse {
-	resp := responsePool.Get().(*TResponse)
+func GetResponse() *Response {
+	resp := responsePool.Get().(*Response)
 	if ServerLessThan7 {
 		resp.TotalPath = "hits.total"
 	} else {
@@ -20,7 +20,7 @@ func GetResponse() *TResponse {
 	return resp
 }
 
-func PutResponse(r *TResponse) {
+func PutResponse(r *Response) {
 	r.Response = nil
 	r.Err = nil
 	r.TotalPath = ""
