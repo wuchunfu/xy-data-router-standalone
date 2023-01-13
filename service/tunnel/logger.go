@@ -15,7 +15,7 @@ var (
 
 // zerolog of arpc
 // 注意: 受抽样日志影响, 日志可能不会被全部输出
-type logger struct {
+type arpcLogger struct {
 	log zerolog.Logger
 }
 
@@ -31,8 +31,8 @@ func loadLogger() {
 	log.SetLogger(newLogger())
 }
 
-func newLogger() *logger {
-	l := &logger{
+func newLogger() *arpcLogger {
+	l := &arpcLogger{
 		log: common.LogSampled,
 	}
 	if conf.Debug {
@@ -42,24 +42,24 @@ func newLogger() *logger {
 	return l
 }
 
-func (l *logger) SetLevel(lvl int) {}
+func (l *arpcLogger) SetLevel(lvl int) {}
 
-func (l *logger) SetLogger(logger zerolog.Logger) {
-	l.log = logger
+func (l *arpcLogger) SetLogger(appLogger zerolog.Logger) {
+	l.log = appLogger
 }
 
-func (l *logger) Debug(format string, v ...any) {
+func (l *arpcLogger) Debug(format string, v ...any) {
 	l.log.Debug().Msgf(format, v...)
 }
 
-func (l *logger) Info(format string, v ...any) {
+func (l *arpcLogger) Info(format string, v ...any) {
 	l.log.Info().Msgf(format, v...)
 }
 
-func (l *logger) Warn(format string, v ...any) {
+func (l *arpcLogger) Warn(format string, v ...any) {
 	l.log.Warn().Msgf(format, v...)
 }
 
-func (l *logger) Error(format string, v ...any) {
+func (l *arpcLogger) Error(format string, v ...any) {
 	l.log.Error().Msgf(format, v...)
 }

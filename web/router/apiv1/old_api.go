@@ -9,6 +9,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
@@ -25,7 +26,7 @@ func oldAPIHandler(delKeys []string) fiber.Handler {
 		// 接口配置检查
 		apiConf, ok := conf.APIConfig[apiname]
 		if !ok || apiConf.APIName == "" {
-			common.LogSampled.Info().Str("uri", c.OriginalURL()).Int("len", len(apiname)).Msg("api not found")
+			sampler.Info().Str("uri", c.OriginalURL()).Int("len", len(apiname)).Msg("api not found")
 			return c.SendString("0")
 		}
 

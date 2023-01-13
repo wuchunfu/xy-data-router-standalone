@@ -6,6 +6,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
 )
 
 // 初始化获取远端配置
@@ -21,11 +22,11 @@ func getRemoteConf(ctx context.Context, c *conf.FilesConf) {
 	v := reflect.ValueOf(c)
 	m := v.MethodByName(c.Method)
 	if m.Kind() != reflect.Func {
-		common.Log.Error().Str("method", c.Method).Msg("skip init get remote conf(func error)")
+		logger.Error().Str("method", c.Method).Msg("skip init get remote conf(func error)")
 		return
 	}
 
-	common.Log.Info().
+	logger.Info().
 		Str("path", c.Path).Str("method", c.Method).Dur("duration", c.GetConfDuration).
 		Msg("start get remote conf")
 
@@ -35,14 +36,14 @@ func getRemoteConf(ctx context.Context, c *conf.FilesConf) {
 	for range ticker.C {
 		select {
 		case <-ctx.Done():
-			common.Log.Warn().
+			logger.Warn().
 				Str("path", c.Path).Str("method", c.Method).
 				Msg("exit get remote conf")
 			return
 		default:
 			res := m.Call(nil)
 			if !res[0].IsNil() {
-				common.Log.Error().
+				logger.Error().
 					Str("path", c.Path).Str("method", c.Method).
 					Msgf("get remote conf err: %s", res[0])
 			}

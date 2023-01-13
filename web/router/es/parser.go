@@ -11,6 +11,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/es"
 	"github.com/fufuok/xy-data-router/web/response"
 )
@@ -39,14 +40,14 @@ func parseESResponse(resp *es.Response, params *params) *result {
 	ret.StatusCode = resp.Response.StatusCode
 
 	if resp.Err != nil {
-		common.LogSampled.Error().Err(resp.Err).Msg("getting response")
+		sampler.Error().Err(resp.Err).Msg("getting response")
 		ret.ErrMsg = "请求失败, 服务繁忙"
 		ret.Error = resp.Err.Error()
 		return ret
 	}
 
 	if resp.Response.Body == nil {
-		common.LogSampled.Error().Int("status_code", ret.StatusCode).Msg("response.Body is nil")
+		sampler.Error().Int("status_code", ret.StatusCode).Msg("response.Body is nil")
 		ret.ErrMsg = "请求失败, 服务异常"
 		return ret
 	}
@@ -62,7 +63,7 @@ func parseESResponse(resp *es.Response, params *params) *result {
 func parseESResult(resp *es.Response, params *params, ret *result) *result {
 	res, err := io.ReadAll(resp.Response.Body)
 	if err != nil {
-		common.LogSampled.Error().Err(err).Msg("response.Body")
+		sampler.Error().Err(err).Msg("response.Body")
 		ret.ErrMsg = "请求失败, 请稍后重试"
 		ret.Error = err.Error()
 		return ret
@@ -77,7 +78,7 @@ func parseESResult(resp *es.Response, params *params, ret *result) *result {
 			}
 		}
 		ret.ErrMsg = "请求错误, 请检查参数"
-		common.LogSampled.Warn().
+		sampler.Warn().
 			RawJSON("body", json.MustJSON(params.Body)).
 			Int("http_code", resp.Response.StatusCode).
 			Str("client_ip", params.ClientIP).
@@ -94,7 +95,7 @@ func parseESResult(resp *es.Response, params *params, ret *result) *result {
 	ret.Took = gjson.GetBytes(res, "took").Int()
 	costTime := time.Duration(ret.Took) * time.Millisecond
 	if costTime > conf.Config.WebConf.ESSlowQueryDuration {
-		common.LogSampled.Warn().
+		sampler.Warn().
 			RawJSON("body", json.MustJSON(params.Body)).
 			Str("client_ip", params.ClientIP).
 			Str("index", params.Index).

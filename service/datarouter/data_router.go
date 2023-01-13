@@ -5,6 +5,8 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 )
 
 // initDataRouter 根据接口配置初始化数据分发处理器
@@ -25,7 +27,7 @@ func initDataRouter() {
 		apiConf.ESBulkHeader = getESBulkHeader(apiConf, ymd)
 		apiConf.ESBulkHeaderLength = len(apiConf.ESBulkHeader)
 		if conf.Debug {
-			common.Log.Info().RawJSON(apiname, apiConf.ESBulkHeader).Msg("ESBulkHeader")
+			logger.Info().RawJSON(apiname, apiConf.ESBulkHeader).Msg("ESBulkHeader")
 		}
 		dr, ok := dataRouters.Load(apiname)
 		if ok {
@@ -44,7 +46,7 @@ func initDataRouter() {
 
 // 数据分发处理器
 func dataRouter(dr *router) {
-	common.Log.Info().Str("apiname", dr.apiConf.APIName).Msg("Start DataRouter worker")
+	logger.Info().Str("apiname", dr.apiConf.APIName).Msg("Start DataRouter worker")
 
 	// 开启接口对应 API 推送处理器
 	go apiWorker(dr)
@@ -57,7 +59,7 @@ func dataRouter(dr *router) {
 			if err := DataProcessorPool.Invoke(dp); err != nil {
 				releaseDataProcessor(dp)
 				DataProcessorDiscards.Inc()
-				common.LogSampled.Warn().Err(err).Msg("go dataProcessor discards")
+				sampler.Warn().Err(err).Msg("go dataProcessor discards")
 			}
 		})
 	}
@@ -65,5 +67,5 @@ func dataRouter(dr *router) {
 	// 准备退出
 	time.Sleep(2 * time.Second)
 	close(dr.apiChan.In)
-	common.Log.Warn().Str("apiname", dr.apiConf.APIName).Msg("DataRouter worker exited")
+	logger.Warn().Str("apiname", dr.apiConf.APIName).Msg("DataRouter worker exited")
 }

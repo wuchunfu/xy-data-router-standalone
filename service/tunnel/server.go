@@ -6,8 +6,9 @@ import (
 
 	"github.com/lesismal/arpc"
 
-	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
@@ -29,7 +30,7 @@ func newTunServer() error {
 	srv.Codec = &genCodec{}
 	srv.Handler.SetLogTag("[Tunnel SRV" + logType + "]")
 	srv.Handler.Handle(tunMethod, onData)
-	common.Log.Info().
+	logger.Info().
 		Str("addr", conf.Config.TunConf.ServerAddr).
 		Int("send_queue_size", srv.Handler.SendQueueSize()).
 		Int("send_buffer_size", srv.Handler.SendBufferSize()).
@@ -49,7 +50,7 @@ func newTunServer() error {
 func onData(c *arpc.Context) {
 	item := schema.Make()
 	if err := c.Bind(item); err != nil || item.APIName == "" {
-		common.LogSampled.Warn().
+		sampler.Warn().
 			Err(err).Str("apiname", item.APIName).Str("client_ip", item.IP).
 			Str("remote_addr", c.Client.Conn.RemoteAddr().String()).
 			Msg("TunRecvBad")

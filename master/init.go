@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/internal/logger"
 	"github.com/fufuok/xy-data-router/service"
 	"github.com/fufuok/xy-data-router/web"
 )
@@ -34,12 +35,12 @@ func Start() {
 			select {
 			case <-restartChan:
 				// 强制退出, 由 Daemon 重启程序
-				common.Log.Warn().Msg("restart <-restartChan")
+				logger.Warn().Msg("restart <-restartChan")
 				os.Exit(0)
 			case <-reloadChan:
 				// 重载配置及相关服务
 				cancel()
-				common.Log.Warn().Msg("reload <-reloadChan")
+				logger.Warn().Msg("reload <-reloadChan")
 			}
 		}
 	}()

@@ -12,6 +12,8 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/web/middleware"
 	"github.com/fufuok/xy-data-router/web/response"
 )
@@ -67,7 +69,7 @@ func initWeb() {
 
 	if conf.Config.WebConf.ServerHttpsAddr != "" {
 		go func() {
-			common.Log.Info().Str("addr", conf.Config.WebConf.ServerHttpsAddr).Msg("Listening and serving HTTPS")
+			logger.Info().Str("addr", conf.Config.WebConf.ServerHttpsAddr).Msg("Listening and serving HTTPS")
 			if err := app.ListenTLS(conf.Config.WebConf.ServerHttpsAddr,
 				conf.Config.WebConf.CertFile, conf.Config.WebConf.KeyFile); err != nil {
 				log.Fatalln("Failed to start HTTPS Server:", err, "\nbye.")
@@ -75,7 +77,7 @@ func initWeb() {
 		}()
 	}
 
-	common.Log.Info().Str("addr", conf.Config.WebConf.ServerAddr).Msg("Listening and serving HTTP")
+	logger.Info().Str("addr", conf.Config.WebConf.ServerAddr).Msg("Listening and serving HTTP")
 	if err := app.Listen(conf.Config.WebConf.ServerAddr); err != nil {
 		log.Fatalln("Failed to start HTTP Server:", err, "\nbye.")
 	}
@@ -89,7 +91,7 @@ func errorHandler(c *fiber.Ctx, err error) error {
 	}
 	common.HTTPBadRequestCount.Inc()
 	if conf.Debug {
-		common.LogSampled.Error().Err(err).
+		sampler.Error().Err(err).
 			Str("client_ip", common.GetClientIP(c)).Str("method", c.Method()).Int("status_code", code).
 			Msg(c.OriginalURL())
 	}

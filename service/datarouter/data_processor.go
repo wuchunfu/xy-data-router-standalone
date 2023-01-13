@@ -9,6 +9,7 @@ import (
 	"github.com/tidwall/pretty"
 
 	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
@@ -36,7 +37,7 @@ func dataProcessor(dp *processor) {
 		}
 
 		if !gjson.ValidBytes(js) {
-			common.LogSampled.Info().
+			sampler.Info().
 				Bytes("body", js).Str("apiname", dp.data.APIName).Str("client_ip", dp.data.IP).
 				Msg("Invalid JSON")
 			continue

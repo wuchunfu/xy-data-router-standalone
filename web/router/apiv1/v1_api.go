@@ -11,6 +11,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/gzip"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/schema"
 	"github.com/fufuok/xy-data-router/web/response"
 )
@@ -23,7 +24,7 @@ func apiHandler(c *fiber.Ctx) error {
 	// 检查接口配置
 	apiConf, ok := conf.APIConfig[apiname]
 	if !ok || apiConf.APIName == "" {
-		common.LogSampled.Info().
+		sampler.Info().
 			Str("client_ip", common.GetClientIP(c)).Str("uri", c.OriginalURL()).Int("len", len(apiname)).
 			Msg("api not found")
 		return response.APIFailure(c, "接口配置有误", nil)

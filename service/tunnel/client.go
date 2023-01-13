@@ -9,6 +9,8 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 )
 
 func initTunClient() {
@@ -17,7 +19,7 @@ func initTunClient() {
 	}
 
 	clients := newTunClients()
-	common.Log.Info().
+	logger.Info().
 		Str("addr", common.ForwardTunnel).
 		Int("client_num", conf.Config.TunConf.ClientNum).
 		Int("send_queue_size", arpc.DefaultHandler.SendQueueSize()).
@@ -28,7 +30,7 @@ func initTunClient() {
 	// 支持创建多个 client, 每 client 支持多协程并发处理数据
 	for i := range clients {
 		client := clients[i]
-		common.Log.Debug().Msgf("tunnel client[%d] is working: %p", i, &client.Conn)
+		logger.Debug().Msgf("tunnel client[%d] is working: %p", i, &client.Conn)
 		go func() {
 			defer client.Stop()
 			// 接收数据转发到通道
@@ -37,7 +39,7 @@ func initTunClient() {
 				_ = common.GoPool.Submit(func() {
 					// 不超时, 直到 ErrClientOverstock
 					if err := client.Notify(tunMethod, item, arpc.TimeZero); err != nil {
-						common.LogSampled.Warn().Err(err).Msg("Failed to write Tunnel")
+						sampler.Warn().Err(err).Msg("Failed to write Tunnel")
 						SendErrors.Inc()
 						return
 					}
@@ -63,7 +65,7 @@ func newTunClients() (clients []*arpc.Client) {
 		client.Handler.HandleOverstock(onOverstock)
 		clients = append(clients, client)
 
-		common.Log.Debug().Msgf("new tunnel client: %p", &client.Conn)
+		logger.Debug().Msgf("new tunnel client: %p", &client.Conn)
 	}
 	return
 }

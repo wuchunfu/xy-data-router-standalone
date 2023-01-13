@@ -8,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
 	"github.com/fufuok/xy-data-router/service"
 	"github.com/fufuok/xy-data-router/web"
 )
@@ -23,8 +24,8 @@ func Watcher() {
 	intervalStr := interval.String()
 	md5Main := utils.MustMD5Sum(mainFile)
 	md5Conf := conf.GetFileVer(conf.ConfigFile).MD5
-	common.Log.Info().Str("main", mainFile).Str("interval", intervalStr).Msg("Watching")
-	common.Log.Info().Str("config", conf.ConfigFile).Str("interval", intervalStr).Msg("Watching")
+	logger.Info().Str("main", mainFile).Str("interval", intervalStr).Msg("Watching")
+	logger.Info().Str("config", conf.ConfigFile).Str("interval", intervalStr).Msg("Watching")
 
 	go func() {
 		ticker := time.NewTicker(interval)
@@ -35,7 +36,7 @@ func Watcher() {
 			md5New := utils.MustMD5Sum(mainFile)
 			if md5New != md5Main {
 				md5Main = md5New
-				common.Log.Warn().Msg(">>>>>>> restart main <<<<<<<")
+				logger.Warn().Msg(">>>>>>> restart main <<<<<<<")
 				restartChan <- true
 				continue
 			}
@@ -44,13 +45,13 @@ func Watcher() {
 			if md5New != md5Conf {
 				md5Conf = md5New
 				if err := conf.LoadConf(); err != nil {
-					common.Log.Error().Err(err).Msg("reload config")
+					logger.Error().Err(err).Msg("reload config")
 					continue
 				}
 
 				// 重启程序指令
 				if conf.Config.SYSConf.RestartMain {
-					common.Log.Warn().Msg(">>>>>>> restart main(config) <<<<<<<")
+					logger.Warn().Msg(">>>>>>> restart main(config) <<<<<<<")
 					restartChan <- true
 					continue
 				}
@@ -63,10 +64,10 @@ func Watcher() {
 				if interval != conf.Config.SYSConf.WatcherIntervalDuration {
 					interval = conf.Config.SYSConf.WatcherIntervalDuration
 					ticker.Reset(interval)
-					common.Log.Warn().Str("interval", interval.String()).Msg("reset ticker")
+					logger.Warn().Str("interval", interval.String()).Msg("reset ticker")
 				}
 
-				common.Log.Warn().Msg(">>>>>>> reload config <<<<<<<")
+				logger.Warn().Msg(">>>>>>> reload config <<<<<<<")
 				reloadChan <- true
 			}
 		}

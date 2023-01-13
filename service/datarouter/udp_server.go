@@ -10,6 +10,8 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
@@ -24,7 +26,7 @@ func initUDPServer() {
 		fn = udpServerG
 	}
 
-	common.Log.Info().
+	logger.Info().
 		Str("raddr", conf.Config.UDPConf.ServerRAddr).
 		Str("rwaddr", conf.Config.UDPConf.ServerRWAddr).
 		Str("proto", conf.Config.UDPConf.Proto).
@@ -112,7 +114,7 @@ func saveUDPData(item *schema.DataItem) bool {
 	UDPRequestCount.Inc()
 
 	if len(conf.ESBlackListConfig) > 0 && utils.InIPNetString(item.IP, conf.ESBlackListConfig) {
-		common.LogSampled.Info().Str("method", "UDP").Msg("非法访问: " + item.IP)
+		sampler.Info().Str("method", "UDP").Msg("非法访问: " + item.IP)
 		return false
 	}
 
@@ -125,7 +127,7 @@ func saveUDPData(item *schema.DataItem) bool {
 	// 接口配置检查
 	apiConf, ok := conf.APIConfig[esIndex]
 	if !ok || apiConf.APIName == "" {
-		common.LogSampled.Info().
+		sampler.Info().
 			Str("client_ip", item.IP).Str("udp_x", esIndex).Int("len", len(esIndex)).
 			Msg("api not found")
 		return false

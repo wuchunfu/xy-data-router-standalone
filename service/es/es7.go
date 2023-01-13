@@ -6,8 +6,8 @@ import (
 	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/elastic/go-elasticsearch/v7/esapi"
 
-	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
 )
 
 var (
@@ -29,7 +29,7 @@ type Response struct {
 }
 
 func newES() (client esClient, cfgErr error, esErr error) {
-	common.Log.Info().Strs("hosts", conf.Config.DataConf.ESAddress).Msg("Initialize ES connection")
+	logger.Info().Strs("hosts", conf.Config.DataConf.ESAddress).Msg("Initialize ES connection")
 	client.client, cfgErr = elasticsearch.NewClient(elasticsearch.Config{
 		Addresses:     conf.Config.DataConf.ESAddress,
 		RetryOnStatus: conf.Config.DataConf.ESRetryOnStatus,

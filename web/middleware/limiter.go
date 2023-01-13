@@ -8,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 )
 
 // IPLimiter 基于请求 IP 限流
@@ -19,7 +20,7 @@ func IPLimiter() fiber.Handler {
 			return common.GetClientIP(c)
 		},
 		LimitReached: func(c *fiber.Ctx) error {
-			common.LogSampled.Error().
+			sampler.Error().
 				Str("uri", c.OriginalURL()).Str("ip", common.GetClientIP(c)).Strs("ips", c.IPs()).
 				Msg("limit reached")
 			return c.SendStatus(fiber.StatusTooManyRequests)

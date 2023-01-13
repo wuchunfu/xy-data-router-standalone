@@ -8,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 )
 
 // WebAPILogger Web 日志
@@ -20,7 +21,7 @@ func WebAPILogger() fiber.Handler {
 
 		// Manually call error handler
 		if chainErr != nil {
-			common.LogSampled.Error().Err(chainErr).
+			sampler.Error().Err(chainErr).
 				Bytes("body", c.Body()).
 				Str("client_ip", common.GetClientIP(c)).Str("method", c.Method()).
 				Msg(c.OriginalURL())
@@ -31,7 +32,7 @@ func WebAPILogger() fiber.Handler {
 		if costTime > conf.Config.WebConf.SlowResponseDuration ||
 			c.Response().StatusCode() >= conf.Config.WebConf.ErrCodeLog {
 			// 记录慢响应日志或错误响应日志
-			common.LogSampled.Warn().
+			sampler.Warn().
 				Bytes("body", c.Body()).
 				Str("client_ip", common.GetClientIP(c)).Dur("duration", costTime).
 				Str("method", c.Method()).Int("http_code", c.Response().StatusCode()).
@@ -55,7 +56,7 @@ func RecoverLogger() fiber.Handler {
 						Message: "Internal Server Error",
 					}
 				}
-				common.LogSampled.Error().
+				sampler.Error().
 					Bytes("stack", debug.Stack()).
 					Bytes("body", c.Body()).
 					Str("client_ip", c.IP()).

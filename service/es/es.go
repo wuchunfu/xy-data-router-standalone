@@ -11,6 +11,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/internal/logger"
 )
 
 var (
@@ -63,7 +64,7 @@ func parseVersion(client esClient) error {
 	}
 	if resp.Response.IsError() {
 		err := fmt.Errorf("ES info error, status: %s", resp.Response.Status())
-		common.Log.Error().Err(err).Msg("es.Info")
+		logger.Error().Err(err).Msg("es.Info")
 		return err
 	}
 
@@ -72,13 +73,13 @@ func parseVersion(client esClient) error {
 	n, _ := buf.ReadFrom(resp.Response.Body)
 	if n == 0 {
 		err := fmt.Errorf("ES info error: nil")
-		common.Log.Error().Err(err).Msg("es.Info")
+		logger.Error().Err(err).Msg("es.Info")
 		return err
 	}
 
 	ServerVer = gjson.GetBytes(buf.Bytes(), "version.number").String()
 	ServerMainVer = utils.MustInt(strings.SplitN(ServerVer, ".", 2)[0])
 	ServerLessThan7 = ServerMainVer < 7
-	common.Log.Info().Str("server_version", ServerVer).Str("client_version", ClientVer).Msg("ES info")
+	logger.Info().Str("server_version", ServerVer).Str("client_version", ClientVer).Msg("ES info")
 	return nil
 }

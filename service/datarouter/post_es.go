@@ -11,6 +11,8 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/es"
 )
 
@@ -25,7 +27,7 @@ func initESBulkPool() {
 		ants.WithMaxBlockingTasks(conf.Config.DataConf.ESBulkerWaitingLimit),
 		ants.WithLogger(common.NewAppLogger()),
 		ants.WithPanicHandler(func(r any) {
-			common.LogSampled.Error().Msgf("Recovery dataProcessor: %s", r)
+			sampler.Error().Msgf("Recovery dataProcessor: %s", r)
 		}),
 	)
 }
@@ -102,7 +104,7 @@ func esWorker() {
 				if dis.count > 0 {
 					submitESBulk(dis)
 				}
-				common.Log.Error().Msg("PostES worker exited")
+				logger.Error().Msg("PostES worker exited")
 				return
 			}
 
@@ -124,7 +126,7 @@ func submitESBulk(dis *dataItems) {
 	_ = common.GoPool.Submit(func() {
 		if err := ESBulkPool.Invoke(dis); err != nil {
 			ESBulkDiscards.Inc()
-			common.LogSampled.Warn().Err(err).Msg("go esBulk discards")
+			sampler.Warn().Err(err).Msg("go esBulk discards")
 		}
 	})
 }

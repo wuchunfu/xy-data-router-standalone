@@ -8,6 +8,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
@@ -42,7 +43,7 @@ func initDataProcessorPool() {
 		ants.WithMaxBlockingTasks(conf.Config.DataConf.ProcessorWaitingLimit),
 		ants.WithLogger(common.NewAppLogger()),
 		ants.WithPanicHandler(func(r any) {
-			common.LogSampled.Error().Msgf("Recovery dataProcessor: %s", r)
+			sampler.Error().Msgf("Recovery dataProcessor: %s", r)
 		}),
 	)
 }

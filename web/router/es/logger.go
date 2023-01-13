@@ -8,6 +8,7 @@ import (
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/internal/logger"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
@@ -32,6 +33,6 @@ func log(params *params, ret *result) {
 	item := schema.New(conf.Config.LogConf.ESIndex, common.ExternalIPv4, data)
 	schema.PushDataToChanx(item)
 	if conf.Debug {
-		common.Log.Debug().RawJSON("query", buf.Bytes()).Msg("es query")
+		logger.Debug().RawJSON("query", buf.Bytes()).Msg("es query")
 	}
 }

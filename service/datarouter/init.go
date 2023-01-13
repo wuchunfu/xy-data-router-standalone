@@ -7,6 +7,8 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
+	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
@@ -138,11 +140,11 @@ func dataEntry() {
 		ItemTotal.Inc()
 		dr, ok := dataRouters.Load(item.APIName)
 		if !ok {
-			common.LogSampled.Error().Str("apiname", item.APIName).Int("len", len(item.APIName)).Msg("nonexistence")
+			sampler.Error().Str("apiname", item.APIName).Int("len", len(item.APIName)).Msg("nonexistence")
 			item.Release()
 			continue
 		}
 		dr.drChan.In <- item
 	}
-	common.Log.Error().Msg("Exception: DataRouter entry worker exited")
+	logger.Error().Msg("Exception: DataRouter entry worker exited")
 }

@@ -8,6 +8,8 @@ import (
 	"github.com/imroc/req/v3"
 
 	"github.com/fufuok/xy-data-router/common"
+	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 )
 
 func apiWorker(dr *router) {
@@ -15,7 +17,7 @@ func apiWorker(dr *router) {
 	interval := 1
 	if dr.apiConf.PostAPI.Interval > 0 {
 		interval = dr.apiConf.PostAPI.Interval
-		common.Log.Info().
+		logger.Info().
 			Int("interval", interval).Str("apiname", dr.apiConf.APIName).
 			Msg("apiWorker start")
 	}
@@ -31,7 +33,7 @@ func apiWorker(dr *router) {
 				if dr.apiConf.PostAPI.Interval != interval {
 					interval = dr.apiConf.PostAPI.Interval
 					ticker.Reset(time.Duration(interval) * time.Second)
-					common.Log.Warn().
+					logger.Warn().
 						Int("interval", interval).Str("apiname", dr.apiConf.APIName).
 						Msg("apiWorker restart")
 				}
@@ -48,7 +50,7 @@ func apiWorker(dr *router) {
 				if dis.count > 0 {
 					postAPI(dis, dr.apiConf.PostAPI.API)
 				}
-				common.Log.Warn().Str("apiname", dr.apiConf.APIName).Msg("apiWorker exited")
+				logger.Warn().Str("apiname", dr.apiConf.APIName).Msg("apiWorker exited")
 				return
 			}
 
@@ -87,7 +89,7 @@ func postAPI(dis *dataItems, api []string) {
 			_ = common.GoPool.Submit(func() {
 				defer wg.Done()
 				if _, err := req.SetBodyJsonBytes(apiBody).Post(apiUrl); err != nil {
-					common.LogSampled.Error().Err(err).Str("url", apiUrl).Msg("apiWorker")
+					sampler.Error().Err(err).Str("url", apiUrl).Msg("apiWorker")
 				}
 			})
 		}

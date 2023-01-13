@@ -6,9 +6,9 @@ import (
 	"github.com/fufuok/utils/pools/bufferpool"
 	"github.com/tidwall/gjson"
 
-	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"
+	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 )
 
 // ES 批量写入响应
@@ -37,7 +37,7 @@ func BulkRequest(body io.Reader, esBody []byte) bool {
 	defer PutResponse(resp)
 	resp.Response, resp.Err = Client.Bulk(body)
 	if resp.Err != nil {
-		common.LogSampled.Error().Err(resp.Err).Msg("es bulk")
+		sampler.Error().Err(resp.Err).Msg("es bulk")
 		BulkErrors.Inc()
 		return false
 	}
@@ -69,7 +69,7 @@ func esBulkResult(resp *Response, esBody []byte) bool {
 		if _, err := buf.ReadFrom(resp.Response.Body); err != nil {
 			return false
 		}
-		common.LogSampled.Warn().
+		sampler.Warn().
 			Int("http_code", resp.Response.StatusCode).
 			Str("error_type", gjson.GetBytes(buf.Bytes(), "error.type").String()).
 			Str("error_reason", gjson.GetBytes(buf.Bytes(), "error.reason").String()).
@@ -84,7 +84,7 @@ func esBulkResult(resp *Response, esBody []byte) bool {
 
 	var blk esBulkResponse
 	if err := json.NewDecoder(resp.Response.Body).Decode(&blk); err != nil {
-		common.LogSampled.Error().Err(err).
+		sampler.Error().Err(err).
 			Str("resp", resp.Response.String()).
 			Str("error_reason", "failure to to parse response body").
 			Msg("es bulk")
@@ -102,7 +102,7 @@ func esBulkResult(resp *Response, esBody []byte) bool {
 		if d.Index.Status <= 201 {
 			continue
 		}
-		l := common.LogSampled.Warn().Int("status", d.Index.Status).
+		l := sampler.Warn().Int("status", d.Index.Status).
 			Str("error_type", d.Index.Error.Type).
 			Str("error_reason", d.Index.Error.Reason).
 			Str("error_cause_type", d.Index.Error.Cause.Type).
