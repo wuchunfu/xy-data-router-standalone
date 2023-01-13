@@ -15,6 +15,7 @@ require (
 	github.com/imroc/req/v3 v3.11.3
 	github.com/klauspost/compress v1.15.4
 	github.com/lesismal/arpc v1.2.8
+	github.com/natefinch/lumberjack/v3 v3.0.0-alpha
 	github.com/panjf2000/gnet/v2 v2.0.3
 	github.com/rs/zerolog v1.26.1
 	github.com/tidwall/gjson v1.14.1
@@ -22,7 +23,6 @@ require (
 	github.com/tidwall/sjson v1.2.4
 	github.com/valyala/fasthttp v1.37.0
 	github.com/valyala/gozstd v1.17.0
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
 require (
@@ -39,4 +39,5 @@ require (
 	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 )

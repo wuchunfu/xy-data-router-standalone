@@ -72,7 +72,9 @@ func InitMain() {
 
 // InitRuntime 重新加载或初始化运行时配置
 func InitRuntime() {
-	loadLogger()
+	if err := loadLogger(); err != nil {
+		Log.Error().Err(err).Msg("Unable to reinitialize logger")
+	}
 	loadReq()
 }
 
