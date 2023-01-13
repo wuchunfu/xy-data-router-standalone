@@ -104,13 +104,13 @@ type tDataConf struct {
 	ESRetryOnStatus           []int    `json:"es_retry_on_status"`
 	ESMaxRetries              int      `json:"es_max_retries"`
 	ESDisableRetry            bool     `json:"es_disable_retry"`
-	ESBulkWorkerSize          int      `json:"es_bulk_worker_size"`
-	ESBulkMaxWorkerSize       int      `json:"es_bulk_max_worker_size"`
+	ESBulkerSize              int      `json:"es_bulker_size"`
+	ESBulkerWaitingLimit      int      `json:"es_bulker_waiting_limit"`
 	ESBusyPercent             float64  `json:"es_busy_percent"`
 	ChanSize                  int      `json:"chan_size"`
 	ChanMaxBufCap             int      `json:"chan_max_buf_cap"`
-	ProcessorWorkerSize       int      `json:"processor_worker_size"`
-	ProcessorMaxWorkerSize    int      `json:"processor_max_worker_size"`
+	ProcessorSize             int      `json:"processor_size"`
+	ProcessorWaitingLimit     int      `json:"processor_waiting_limit"`
 	ESPostBatchBytes          int
 	ESPostMaxIntervalDuration time.Duration
 }
@@ -398,19 +398,19 @@ func readConf() (
 	}
 
 	// 数据处理并发协程数限制
-	if config.DataConf.ProcessorWorkerSize < 10 {
-		config.DataConf.ProcessorWorkerSize = DataProcessorSize
+	if config.DataConf.ProcessorSize < 10 {
+		config.DataConf.ProcessorSize = DataProcessorSize
 	}
-	if config.DataConf.ProcessorMaxWorkerSize < 10000 {
-		config.DataConf.ProcessorMaxWorkerSize = DataProcessorMaxWorkerSize
+	if config.DataConf.ProcessorWaitingLimit < 10000 {
+		config.DataConf.ProcessorWaitingLimit = DataProcessorWaitingLimit
 	}
 
 	// ES Bulk 写入并发协程限制
-	if config.DataConf.ESBulkWorkerSize < 1 {
-		config.DataConf.ESBulkWorkerSize = ESBulkWorkerSize
+	if config.DataConf.ESBulkerSize < 1 {
+		config.DataConf.ESBulkerSize = ESBulkerSize
 	}
-	if config.DataConf.ESBulkMaxWorkerSize < ESBulkMinWorkerSize {
-		config.DataConf.ESBulkMaxWorkerSize = ESBulkMaxWorkerSize
+	if config.DataConf.ESBulkerWaitingLimit < ESBulkerWaitingMin {
+		config.DataConf.ESBulkerWaitingLimit = ESBulkerWaitingLimit
 	}
 
 	// ES 基于排队数的繁忙比率定义

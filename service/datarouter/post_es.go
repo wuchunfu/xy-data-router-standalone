@@ -17,12 +17,12 @@ import (
 // ES 批量写入协程池初始化
 func initESBulkPool() {
 	ESBulkPool, _ = ants.NewPoolWithFunc(
-		conf.Config.DataConf.ESBulkWorkerSize,
+		conf.Config.DataConf.ESBulkerSize,
 		func(v any) {
 			esBulk(v.(*tDataItems))
 		},
 		ants.WithExpiryDuration(10*time.Second),
-		ants.WithMaxBlockingTasks(conf.Config.DataConf.ESBulkMaxWorkerSize),
+		ants.WithMaxBlockingTasks(conf.Config.DataConf.ESBulkerWaitingLimit),
 		ants.WithLogger(common.NewAppLogger()),
 		ants.WithPanicHandler(func(r any) {
 			common.LogSampled.Error().Msgf("Recovery dataProcessor: %s", r)
@@ -122,10 +122,8 @@ func esWorker() {
 // 提交批量任务, 提交不阻塞, 有执行并发限制, 最大排队数限制
 func submitESBulk(dis *tDataItems) {
 	_ = common.GoPool.Submit(func() {
-		ESBulkTodoCount.Inc()
 		if err := ESBulkPool.Invoke(dis); err != nil {
 			ESBulkDiscards.Inc()
-			ESBulkTodoCount.Dec()
 			common.LogSampled.Warn().Err(err).Msg("go esBulk discards")
 		}
 	})
@@ -141,7 +139,6 @@ func esBulk(dis *tDataItems) bool {
 	dis.release()
 
 	defer func() {
-		ESBulkTodoCount.Dec()
 		bytespool.Release(esBody)
 		readerpool.Release(rBody)
 	}()

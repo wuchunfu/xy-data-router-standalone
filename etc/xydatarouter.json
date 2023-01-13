@@ -97,23 +97,23 @@
       429
     ],
     "__ESMaxRetries": "ES 重试次数, 填 0 则默认: 3",
-    "es_max_retries": 2,
+    "es_max_retries": 1,
     "__ESDisableRetry": "是否禁止 ES 重试, 默认: false",
-    "es_disable_retry": false,
-    "__ESBulkWorkerSize": "ES 批量写入并发协程数, 达到该值会排队, 最低: 1, 默认: 30",
-    "es_bulk_worker_size": 30,
-    "__ESBulkMaxWorkerSize": "(*重启生效) ES 批量写入协程池最大排队大小, 达到该值会丢弃, 最低: 10, 默认: 800, 最大占用: 830*5M",
-    "es_bulk_max_worker_size": 800,
-    "__ESBusyPercent": "基于排队数的繁忙比率定义, 默认: 0.5, 最大: 1, 繁忙: n > ESBulkMaxWorkerSize*ESBusyPercent > 10",
-    "es_busy_percent": 0.2,
+    "es_disable_retry": true,
+    "__ESBulkerSize": "ES 批量写入并发协程数, 达到该值会排队, 最低: 1, 默认: 30",
+    "es_bulker_size": 7,
+    "__ESBulkerWaitingLimit": "ES 批量写入协程池最大排队大小, 达到该值会丢弃, 最低: 10, 默认: 800, 最大占用: 830*5M",
+    "es_bulker_waiting_limit": 80,
+    "__ESBusyPercent": "基于排队数的繁忙比率定义, 默认: 0.5, 最大: 1, 繁忙: n > ESBulkerWaitingLimit*ESBusyPercent > 10",
+    "es_busy_percent": 0.5,
     "__ChanSize": "无限缓冲信道默认初始化缓冲大小",
     "chan_size": 50,
     "__ChanMaxBufCap": "无限缓冲信道最大缓冲数量, 0 为无限(默认), 超过限制(DataChanSize + DataChanMaxBufCap)丢弃数据",
     "chan_max_buf_cap": 500000,
-    "__ProcessorWorkerSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",
-    "processor_worker_size": 3000,
-    "__ProcessorMaxWorkerSize": "数据处理最大排队大小, 达到该值会丢弃, 最低: 10000, 默认 100000 个数据",
-    "processor_max_worker_size": 100000
+    "__ProcessorSize": "数据处理并发协程数, 最低: 10, 默认: 3000, 达到该值会排队处理",
+    "processor_size": 200,
+    "__ProcessorWaitingLimit": "数据处理最大排队大小, 达到该值会丢弃, 最低: 10000, 默认 100000 个数据",
+    "processor_waiting_limit": 100000
   },
   "api_conf": [
     {
@@ -172,6 +172,7 @@
     }
   ],
   "es_white_list": [
+    "__允许请求 ES 查询接口的 IP/段",
     "127.0.0.1",
     "12.3.4.5/32",
     "fe80::d294:66ff:fe75:f3cd/64",

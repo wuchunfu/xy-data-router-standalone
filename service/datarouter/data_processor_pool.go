@@ -29,18 +29,17 @@ func releaseDataProcessor(dp *tDataProcessor) {
 	dp.dr = nil
 	dp.data.Release()
 	dpPool.Put(dp)
-	DataProcessorTodoCount.Dec()
 }
 
 // 数据处理协程池初始化
 func initDataProcessorPool() {
 	DataProcessorPool, _ = ants.NewPoolWithFunc(
-		conf.Config.DataConf.ProcessorWorkerSize,
+		conf.Config.DataConf.ProcessorSize,
 		func(i any) {
 			dataProcessor(i.(*tDataProcessor))
 		},
 		ants.WithExpiryDuration(10*time.Second),
-		ants.WithMaxBlockingTasks(conf.Config.DataConf.ProcessorMaxWorkerSize),
+		ants.WithMaxBlockingTasks(conf.Config.DataConf.ProcessorWaitingLimit),
 		ants.WithLogger(common.NewAppLogger()),
 		ants.WithPanicHandler(func(r any) {
 			common.LogSampled.Error().Msgf("Recovery dataProcessor: %s", r)

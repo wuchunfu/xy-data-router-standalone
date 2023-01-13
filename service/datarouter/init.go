@@ -26,10 +26,7 @@ var (
 	// ESChan ES 数据接收信道
 	ESChan *chanx.UnboundedChan[*schema.DataItem]
 
-	// DataProcessorTodoCount 待处理的数据项计数
-	DataProcessorTodoCount xsync.Counter
-
-	// DataProcessorDiscards 数据处理丢弃计数, 超过 ProcessorMaxWorkerSize
+	// DataProcessorDiscards 数据处理丢弃计数, 超过 ProcessorWaitingLimit
 	DataProcessorDiscards xsync.Counter
 
 	// ESDataItemDiscards 数据丢弃计数, 繁忙时丢弃可选接口的数据, 不写 ES
@@ -38,10 +35,7 @@ var (
 	// ESDataTotal ES 收到数据数量计数
 	ESDataTotal xsync.Counter
 
-	// ESBulkTodoCount ES Bulk 待处理项计数
-	ESBulkTodoCount xsync.Counter
-
-	// ESBulkDiscards ES Bulk 写入丢弃协程数, 超过 ESBulkMaxWorkerSize
+	// ESBulkDiscards ES Bulk 写入丢弃协程数, 超过 ESBulkerWaitingLimit
 	ESBulkDiscards xsync.Counter
 
 	// UDPRequestCount UDP 请求计数
@@ -104,7 +98,7 @@ func InitRuntime() {
 
 	// 调节协程池
 	tuneDataProcessorSize()
-	tuneESBulkWorkerSize()
+	tuneESBulkerSize()
 }
 
 func Stop() {
@@ -118,14 +112,14 @@ func poolRelease() {
 
 // tuneDataProcessorSize 调节协程并发数, 最大阻塞任务数
 func tuneDataProcessorSize() {
-	DataProcessorPool.Tune(conf.Config.DataConf.ProcessorWorkerSize)
-	DataProcessorPool.TuneMaxBlockingTasks(conf.Config.DataConf.ProcessorMaxWorkerSize)
+	DataProcessorPool.Tune(conf.Config.DataConf.ProcessorSize)
+	DataProcessorPool.TuneMaxBlockingTasks(conf.Config.DataConf.ProcessorWaitingLimit)
 }
 
-// tuneESBulkWorkerSize 调节协程并发数, 最大阻塞任务数
-func tuneESBulkWorkerSize() {
-	ESBulkPool.Tune(conf.Config.DataConf.ESBulkWorkerSize)
-	ESBulkPool.TuneMaxBlockingTasks(conf.Config.DataConf.ESBulkMaxWorkerSize)
+// tuneESBulkerSize 调节协程并发数, 最大阻塞任务数
+func tuneESBulkerSize() {
+	ESBulkPool.Tune(conf.Config.DataConf.ESBulkerSize)
+	ESBulkPool.TuneMaxBlockingTasks(conf.Config.DataConf.ESBulkerWaitingLimit)
 }
 
 // 新数据信道

@@ -73,11 +73,11 @@ const (
 	ESPostBatchNum    = 4500
 	ESPostBatchBytes  = 5 << 20
 	ESPostMaxInterval = 1 * time.Second
-	// ESBulkWorkerSize ES 批量写入并发协程数, 最大最小排队数, 基于排队数的繁忙比率定义
-	ESBulkWorkerSize    = 30
-	ESBulkMaxWorkerSize = 800
-	ESBulkMinWorkerSize = 10
-	ESBusyPercent       = 0.5
+	// ESBulkerSize ES 批量写入并发协程数, 最大最小排队数, 基于排队数的繁忙比率定义
+	ESBulkerSize         = 30
+	ESBulkerWaitingMin   = 10
+	ESBulkerWaitingLimit = 800
+	ESBusyPercent        = 0.5
 	// UpdateESOptionalInterval 更新可选写入 ES 状态时间间隔
 	UpdateESOptionalInterval = 500 * time.Millisecond
 
@@ -91,8 +91,8 @@ const (
 	DataChanMaxBufCap = 0
 
 	// DataProcessorSize 数据处理并发协程数
-	DataProcessorSize          = 3000
-	DataProcessorMaxWorkerSize = 100000
+	DataProcessorSize         = 3000
+	DataProcessorWaitingLimit = 100000
 
 	// BaseSecretKeyName 项目基础密钥 (环境变量名)
 	BaseSecretKeyName = "DR_BASE_SECRET_KEY"

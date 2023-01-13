@@ -49,13 +49,14 @@ func initESWriteBreaker() {
 				fusing = false
 			} else {
 				ESBreakerCount.Inc()
+				ESDisableWrite.StoreTrue()
 			}
 		}
 
-		// 部分接口数据写入熔断: ES 批量写入排队数 > 10 且 > 最大排队数 * 0.5
-		n := ESBulkTodoCount.Value()
-		m := int64(float64(conf.Config.DataConf.ESBulkMaxWorkerSize) * conf.Config.DataConf.ESBusyPercent)
-		ESOptionalWrite.Store(n > int64(conf.ESBulkMinWorkerSize) && n > m)
+		// 部分接口数据写入熔断: ES 批量写入排队数 >= 10 且 > 最大排队数 * 0.5
+		n := ESBulkPool.Waiting()
+		m := int(float64(conf.Config.DataConf.ESBulkerWaitingLimit) * conf.Config.DataConf.ESBusyPercent)
+		ESOptionalWrite.Store(n >= conf.ESBulkerWaitingMin && n > m)
 	}
 	common.Log.Error().Msg("Exception: DataRouter ESWriteBreaker worker exited")
 }

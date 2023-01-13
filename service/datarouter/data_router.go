@@ -54,7 +54,6 @@ func dataRouter(dr *tDataRouter) {
 		// 提交不阻塞, 有执行并发限制, 最大排队数限制
 		dp := newDataPorcessor(dr, item)
 		_ = common.GoPool.Submit(func() {
-			DataProcessorTodoCount.Inc()
 			if err := DataProcessorPool.Invoke(dp); err != nil {
 				releaseDataProcessor(dp)
 				DataProcessorDiscards.Inc()

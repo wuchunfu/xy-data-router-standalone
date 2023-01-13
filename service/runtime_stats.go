@@ -111,17 +111,17 @@ func dataStats() map[string]any {
 	tunTotal := tunnel.ItemTotal.Value()
 	return map[string]any{
 		// 数据传输到 ES 处理通道繁忙状态
-		"ESDataQueueAll":             datarouter.ESChan.Len(),
-		"ESDataQueueBuf":             datarouter.ESChan.BufLen(),
-		"ESDataQueueDiscards_______": datarouter.ESChan.Discards(),
+		"ESDataQueueAll":              datarouter.ESChan.Len(),
+		"ESDataQueueBuf":              datarouter.ESChan.BufLen(),
+		"ESDataQueueDiscards________": datarouter.ESChan.Discards(),
 
 		// 数据传输通道繁忙状态
-		"TunnelQueueAll":             schema.ItemTunChan.Len(),
-		"TunnelQueueBuf":             schema.ItemTunChan.BufLen(),
-		"TunnelQueueDiscards_______": schema.ItemTunChan.Discards(),
-		"DataRouterQueueAll":         schema.ItemDrChan.Len(),
-		"DataRouterQueueBuf":         schema.ItemDrChan.BufLen(),
-		"DataRouterQueueDiscards___": schema.ItemDrChan.Discards(),
+		"TunnelQueueAll":              schema.ItemTunChan.Len(),
+		"TunnelQueueBuf":              schema.ItemTunChan.BufLen(),
+		"TunnelQueueDiscards________": schema.ItemTunChan.Discards(),
+		"DataRouterQueueAll":          schema.ItemDrChan.Len(),
+		"DataRouterQueueBuf":          schema.ItemDrChan.BufLen(),
+		"DataRouterQueueDiscards____": schema.ItemDrChan.Discards(),
 
 		// 数据项统计
 		"AllItemTotal":        utils.Comma(schema.ItemTotal.Value()),
@@ -133,38 +133,40 @@ func dataStats() map[string]any {
 		"CommonGoPoolRunning": common.GoPool.Running(),
 
 		// 数据处理协程池, 排队, 待处理数据量, 丢弃数据量, 繁忙状态
-		"DataProcessorTodoCount____": datarouter.DataProcessorTodoCount.Value(),
-		"DataProcessorDiscards_____": datarouter.DataProcessorDiscards.Value(),
-		"DataProcessorWorkerRunning": datarouter.DataProcessorPool.Running(),
-		"DataProcessorWorkerFree___": datarouter.DataProcessorPool.Free(),
+		"DataProcessorDiscards______": datarouter.DataProcessorDiscards.Value(),
+		"DataProcessorRunning":        datarouter.DataProcessorPool.Running(),
+		"DataProcessorWaiting":        datarouter.DataProcessorPool.Waiting(),
+		"DataProcessorWaitingLimit":   conf.Config.DataConf.ProcessorWaitingLimit,
+		"DataProcessorFree__________": datarouter.DataProcessorPool.Free(),
 
 		// 设置为可选写入 ES 的接口丢弃数据项计数
-		"ESDataItemDiscards________": datarouter.ESDataItemDiscards.Value(),
+		"ESDataItemDiscards_________": datarouter.ESDataItemDiscards.Value(),
 
 		// ES 总数据量, 排队, 待批量写入任务数, 丢弃任务数, 写入错误任务数, 繁忙状态
-		"ESDataTotal":                utils.Comma(datarouter.ESDataTotal.Value()),
-		"ESBulkTodoCount___________": datarouter.ESBulkTodoCount.Value(),
-		"ESBulkCount":                utils.Comma(es.BulkCount.Value()),
-		"ESBulkErrors______________": es.BulkErrors.Value(),
-		"ESBulkDiscards____________": datarouter.ESBulkDiscards.Value(),
-		"ESBulkWorkerRunning":        datarouter.ESBulkPool.Running(),
-		"ESBulkWorkerFree__________": datarouter.ESBulkPool.Free(),
+		"ESDataTotal":                 utils.Comma(datarouter.ESDataTotal.Value()),
+		"ESBulkCount":                 utils.Comma(es.BulkCount.Value()),
+		"ESBulkErrors_______________": es.BulkErrors.Value(),
+		"ESBulkDiscards_____________": datarouter.ESBulkDiscards.Value(),
+		"ESBulkerRunning":             datarouter.ESBulkPool.Running(),
+		"ESBulkerWaiting____________": datarouter.ESBulkPool.Waiting(),
+		"ESBulkerWaitingLimit":        conf.Config.DataConf.ESBulkerWaitingLimit,
+		"ESBulkerFree_______________": datarouter.ESBulkPool.Free(),
 		// ES 写入熔断次数
-		"ESBreakerCount____________": datarouter.ESBreakerCount.Value(),
+		"ESBreakerCount_____________": datarouter.ESBreakerCount.Value(),
 		// 是否关闭了 ES 写入
-		"ESDisableWrite____________": datarouter.ESDisableWrite.Load(),
+		"ESDisableWrite_____________": datarouter.ESDisableWrite.Load(),
 		// 繁忙时自动开启, 开启时所有设置了该标识的接口数据将不会写入 ES
-		"ESOptionalWrite___________": datarouter.ESOptionalWrite.Load(),
+		"ESOptionalWrite____________": datarouter.ESOptionalWrite.Load(),
 
 		// HTTP 请求数, 非法/错误请求数, UDP 请求数, Tunnel 收发数据数
-		"HTTPRequestCount":           utils.Comma(common.HTTPRequestCount.Value()),
-		"HTTPBadRequestCount":        utils.Comma(common.HTTPBadRequestCount.Value()),
-		"UDPRequestCount":            utils.Comma(datarouter.UDPRequestCount.Value()),
-		"TunnelRecvCount":            utils.Comma(tunnel.RecvCount.Value()),
-		"TunnelRecvBadCount________": tunnel.RecvBadCount.Value(),
-		"TunnelCompressTotal":        utils.Comma(tunnel.CompressTotal.Value()),
-		"TunnelSendCount":            utils.Comma(tunSendCount),
-		"TunnelSendErrors__________": tunSendErrors,
-		"TunnelTodoSendCount_______": tunTotal - tunSendCount - tunSendErrors,
+		"HTTPRequestCount":            utils.Comma(common.HTTPRequestCount.Value()),
+		"HTTPBadRequestCount":         utils.Comma(common.HTTPBadRequestCount.Value()),
+		"UDPRequestCount":             utils.Comma(datarouter.UDPRequestCount.Value()),
+		"TunnelRecvCount":             utils.Comma(tunnel.RecvCount.Value()),
+		"TunnelRecvBadCount_________": tunnel.RecvBadCount.Value(),
+		"TunnelCompressTotal":         utils.Comma(tunnel.CompressTotal.Value()),
+		"TunnelSendCount":             utils.Comma(tunSendCount),
+		"TunnelSendErrors___________": tunSendErrors,
+		"TunnelTodoSendCount________": tunTotal - tunSendCount - tunSendErrors,
 	}
 }
