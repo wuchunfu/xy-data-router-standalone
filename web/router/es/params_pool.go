@@ -2,6 +2,8 @@ package es
 
 import (
 	"sync"
+
+	"github.com/fufuok/utils"
 )
 
 type params struct {
@@ -11,6 +13,7 @@ type params struct {
 	ScrollID   string         `json:"scroll_id"`
 	Body       map[string]any `json:"body"`
 	ClientIP   string         `json:"client_ip"`
+	Refresh    string         `json:"refresh"`
 }
 
 var paramsPool = sync.Pool{
@@ -25,9 +28,19 @@ func getParams() *params {
 
 func putParams(p *params) {
 	p.Index = ""
-	p.Body = nil
-	p.ClientIP = ""
 	p.Scroll = 0
 	p.ScrollID = ""
+	p.ClientIP = ""
+	p.Body = nil
+	p.Refresh = ""
 	paramsPool.Put(p)
+}
+
+// 只允许 ?refresh=true 或默认
+func fixedRefresh(s string) string {
+	s = utils.ToLower(s)
+	if s != "true" {
+		s = ""
+	}
+	return s
 }

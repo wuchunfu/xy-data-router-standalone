@@ -13,6 +13,7 @@ import (
 //
 // {
 //    "index": "test",
+//    "refresh": "true",
 //    "document_id": "1"
 // }
 func deleteHandler(c *fiber.Ctx) error {
@@ -27,6 +28,7 @@ func deleteHandler(c *fiber.Ctx) error {
 	defer es.PutResponse(resp)
 	resp.Response, resp.Err = es.Client.Delete(params.Index, params.DocumentID,
 		es.Client.Delete.WithContext(context.Background()),
+		es.Client.Delete.WithRefresh(fixedRefresh(params.Refresh)),
 	)
 
 	return sendResult(c, resp, params)

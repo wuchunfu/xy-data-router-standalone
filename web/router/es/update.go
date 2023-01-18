@@ -20,6 +20,7 @@ type updateBody struct {
 // {
 //    "index": "test",
 //    "document_id": "1",
+//    "refresh": "true",
 //    "body": {
 //        "counter": 1,
 //        "tags": [
@@ -45,6 +46,7 @@ func updateHandler(c *fiber.Ctx) error {
 	defer es.PutResponse(resp)
 	resp.Response, resp.Err = es.Client.Update(params.Index, params.DocumentID, bodyBuf,
 		es.Client.Update.WithContext(context.Background()),
+		es.Client.Update.WithRefresh(fixedRefresh(params.Refresh)),
 	)
 
 	return sendResult(c, resp, params)
