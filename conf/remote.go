@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/fufuok/utils"
+	"github.com/fufuok/utils/xjson/gjson"
 	"github.com/imroc/req/v3"
-	"github.com/tidwall/gjson"
 )
 
 // GetMonitorSource 获取监控平台源数据配置

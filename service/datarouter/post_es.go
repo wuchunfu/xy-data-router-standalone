@@ -6,8 +6,8 @@ import (
 	"github.com/fufuok/ants"
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
-	"github.com/fufuok/utils/jsongen"
 	"github.com/fufuok/utils/pools/readerpool"
+	"github.com/fufuok/utils/xjson/jsongen"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"

@@ -2,8 +2,8 @@ package es
 
 import (
 	"github.com/fufuok/utils/pools/bufferpool"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
+	"github.com/fufuok/utils/xjson/gjson"
+	"github.com/fufuok/utils/xjson/sjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"

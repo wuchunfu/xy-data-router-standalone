@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/fufuok/utils"
+	"github.com/fufuok/utils/xjson/sjson"
 	"github.com/gofiber/fiber/v2"
-	"github.com/tidwall/sjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"

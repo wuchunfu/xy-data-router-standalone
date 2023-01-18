@@ -5,8 +5,8 @@ import (
 
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/pretty"
+	"github.com/fufuok/utils/xjson/gjson"
+	"github.com/fufuok/utils/xjson/pretty"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/internal/logger/sampler"

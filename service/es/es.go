@@ -7,8 +7,8 @@ import (
 
 	"github.com/fufuok/utils"
 	"github.com/fufuok/utils/pools/bufferpool"
+	"github.com/fufuok/utils/xjson/gjson"
 	"github.com/fufuok/utils/xsync"
-	"github.com/tidwall/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/internal/logger"

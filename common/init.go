@@ -5,8 +5,8 @@ import (
 
 	"github.com/fufuok/timewheel"
 	"github.com/fufuok/utils/myip"
+	"github.com/fufuok/utils/xjson/gjson"
 	"github.com/fufuok/utils/xsync"
-	"github.com/tidwall/gjson"
 )
 
 var (

@@ -7,7 +7,7 @@ import (
 
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
-	"github.com/tidwall/gjson"
+	"github.com/fufuok/utils/xjson/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
 )

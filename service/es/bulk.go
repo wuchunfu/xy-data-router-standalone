@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/fufuok/utils/pools/bufferpool"
-	"github.com/tidwall/gjson"
+	"github.com/fufuok/utils/xjson/gjson"
 
 	"github.com/fufuok/xy-data-router/conf"
 	"github.com/fufuok/xy-data-router/internal/json"

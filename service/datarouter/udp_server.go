@@ -6,7 +6,7 @@ import (
 
 	"github.com/fufuok/utils"
 	"github.com/fufuok/utils/sync/errgroup"
-	"github.com/tidwall/gjson"
+	"github.com/fufuok/utils/xjson/gjson"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"

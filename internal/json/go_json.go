@@ -1,4 +1,4 @@
-//go:build go_json
+//go:build !std_json
 
 package json
 
@@ -14,5 +14,3 @@ var (
 	NewDecoder    = json.NewDecoder
 	NewEncoder    = json.NewEncoder
 )
-
-type RawMessage = json.RawMessage

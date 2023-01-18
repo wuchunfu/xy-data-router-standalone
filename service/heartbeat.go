@@ -3,7 +3,7 @@ package service
 import (
 	"time"
 
-	"github.com/fufuok/utils/jsongen"
+	"github.com/fufuok/utils/xjson/jsongen"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
