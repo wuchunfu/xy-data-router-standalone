@@ -37,15 +37,14 @@ func sendResult(c *fiber.Ctx, resp *es.Response, params *params) error {
 // 解析 ES 请求结果
 func parseESResponse(resp *es.Response, params *params) *result {
 	ret := getResult()
-	ret.StatusCode = resp.Response.StatusCode
-
-	if resp.Err != nil {
+	if resp.Err != nil || resp.Response == nil {
 		sampler.Error().Err(resp.Err).Msg("getting response")
 		ret.ErrMsg = "请求失败, 服务繁忙"
 		ret.Error = resp.Err.Error()
 		return ret
 	}
 
+	ret.StatusCode = resp.Response.StatusCode
 	if resp.Response.Body == nil {
 		sampler.Error().Int("status_code", ret.StatusCode).Msg("response.Body is nil")
 		ret.ErrMsg = "请求失败, 服务异常"
