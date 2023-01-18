@@ -1,5 +1,11 @@
 # XY.DataRouter
 
+## v1.103.10.22053013
+
+- 优化 JSON 包: 合并常用 JSON 包到 utils
+- 增加从环境变量中获取转发地址 `ForwardHost`
+- 修正 ES 响应失败时的结果解析
+
 ## v1.103.9.22052316
 
 - 允许在 ES 文档更新/删除时使用 `refersh=true`
