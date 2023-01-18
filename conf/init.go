@@ -57,4 +57,5 @@ func InitMain() {
 	if err := LoadConf(); err != nil {
 		log.Fatalln("Failed to initialize config:", err, "\nbye.")
 	}
+	loadEnvConf()
 }

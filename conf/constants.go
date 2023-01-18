@@ -107,4 +107,7 @@ const (
 
 	// ReqTimeoutDuration 作为客户端发起请求默认超时时间(秒), 数据分发到其他接口时请求默认超时时间
 	ReqTimeoutDuration = 30 * time.Second
+
+	// ForwardHostEnv 上联服务地址环境变量名, 程序启动未指定时, 检查该变量
+	ForwardHostEnv = "DR_FORWARD_HOST"
 )
