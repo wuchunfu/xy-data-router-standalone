@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fufuok/utils"
 	"github.com/natefinch/lumberjack/v3"
 	"github.com/rs/zerolog"
 
@@ -132,6 +133,7 @@ func newAlarmWriter(lv zerolog.Level) *alarmWriter {
 // Write 发送报警消息到接口
 func (w *alarmWriter) Write(p []byte) (n int, err error) {
 	if conf.Config.LogConf.PostAlarmAPI != "" {
+		p := utils.CopyBytes(p)
 		_ = GoPool.Submit(func() {
 			sendAlarm(p)
 		})
