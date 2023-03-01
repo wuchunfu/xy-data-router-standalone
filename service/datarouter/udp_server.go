@@ -23,7 +23,7 @@ var (
 func initUDPServer() {
 	fn := udpServer
 	if conf.Config.UDPConf.Proto == "gnet" {
-		fn = udpServerG
+		fn = udpServerGnet
 	}
 
 	logger.Info().

@@ -1,3 +1,5 @@
+//go:build linux
+
 package datarouter
 
 import (
@@ -10,23 +12,23 @@ import (
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
-type udpServerGnet struct {
+type gnetEngine struct {
 	// 是否应答
 	withSendTo bool
 
 	gnet.BuiltinEventEngine
 }
 
-func udpServerG(addr string, withSendTo bool) error {
+func udpServerGnet(addr string, withSendTo bool) error {
 	return gnet.Run(
-		&udpServerGnet{withSendTo: withSendTo},
+		&gnetEngine{withSendTo: withSendTo},
 		fmt.Sprintf("udp://%s", addr),
 		gnet.WithMulticore(true),
 		gnet.WithReusePort(true),
 	)
 }
 
-func (s *udpServerGnet) OnTraffic(c gnet.Conn) (action gnet.Action) {
+func (s *gnetEngine) OnTraffic(c gnet.Conn) (action gnet.Action) {
 	ip, _, err := utils.GetIPPort(c.RemoteAddr())
 	if err != nil {
 		return
