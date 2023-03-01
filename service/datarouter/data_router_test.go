@@ -24,9 +24,7 @@ func BenchmarkDataRouterLoad(b *testing.B) {
 			ESIndexSplit:  "day",
 			RequiredField: []string{"timestamp", "name", "msg", "more"},
 			PostAPI: conf.PostAPIConf{
-				API: []string{"https://test.demo.com/v1/apiname",
-					"http://localhost/api",
-				},
+				API: []string{"https://test.demo.com/v1/apiname", "http://localhost/api"},
 			},
 		}
 	}

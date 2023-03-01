@@ -1,5 +1,12 @@
 # XY.DataRouter
 
+## v1.103.12.22062113
+
+- 允许配置 `es_post_batch_mb` 为小数
+- 运行状态增加 `ESIndexingRate(/s)`
+- 增加支持 ES8 根证书认证方式
+- 增加 `/es/health` 展示 ES 集群健康状态
+
 ## v1.103.11.22060515
 
 - 增加支持 ES8 认证配置
