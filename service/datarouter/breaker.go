@@ -6,7 +6,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/alarm"
 )
 
 var (
@@ -59,5 +59,5 @@ func initESWriteBreaker() {
 		m := int(float64(conf.Config.DataConf.ESBulkerWaitingLimit) * conf.Config.DataConf.ESBusyPercent)
 		ESOptionalWrite.Store(n >= conf.ESBulkerWaitingMin && n > m)
 	}
-	logger.Error().Msg("Exception: DataRouter ESWriteBreaker worker exited")
+	alarm.Error().Msg("Exception: DataRouter ESWriteBreaker worker exited")
 }

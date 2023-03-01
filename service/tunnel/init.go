@@ -7,7 +7,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/alarm"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
 
@@ -63,5 +63,5 @@ func dataEntry() {
 		}
 		tunChan.In <- item
 	}
-	logger.Error().Msg("Exception: Tunnel entry worker exited")
+	alarm.Error().Msg("Exception: Tunnel entry worker exited")
 }

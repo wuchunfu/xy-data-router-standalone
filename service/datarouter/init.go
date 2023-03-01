@@ -7,7 +7,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/alarm"
 	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/schema"
 )
@@ -146,5 +146,5 @@ func dataEntry() {
 		}
 		dr.drChan.In <- item
 	}
-	logger.Error().Msg("Exception: DataRouter entry worker exited")
+	alarm.Error().Msg("Exception: DataRouter entry worker exited")
 }

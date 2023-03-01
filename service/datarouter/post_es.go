@@ -11,7 +11,7 @@ import (
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
-	"github.com/fufuok/xy-data-router/internal/logger"
+	"github.com/fufuok/xy-data-router/internal/logger/alarm"
 	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/service/es"
 )
@@ -104,7 +104,7 @@ func esWorker() {
 				if dis.count > 0 {
 					submitESBulk(dis)
 				}
-				logger.Error().Msg("PostES worker exited")
+				alarm.Error().Msg("Exception: PostES worker exited")
 				return
 			}
 
