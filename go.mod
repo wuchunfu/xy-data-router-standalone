@@ -12,9 +12,9 @@ require (
 	github.com/fufuok/utils v0.6.0
 	github.com/goccy/go-json v0.9.7
 	github.com/gofiber/fiber/v2 v2.34.0
-	github.com/imroc/req/v3 v3.11.3
+	github.com/imroc/req/v3 v3.11.4
 	github.com/klauspost/compress v1.15.5
-	github.com/lesismal/arpc v1.2.8
+	github.com/lesismal/arpc v1.2.9
 	github.com/natefinch/lumberjack/v3 v3.0.0-alpha
 	github.com/panjf2000/gnet/v2 v2.0.3
 	github.com/rs/zerolog v1.26.1

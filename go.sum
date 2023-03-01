@@ -36,6 +36,8 @@ github.com/hashicorp/go-multierror v1.1.1 h1:H5DkEtf6CXdFp0N0Em5UCwQpXMWke8IA0+l
 github.com/hashicorp/go-multierror v1.1.1/go.mod h1:iw975J/qwKPdAO1clOe2L8331t/9/fmwbPZ6JB6eMoM=
 github.com/imroc/req/v3 v3.11.3 h1:3KmVX29c2fdF9XcRZ95/7fymisG/EXcUE7IwE6u4sNk=
 github.com/imroc/req/v3 v3.11.3/go.mod h1:G6fkq27P+JcTcgRVxecxY+amHN1xFl8W81eLCfJ151M=
+github.com/imroc/req/v3 v3.11.4 h1:z5/gQUkpq9gViLmRdT594u/UhJKgEg5P+6L39RSYcYA=
+github.com/imroc/req/v3 v3.11.4/go.mod h1:G6fkq27P+JcTcgRVxecxY+amHN1xFl8W81eLCfJ151M=
 github.com/klauspost/compress v1.15.0/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=
 github.com/klauspost/compress v1.15.5 h1:qyCLMz2JCrKADihKOh9FxnW3houKeNsp2h5OEz0QSEA=
 github.com/klauspost/compress v1.15.5/go.mod h1:PhcZ0MbTNciWF3rruxRgKxI5NkcHHrHUDtV4Yw2GlzU=
@@ -44,6 +46,8 @@ github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/lesismal/arpc v1.2.8 h1:5I0nL4D5QPZb2Bl9qryfcEzDHrFigoQiascHLrL0Los=
 github.com/lesismal/arpc v1.2.8/go.mod h1:nSF7m8oiGzALHdcNz9kPLDeXOAzp8IrnVlqxjjJfG18=
+github.com/lesismal/arpc v1.2.9 h1:2U2HJZdQmw6Q1E7vHDOVAA2cpH7DcorFg0SLa9GtBsk=
+github.com/lesismal/arpc v1.2.9/go.mod h1:nSF7m8oiGzALHdcNz9kPLDeXOAzp8IrnVlqxjjJfG18=
 github.com/natefinch/lumberjack/v3 v3.0.0-alpha h1:HZ2AJF20D1lo9S0F/rpgkFbPGam5dgR3X0KUtZA5mlY=
 github.com/natefinch/lumberjack/v3 v3.0.0-alpha/go.mod h1:rPTlHhMjhrvPAhqKh0FC57E0pXZoanrXgMDj4yv5wcM=
 github.com/panjf2000/ants/v2 v2.4.8 h1:JgTbolX6K6RreZ4+bfctI0Ifs+3mrE5BIHudQxUDQ9k=
