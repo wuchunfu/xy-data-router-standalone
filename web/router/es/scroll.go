@@ -32,7 +32,10 @@ func scrollHandler(c *fiber.Ctx) error {
 	params := getParams()
 	defer putParams(params)
 
-	if err := c.BodyParser(params); err != nil || params.Scroll <= 0 || params.ScrollID == "" {
+	if err := c.BodyParser(params); err != nil {
+		return response.APIFailure(c, "参数解析错误", err.Error())
+	}
+	if params.Scroll <= 0 || params.ScrollID == "" {
 		return response.APIFailure(c, "缺失必填参数", "scroll, scroll_id")
 	}
 

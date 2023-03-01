@@ -18,7 +18,10 @@ func deleteHandler(c *fiber.Ctx) error {
 	params := getParams()
 	defer putParams(params)
 
-	if err := c.BodyParser(params); err != nil || params.Index == "" || params.DocumentID == "" {
+	if err := c.BodyParser(params); err != nil {
+		return response.APIFailure(c, "参数解析错误", err.Error())
+	}
+	if params.Index == "" || params.DocumentID == "" {
 		return response.APIFailure(c, "缺失必填参数", "index, document_id")
 	}
 

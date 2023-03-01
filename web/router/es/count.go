@@ -16,7 +16,10 @@ func countHandler(c *fiber.Ctx) error {
 	params := getParams()
 	defer putParams(params)
 
-	if err := c.BodyParser(params); err != nil || params.Index == "" {
+	if err := c.BodyParser(params); err != nil {
+		return response.APIFailure(c, "参数解析错误", err.Error())
+	}
+	if params.Index == "" {
 		return response.APIFailure(c, "缺失必填参数", "index")
 	}
 
