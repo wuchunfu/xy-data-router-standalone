@@ -32,15 +32,14 @@ type allConf struct {
 
 // 主配置, 变量意义见配置文件中的描述及 constants.go 中的默认值
 type sysConf struct {
-	Debug                   bool   `json:"debug"`
 	PProfAddr               string `json:"pprof_addr"`
 	RestartMain             bool   `json:"restart_main"`
 	WatcherInterval         int    `json:"watcher_interval"`
 	ReqTimeout              int    `json:"req_timeout"`
 	ReqMaxRetries           int    `json:"req_max_retries"`
+	BaseSecretValue         string `json:"-"`
 	ReqTimeoutDuration      time.Duration
 	WatcherIntervalDuration time.Duration
-	BaseSecretValue         string
 }
 
 type LogConf struct {
@@ -74,11 +73,11 @@ type webConf struct {
 	TrustedProxies          []string `json:"trusted_proxies"`
 	ESAPITimeoutSecond      int      `json:"esapi_timeout_second"`
 	ESSlowQuery             int      `json:"es_slow_query"`
+	CertFile                string   `json:"-"`
+	KeyFile                 string   `json:"-"`
 	ESSlowQueryDuration     time.Duration
 	SlowResponseDuration    time.Duration
 	ESAPITimeout            time.Duration
-	CertFile                string
-	KeyFile                 string
 }
 
 type udpConf struct {
@@ -164,7 +163,6 @@ func LoadConf() error {
 		return err
 	}
 
-	Debug = config.SYSConf.Debug
 	Config = config
 	APIConfig = apiConfig
 	ESWhiteListConfig = whiteList
@@ -202,6 +200,10 @@ func readConf() (
 	// 日志级别: -1Trace 0Debug 1Info 2Warn 3Error(默认) 4Fatal 5Panic 6NoLevel 7Off
 	if config.LogConf.Level > 7 || config.LogConf.Level < -1 {
 		config.LogConf.Level = LogLevel
+	}
+	// 调试模式 Debug 日志
+	if Debug {
+		config.LogConf.Level = 0
 	}
 
 	// ES 批量写入错误日志
@@ -467,7 +469,7 @@ func readConf() (
 	ver := GetFileVer(ConfigFile)
 	ver.MD5 = utils.MD5BytesHex(body)
 	ver.LastUpdate = time.Now()
-	if config.SYSConf.Debug {
+	if Debug {
 		fmt.Printf("\n\n%s\n\n", json.MustJSONIndent(config))
 		fmt.Printf("\nWhitelist:\n%s\n\n", whiteList)
 		fmt.Printf("\nBlackList:\n%s\n\n", blackList)

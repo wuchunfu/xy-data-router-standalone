@@ -1,6 +1,5 @@
 {
   "sys_conf": {
-    "debug": true,
     "pprof_addr": ":8888",
     "restart_main": false,
     "watcher_interval": 1,
