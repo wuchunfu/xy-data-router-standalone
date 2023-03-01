@@ -46,7 +46,6 @@ func getESBulkHeader(apiConf *conf.APIConf, ymd string) []byte {
 	case "month":
 		esIndex = esIndex + "_" + ymd[:4]
 	case "none":
-		break
 	default:
 		esIndex = esIndex + "_" + ymd
 	}
@@ -115,8 +114,6 @@ func esWorker() {
 				submitESBulk(dis)
 				dis = getDataItems()
 			}
-
-			ESDataTotal.Inc()
 		}
 	}
 }
@@ -133,9 +130,11 @@ func submitESBulk(dis *dataItems) {
 
 // 批量写入 ES
 func esBulk(dis *dataItems) bool {
+	ESDataTotal.Add(int64(dis.count))
 	if conf.Config.LogConf.ESBulkTookDebug {
 		defer esBulkTookDebug(time.Now(), dis.count, dis.size)
 	}
+
 	esBody := bytespool.Make(dis.size)
 	for i := 0; i < dis.count; i++ {
 		esBody = append(esBody, dis.items[i].Body...)

@@ -16,6 +16,12 @@ import (
 	"github.com/fufuok/xy-data-router/service/tunnel"
 )
 
+var (
+	// ES 索引数据临时计数和值对应的时间点
+	esIndexTotal     int64
+	esIndexTotalTime time.Time
+)
+
 // RuntimeStats 运行状态统计
 func RuntimeStats() map[string]any {
 	return map[string]any{
@@ -109,6 +115,11 @@ func dataStats() map[string]any {
 	tunSendErrors := tunnel.SendErrors.Value()
 	tunSendCount := tunnel.SendCount.Value()
 	tunTotal := tunnel.ItemTotal.Value()
+
+	// 计算 ES 索引数据速率
+	esDataTotal := datarouter.ESDataTotal.Value()
+	esRate := calcESIndexingRate(esDataTotal)
+
 	return map[string]any{
 		// 数据传输到 ES 处理通道繁忙状态
 		"ESDataQueueAll":              datarouter.ESChan.Len(),
@@ -143,7 +154,7 @@ func dataStats() map[string]any {
 		"ESDataItemDiscards_________": datarouter.ESDataItemDiscards.Value(),
 
 		// ES 总数据量, 排队, 待批量写入任务数, 丢弃任务数, 写入错误任务数, 繁忙状态
-		"ESDataTotal":                 utils.Comma(datarouter.ESDataTotal.Value()),
+		"ESDataTotal":                 utils.Comma(esDataTotal),
 		"ESBulkCount":                 utils.Comma(es.BulkCount.Value()),
 		"ESBulkErrors_______________": es.BulkErrors.Value(),
 		"ESBulkDiscards_____________": datarouter.ESBulkDiscards.Value(),
@@ -157,6 +168,8 @@ func dataStats() map[string]any {
 		"ESDisableWrite_____________": datarouter.ESDisableWrite.Load(),
 		// 繁忙时自动开启, 开启时所有设置了该标识的接口数据将不会写入 ES
 		"ESOptionalWrite____________": datarouter.ESOptionalWrite.Load(),
+		// ES 索引数据速率
+		"ESIndexingRate(/s)": esRate,
 
 		// HTTP 请求数, 非法/错误请求数, UDP 请求数, Tunnel 收发数据数
 		"HTTPRequestCount":            utils.Comma(common.HTTPRequestCount.Value()),
@@ -169,4 +182,15 @@ func dataStats() map[string]any {
 		"TunnelSendErrors___________": tunSendErrors,
 		"TunnelTodoSendCount________": tunTotal - tunSendCount - tunSendErrors,
 	}
+}
+
+func calcESIndexingRate(n int64) (rate float64) {
+	now := time.Now()
+	if esIndexTotal > 0 {
+		rate = float64(n-esIndexTotal) / now.Sub(esIndexTotalTime).Seconds()
+		rate = utils.Round(rate, 2)
+	}
+	esIndexTotal = n
+	esIndexTotalTime = now
+	return
 }
