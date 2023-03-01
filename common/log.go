@@ -91,7 +91,11 @@ func loadLogger() error {
 // 1. 开发环境时, 日志高亮输出到控制台
 // 2. 生产环境时, 日志输出到文件(可选关闭高亮, 保存最近 10 个 30 天内的日志)
 func newLogger() error {
-	basicLog := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "0102 15:04:05"}
+	basicLog := zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		NoColor:    conf.Config.LogConf.NoColor,
+		TimeFormat: "0102 15:04:05",
+	}
 	if !conf.Debug {
 		fh, err := lumberjack.NewRoller(
 			conf.Config.LogConf.File,
@@ -108,7 +112,6 @@ func newLogger() error {
 			return err
 		}
 		basicLog.Out = fh
-		basicLog.NoColor = conf.Config.LogConf.NoColor
 	}
 
 	Log = zerolog.New(basicLog).With().Timestamp().Caller().Logger()
