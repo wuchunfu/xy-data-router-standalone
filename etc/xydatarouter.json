@@ -33,9 +33,10 @@
     "max_age": 30,
     "__ESBulkLevel": "依赖于 Level <= Warn, 设置 Warn 解析 ES Bulk 批量结果, 抽样错误; Info 记录详细内容",
     "es_bulk_level": 2,
+    "__ESBulkTookDebug": "是否采样显示 Bulk 写入的量和花费时间",
+    "es_bulk_took_debug": true,
     "es_index": "app_log",
     "post_alarm_api": ""
-
   },
   "web_conf": {
     "server_addr": ":6600",

@@ -44,18 +44,19 @@ type sysConf struct {
 }
 
 type LogConf struct {
-	Level        int    `json:"level"`
-	NoColor      bool   `json:"no_color"`
-	File         string `json:"file"`
-	Period       int    `json:"period"`
-	Burst        uint32 `json:"burst"`
-	MaxSize      int64  `json:"max_size"`
-	MaxBackups   int    `json:"max_backups"`
-	MaxAge       int    `json:"max_age"`
-	ESBulkLevel  int    `json:"es_bulk_level"`
-	ESIndex      string `json:"es_index"`
-	PostAlarmAPI string `json:"post_alarm_api"`
-	PeriodDur    time.Duration
+	Level           int    `json:"level"`
+	NoColor         bool   `json:"no_color"`
+	File            string `json:"file"`
+	Period          int    `json:"period"`
+	Burst           uint32 `json:"burst"`
+	MaxSize         int64  `json:"max_size"`
+	MaxBackups      int    `json:"max_backups"`
+	MaxAge          int    `json:"max_age"`
+	ESBulkLevel     int    `json:"es_bulk_level"`
+	ESBulkTookDebug bool   `json:"es_bulk_took_debug"`
+	ESIndex         string `json:"es_index"`
+	PostAlarmAPI    string `json:"post_alarm_api"`
+	PeriodDur       time.Duration
 }
 
 type webConf struct {

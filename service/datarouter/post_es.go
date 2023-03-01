@@ -133,6 +133,9 @@ func submitESBulk(dis *dataItems) {
 
 // 批量写入 ES
 func esBulk(dis *dataItems) bool {
+	if conf.Config.LogConf.ESBulkTookDebug {
+		defer esBulkTookDebug(time.Now(), dis.count, dis.size)
+	}
 	esBody := bytespool.Make(dis.size)
 	for i := 0; i < dis.count; i++ {
 		esBody = append(esBody, dis.items[i].Body...)
@@ -146,4 +149,13 @@ func esBulk(dis *dataItems) bool {
 	}()
 
 	return es.BulkRequest(rBody, esBody)
+}
+
+// 调试 ES 写入时间
+func esBulkTookDebug(t time.Time, count, size int) {
+	sampler.Warn().
+		Str("count_s", utils.Commai(count)).
+		Str("size_s", utils.Commai(size)).
+		Str("took_s", utils.Comma(int64(time.Since(t)/time.Millisecond))).
+		Msg("debug")
 }
