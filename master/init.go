@@ -4,7 +4,6 @@ import (
 	"context"
 	_ "net/http/pprof"
 	"os"
-	"time"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/internal/logger"
@@ -26,8 +25,7 @@ func Start() {
 
 	go func() {
 		for {
-			cancelCtx, cancel := context.WithCancel(context.Background())
-			ctx := context.WithValue(cancelCtx, "start", time.Now())
+			ctx, cancel := context.WithCancel(context.Background())
 
 			// 获取远程配置
 			go startRemoteConf(ctx)

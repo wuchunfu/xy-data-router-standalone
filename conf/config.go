@@ -212,7 +212,7 @@ func readConf() (
 	}
 
 	// 抽样日志设置 (x 秒 n 条)
-	if config.LogConf.Burst < 0 || config.LogConf.Period < 0 {
+	if config.LogConf.Period < 0 {
 		config.LogConf.PeriodDur = LogSamplePeriodDur
 		config.LogConf.Burst = LogSampleBurst
 	} else {

@@ -14,7 +14,7 @@ var (
 	_ = io.ReadFull
 	_ = time.Now()
 
-	unmarshalError = errors.New("failed to unmarshal data")
+	errUnmarshal = errors.New("failed to unmarshal data")
 )
 
 type DataItem struct {
@@ -168,7 +168,7 @@ func (d *DataItem) Unmarshal(buf []byte) (i uint64, err error) {
 		// 清除 Mark 数据
 		d.MarkReset()
 		if r := recover(); r != nil {
-			err = unmarshalError
+			err = errUnmarshal
 		}
 	}()
 

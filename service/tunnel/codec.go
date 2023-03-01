@@ -15,7 +15,7 @@ const (
 	flagZstd byte = 'z'
 )
 
-var codecError = errors.New("invalid schema.DataItem")
+var errInvalidSchema = errors.New("invalid schema.DataItem")
 
 // genCodec wraps schema.DataItem
 type genCodec struct{}
@@ -24,7 +24,7 @@ type genCodec struct{}
 func (j *genCodec) Marshal(v any) ([]byte, error) {
 	d, ok := v.(*schema.DataItem)
 	if !ok {
-		return nil, codecError
+		return nil, errInvalidSchema
 	}
 
 	n := d.Size() + 1
@@ -52,7 +52,7 @@ func (j *genCodec) Marshal(v any) ([]byte, error) {
 func (j *genCodec) Unmarshal(data []byte, v any) (err error) {
 	d, ok := v.(*schema.DataItem)
 	if !ok {
-		return codecError
+		return errInvalidSchema
 	}
 
 	if data[0] != flagZstd {
@@ -62,7 +62,7 @@ func (j *genCodec) Unmarshal(data []byte, v any) (err error) {
 
 	// 先解压
 	enc := bytespool.Make(len(data) * 2)
-	enc, err = zstd.Decompress(enc, data[1:])
+	enc, _ = zstd.Decompress(enc, data[1:])
 
 	// 再解码
 	_, err = d.Unmarshal(enc)
