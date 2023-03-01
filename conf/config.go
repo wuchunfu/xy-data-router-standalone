@@ -101,7 +101,7 @@ type dataConf struct {
 	ESAddress                 []string `json:"es_address"`
 	ESDisableWrite            bool     `json:"es_disable_write"`
 	ESPostBatchNum            int      `json:"es_post_batch_num"`
-	ESPostBatchMB             int      `json:"es_post_batch_mb"`
+	ESPostBatchMB             float64  `json:"es_post_batch_mb"`
 	ESPostMaxInterval         int      `json:"es_post_max_interval"`
 	ESRetryOnStatus           []int    `json:"es_retry_on_status"`
 	ESMaxRetries              int      `json:"es_max_retries"`
@@ -435,7 +435,7 @@ func readConf() (
 		config.DataConf.ESPostBatchBytes = ESPostBatchBytes
 	} else {
 		// 配置文件单位是 MB
-		config.DataConf.ESPostBatchBytes = config.DataConf.ESPostBatchMB << 20
+		config.DataConf.ESPostBatchBytes = int(config.DataConf.ESPostBatchMB * 1024 * 1024)
 	}
 
 	// ES Bulk 单次批量最大时间间隔
