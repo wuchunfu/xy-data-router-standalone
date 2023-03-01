@@ -112,6 +112,7 @@ type dataConf struct {
 	ChanMaxBufCap             int      `json:"chan_max_buf_cap"`
 	ProcessorSize             int      `json:"processor_size"`
 	ProcessorWaitingLimit     int      `json:"processor_waiting_limit"`
+	ESAuthPassword            string   `json:"-"`
 	ESPostBatchBytes          int
 	ESPostMaxIntervalDuration time.Duration
 }
@@ -398,6 +399,9 @@ func readConf() (
 	if config.WebConf.LimitBody == 0 {
 		config.WebConf.LimitBody = BodyLimit
 	}
+
+	// ES 认证信息
+	config.DataConf.ESAuthPassword = xcrypto.GetenvDecrypt(ESAuthPasswordEnv, config.SYSConf.BaseSecretValue)
 
 	// 数据处理并发协程数限制
 	if config.DataConf.ProcessorSize < 10 {

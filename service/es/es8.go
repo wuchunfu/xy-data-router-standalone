@@ -30,13 +30,18 @@ type Response struct {
 
 func newES() (client esClient, cfgErr error, esErr error) {
 	logger.Info().Strs("hosts", conf.Config.DataConf.ESAddress).Msg("Initialize ES connection")
-	client.client, cfgErr = elasticsearch.NewClient(elasticsearch.Config{
+	cfg := elasticsearch.Config{
 		Addresses:     conf.Config.DataConf.ESAddress,
 		RetryOnStatus: conf.Config.DataConf.ESRetryOnStatus,
 		MaxRetries:    conf.Config.DataConf.ESMaxRetries,
 		DisableRetry:  conf.Config.DataConf.ESDisableRetry,
 		Transport:     &transport{},
-	})
+	}
+	if conf.Config.DataConf.ESAuthPassword != "" {
+		cfg.Username = conf.ProjectName
+		cfg.Password = conf.Config.DataConf.ESAuthPassword
+	}
+	client.client, cfgErr = elasticsearch.NewClient(cfg)
 	if cfgErr != nil {
 		return
 	}

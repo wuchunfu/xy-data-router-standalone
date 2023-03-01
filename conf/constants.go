@@ -113,4 +113,7 @@ const (
 
 	// ForwardHostEnv 上联服务地址环境变量名, 程序启动未指定时, 检查该变量
 	ForwardHostEnv = "DR_FORWARD_HOST"
+
+	// ESAuthPasswordEnv ES 认证信息环境变量名
+	ESAuthPasswordEnv = "DR_ES_AUTH_PASSWORD"
 )
