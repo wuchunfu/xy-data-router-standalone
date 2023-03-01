@@ -40,5 +40,7 @@ func SetupRouter(app *fiber.App) {
 		es.Post("/update", updateHandler)
 		// ES Delete 删除单个文档
 		es.Post("/delete", deleteHandler)
+		// ES 集群健康
+		es.Get("/health", healthHandler)
 	}
 }
