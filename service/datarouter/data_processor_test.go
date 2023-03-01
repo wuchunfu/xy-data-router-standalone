@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/fufuok/bytespool"
 	"github.com/fufuok/utils"
@@ -23,8 +24,8 @@ func testAppendSYSField(js []byte, ip string) []byte {
 	return append(
 		utils.AddStringBytes(
 			`{"_cip":"`, ip,
-			`","_ctime":"`, common.Now3339Z,
-			`","_gtime":"`, common.Now3339, `",`,
+			`","_ctime":"`, common.Now.Str3339Z,
+			`","_gtime":"`, common.Now.Str3339, `",`,
 		),
 		js[1:]...,
 	)
@@ -107,3 +108,33 @@ func BenchmarkAppendSysField_Larger(b *testing.B) {
 // BenchmarkAppendSysField_Larger/new-4              186739              6402 ns/op           10240 B/op          1 allocs/op
 // BenchmarkAppendSysField_Larger/old-4              187136              6488 ns/op           10336 B/op          2 allocs/op
 // BenchmarkAppendSysField_Larger/old-4              189338              6481 ns/op           10336 B/op          2 allocs/op
+
+func BenchmarkTimeFormat(b *testing.B) {
+	var x, y string
+	b.ReportAllocs()
+	b.ResetTimer()
+	b.Run("new", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			now := time.Now()
+			x = now.Format("2006-01-02T15:04:05Z")
+			y = now.Format(time.RFC3339)
+		}
+	})
+	b.Run("old", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			now := common.Now
+			x = now.Str3339Z
+			x = now.Str3339Z
+		}
+	})
+	_ = x
+	_ = y
+}
+
+// go test -bench=BenchmarkTimeFormat -benchmem
+// goos: linux
+// goarch: amd64
+// pkg: github.com/fufuok/xy-data-router/service/datarouter
+// cpu: Intel(R) Xeon(R) CPU E3-1230 V2 @ 3.30GHz
+// BenchmarkTimeFormat/new-8                 550580              2139 ns/op              56 B/op          2 allocs/op
+// BenchmarkTimeFormat/old-8               679152507            1.803 ns/op               0 B/op          0 allocs/op

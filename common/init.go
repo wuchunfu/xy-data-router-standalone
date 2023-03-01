@@ -18,10 +18,14 @@ var (
 	TWs  *timewheel.TimeWheel
 	TWm  *timewheel.TimeWheel
 
-	// Now3339Z 当前时间 (强制 0 时区)
-	// Now3339 当前时间
-	Now3339Z = time.Now().Format("2006-01-02T15:04:05Z")
-	Now3339  = time.Now().Format(time.RFC3339)
+	// Start 系统启动时间
+	Start = time.Now()
+
+	Now = &CurrentTime{
+		Start.Format("2006-01-02T15:04:05Z"),
+		Start.Format(time.RFC3339),
+		Start,
+	}
 
 	IPv4Zero = "0.0.0.0"
 
@@ -29,13 +33,20 @@ var (
 	HTTPRequestCount    xsync.Counter
 	HTTPBadRequestCount xsync.Counter
 
-	// Start 系统启动时间
-	Start = time.Now()
-
 	// InternalIPv4 服务器 IP
 	InternalIPv4 string
 	ExternalIPv4 string
 )
+
+// CurrentTime 当前时间, 预格式化的字符串形式 (秒级)
+type CurrentTime struct {
+	// 强制 0 时区的 8 时区时间 (仅特定场景展示使用)
+	Str3339Z string
+	// 带时区的正确时间值
+	Str3339 string
+	// 当前时间
+	Time time.Time
+}
 
 // InitMain 程序启动时初始化
 func InitMain() {
@@ -117,9 +128,13 @@ func syncNow() {
 	ticker := TWms.NewTicker(50 * time.Millisecond)
 	defer ticker.Stop()
 	for range ticker.C {
-		now := GTimeNow()
-		Now3339Z = now.Format("2006-01-02T15:04:05Z")
-		Now3339 = now.Format(time.RFC3339)
+		t := GTimeNow()
+		c := &CurrentTime{
+			t.Format("2006-01-02T15:04:05Z"),
+			t.Format(time.RFC3339),
+			t,
+		}
+		Now = c
 	}
 }
 
