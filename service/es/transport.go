@@ -1,6 +1,8 @@
 package es
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"io"
 	"net/http"
 	"strings"
@@ -23,7 +25,19 @@ var (
 type transport struct{}
 
 func initFasthttpClient() {
+	tlsConfig := &tls.Config{
+		InsecureSkipVerify: conf.Config.DataConf.ESInsecureSkipVerify,
+	}
+	if len(conf.Config.DataConf.ESRootCA) > 0 {
+		tlsConfig.RootCAs = x509.NewCertPool()
+		tlsConfig.RootCAs.AppendCertsFromPEM(conf.Config.DataConf.ESRootCA)
+	}
+	dialer := &fasthttp.TCPDialer{
+		Concurrency:      dialConcurrency,
+		DNSCacheDuration: dialDNSCacheDuration,
+	}
 	fasthttpClient = &fasthttp.Client{
+		TLSConfig:                     tlsConfig,
 		ReadTimeout:                   conf.Config.WebConf.ESAPITimeout,
 		WriteTimeout:                  conf.Config.WebConf.ESAPITimeout,
 		MaxIdleConnDuration:           maxIdleConnDuration,
@@ -31,10 +45,7 @@ func initFasthttpClient() {
 		NoDefaultUserAgentHeader:      true,
 		DisableHeaderNamesNormalizing: true,
 		DisablePathNormalizing:        true,
-		Dial: (&fasthttp.TCPDialer{
-			Concurrency:      dialConcurrency,
-			DNSCacheDuration: dialDNSCacheDuration,
-		}).Dial,
+		Dial:                          dialer.Dial,
 	}
 }
 

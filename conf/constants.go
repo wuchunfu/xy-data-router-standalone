@@ -116,4 +116,6 @@ const (
 
 	// ESAuthPasswordEnv ES 认证信息环境变量名
 	ESAuthPasswordEnv = "DR_ES_AUTH_PASSWORD"
+	// ESRootCAFileEnv ES 根证书文件位置环境变量名
+	ESRootCAFileEnv = "DR_ES_ROOT_CA_FILE"
 )

@@ -83,12 +83,13 @@
     "es_address": [
       "http://127.0.0.1:9200"
     ],
+    "es_insecure_skip_verify": true,
     "__ESDisableWrite": "是否关闭写入 ES (慎用), 默认不关闭, 正常写入",
     "es_disable_write": false,
     "__ESPostBatchNum": "ES 单次批量写入最大条数, 默认: 4500",
     "es_post_batch_num": 4000,
     "__ESPostBatchMB": "ES 单次批量写入最大字节数, 单位: MB, 最低: 1, 默认: 5",
-    "es_post_batch_mb": 4,
+    "es_post_batch_mb": 2.5,
     "__ESPostMaxInterval": "ES 单次批量最大写入时间间隔, 单位: 毫秒, 最低: 100, 最高: 180000(3分钟), 默认: 1000, 即 1 秒至少 1 次",
     "es_post_max_interval": 1000,
     "__ESRetryOnStatus": "ES 重试状态码, 留空则默认: [502, 503, 504]",

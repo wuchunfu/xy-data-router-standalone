@@ -101,6 +101,7 @@ type dataConf struct {
 	ESAddress                 []string `json:"es_address"`
 	ESDisableWrite            bool     `json:"es_disable_write"`
 	ESPostBatchNum            int      `json:"es_post_batch_num"`
+	ESInsecureSkipVerify      bool     `json:"es_insecure_skip_verify"`
 	ESPostBatchMB             float64  `json:"es_post_batch_mb"`
 	ESPostMaxInterval         int      `json:"es_post_max_interval"`
 	ESRetryOnStatus           []int    `json:"es_retry_on_status"`
@@ -114,6 +115,7 @@ type dataConf struct {
 	ProcessorSize             int      `json:"processor_size"`
 	ProcessorWaitingLimit     int      `json:"processor_waiting_limit"`
 	ESAuthPassword            string   `json:"-"`
+	ESRootCA                  []byte   `json:"-"`
 	ESPostBatchBytes          int
 	ESPostMaxIntervalDuration time.Duration
 }
@@ -403,6 +405,11 @@ func readConf() (
 
 	// ES 认证信息
 	config.DataConf.ESAuthPassword = xcrypto.GetenvDecrypt(ESAuthPasswordEnv, config.SYSConf.BaseSecretValue)
+	// ES HTTP 根证书信息
+	rootCA := os.Getenv(ESRootCAFileEnv)
+	if utils.IsFile(rootCA) {
+		config.DataConf.ESRootCA, _ = os.ReadFile(rootCA)
+	}
 
 	// 数据处理并发协程数限制
 	if config.DataConf.ProcessorSize < 10 {
