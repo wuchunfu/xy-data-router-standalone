@@ -1,8 +1,6 @@
 package es
 
 import (
-	"context"
-
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/service/es"
@@ -25,7 +23,6 @@ func countHandler(c *fiber.Ctx) error {
 	resp := es.GetResponse()
 	defer es.PutResponse(resp)
 	resp.Response, resp.Err = es.Client.Count(
-		es.Client.Count.WithContext(context.Background()),
 		es.Client.Count.WithIndex(params.Index),
 	)
 	resp.TotalPath = "count"

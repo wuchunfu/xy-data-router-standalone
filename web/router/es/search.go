@@ -1,7 +1,6 @@
 package es
 
 import (
-	"context"
 	"time"
 
 	"github.com/fufuok/utils/pools/bufferpool"
@@ -38,7 +37,7 @@ func searchHandler(c *fiber.Ctx) error {
 	resp := es.GetResponse()
 	defer es.PutResponse(resp)
 	resp.Response, resp.Err = es.Client.Search(
-		es.Client.Search.WithContext(context.Background()),
+		es.Client.Search.WithTimeout(getTimeoutParams(params.TimeoutMs)),
 		es.Client.Search.WithTrackTotalHits(true),
 		es.Client.Search.WithIgnoreUnavailable(true),
 		es.Client.Search.WithScroll(time.Duration(params.Scroll)*time.Second),

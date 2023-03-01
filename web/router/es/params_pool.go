@@ -13,7 +13,12 @@ type params struct {
 	ScrollID   string         `json:"scroll_id"`
 	Body       map[string]any `json:"body"`
 	ClientIP   string         `json:"client_ip"`
-	Refresh    string         `json:"refresh"`
+
+	// ES 更新/删除时可选指定是否刷新数据, 只允许 ?refresh=true 或默认
+	Refresh string `json:"refresh"`
+
+	// 请求 esapi 接口超时毫秒数, 用于提前返回响应, 会自动转换为 ?timeout=99ms
+	TimeoutMs int `json:"timeout_ms"`
 }
 
 var paramsPool = sync.Pool{
@@ -33,10 +38,10 @@ func putParams(p *params) {
 	p.ClientIP = ""
 	p.Body = nil
 	p.Refresh = ""
+	p.TimeoutMs = 0
 	paramsPool.Put(p)
 }
 
-// 只允许 ?refresh=true 或默认
 func fixedRefresh(s string) string {
 	s = utils.ToLower(s)
 	if s != "true" {

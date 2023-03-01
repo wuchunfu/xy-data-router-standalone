@@ -1,7 +1,6 @@
 package es
 
 import (
-	"context"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -40,7 +39,6 @@ func scrollHandler(c *fiber.Ctx) error {
 	resp := es.GetResponse()
 	defer es.PutResponse(resp)
 	resp.Response, resp.Err = es.Client.Scroll(
-		es.Client.Scroll.WithContext(context.Background()),
 		es.Client.Scroll.WithScroll(time.Duration(params.Scroll)*time.Second),
 		es.Client.Scroll.WithScrollID(params.ScrollID),
 	)

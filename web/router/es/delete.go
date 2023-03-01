@@ -1,8 +1,6 @@
 package es
 
 import (
-	"context"
-
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/fufuok/xy-data-router/service/es"
@@ -27,7 +25,6 @@ func deleteHandler(c *fiber.Ctx) error {
 	resp := es.GetResponse()
 	defer es.PutResponse(resp)
 	resp.Response, resp.Err = es.Client.Delete(params.Index, params.DocumentID,
-		es.Client.Delete.WithContext(context.Background()),
 		es.Client.Delete.WithRefresh(fixedRefresh(params.Refresh)),
 	)
 

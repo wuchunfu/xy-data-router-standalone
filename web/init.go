@@ -16,6 +16,7 @@ import (
 	"github.com/fufuok/xy-data-router/internal/logger/sampler"
 	"github.com/fufuok/xy-data-router/web/middleware"
 	"github.com/fufuok/xy-data-router/web/response"
+	"github.com/fufuok/xy-data-router/web/router/es"
 )
 
 //go:embed assets/favicon.ico
@@ -26,12 +27,17 @@ var app *fiber.App
 // InitMain 程序启动时初始化
 func InitMain() {
 	go initWeb()
+	es.InitMain()
 }
 
 // InitRuntime 重新加载或初始化运行时配置
-func InitRuntime() {}
+func InitRuntime() {
+	es.InitRuntime()
+}
 
-func Stop() {}
+func Stop() {
+	es.Stop()
+}
 
 // 初始化 Web 服务
 func initWeb() {

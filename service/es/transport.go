@@ -4,13 +4,39 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/valyala/fasthttp"
+
+	"github.com/fufuok/xy-data-router/conf"
+)
+
+var (
+	fasthttpClient       *fasthttp.Client
+	maxIdleConnDuration  = 10 * time.Minute
+	dialConcurrency      = 4096
+	dialDNSCacheDuration = 1 * time.Hour
 )
 
 // transport implements the elastictransport interface with
 // the github.com/valyala/fasthttp HTTP client.
 type transport struct{}
+
+func initFasthttpClient() {
+	fasthttpClient = &fasthttp.Client{
+		ReadTimeout:                   conf.Config.WebConf.ESAPITimeout,
+		WriteTimeout:                  conf.Config.WebConf.ESAPITimeout,
+		MaxIdleConnDuration:           maxIdleConnDuration,
+		MaxIdemponentCallAttempts:     0,
+		NoDefaultUserAgentHeader:      true,
+		DisableHeaderNamesNormalizing: true,
+		DisablePathNormalizing:        true,
+		Dial: (&fasthttp.TCPDialer{
+			Concurrency:      dialConcurrency,
+			DNSCacheDuration: dialDNSCacheDuration,
+		}).Dial,
+	}
+}
 
 // RoundTrip performs the request and returns a response or error
 func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -22,7 +48,7 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	t.copyRequest(freq, req)
 
-	err := fasthttp.Do(freq, fres)
+	err := fasthttpClient.Do(freq, fres)
 	if err != nil {
 		return nil, err
 	}

@@ -1,8 +1,6 @@
 package es
 
 import (
-	"context"
-
 	"github.com/fufuok/utils/pools/bufferpool"
 	"github.com/gofiber/fiber/v2"
 
@@ -45,7 +43,6 @@ func updateHandler(c *fiber.Ctx) error {
 	resp := es.GetResponse()
 	defer es.PutResponse(resp)
 	resp.Response, resp.Err = es.Client.Update(params.Index, params.DocumentID, bodyBuf,
-		es.Client.Update.WithContext(context.Background()),
 		es.Client.Update.WithRefresh(fixedRefresh(params.Refresh)),
 	)
 

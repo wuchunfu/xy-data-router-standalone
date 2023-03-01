@@ -317,8 +317,9 @@ func readConf() (
 		config.WebConf.ErrCodeLog = WebErrorCodeLog
 	}
 
-	// ES 查询请求代理时的超时秒数, 默认: 30s
-	if config.WebConf.ESAPITimeoutSecond < 1 {
+	// ES 查询请求代理时的超时秒数, 默认: 10s
+	if config.WebConf.ESAPITimeoutSecond < WebESAPITimeoutSecondMin ||
+		config.WebConf.ESAPITimeoutSecond > WebESAPITimeoutSecondMax {
 		config.WebConf.ESAPITimeout = WebESAPITimeout
 	} else {
 		config.WebConf.ESAPITimeout = time.Duration(config.WebConf.ESAPITimeoutSecond) * time.Second

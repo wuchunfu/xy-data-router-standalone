@@ -1,12 +1,15 @@
 package es
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"time"
 
 	"github.com/fufuok/utils"
 	"github.com/fufuok/utils/xjson/gjson"
 	"github.com/gofiber/fiber/v2"
+	"github.com/valyala/fasthttp"
 
 	"github.com/fufuok/xy-data-router/common"
 	"github.com/fufuok/xy-data-router/conf"
@@ -41,6 +44,9 @@ func parseESResponse(resp *es.Response, params *params) *result {
 		sampler.Error().Err(resp.Err).Msg("getting response")
 		ret.ErrMsg = "请求失败, 服务繁忙"
 		ret.Error = resp.Err.Error()
+		if errors.Is(resp.Err, fasthttp.ErrTimeout) {
+			ret.ErrMsg = fmt.Sprintf("ESAPI 请求超时: %s", defaultESAPITimeout.String())
+		}
 		return ret
 	}
 

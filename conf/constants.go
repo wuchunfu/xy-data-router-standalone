@@ -29,8 +29,11 @@ const (
 	WebKeyFileEnv  = "DR_WEB_KEY_FILE"
 	// TunServerAddr Tunnel 绑定端口
 	TunServerAddr = ":6633"
-	// WebESAPITimeout ES 查询请求代理时的超时秒数
-	WebESAPITimeout = 30 * time.Second
+	// WebESAPITimeout ES 查询请求时的超时秒数
+	WebESAPITimeout = 10 * time.Second
+	// WebESAPITimeoutSecondMin ES 查询请求超时最大最小秒数
+	WebESAPITimeoutSecondMin = 1
+	WebESAPITimeoutSecondMax = 120
 	// WebSlowResponseDuration Web 慢响应日志时间设置, 默认: > 1秒则记录
 	WebSlowResponseDuration = time.Second
 	// WebErrorCodeLog HTTP 响应码日志记录, 默认: 500, 即大于等于 500 的状态码记录日志
